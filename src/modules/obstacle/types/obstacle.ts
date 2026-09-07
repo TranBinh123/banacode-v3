@@ -18,6 +18,8 @@ export type ObstaclePuzzle = {
   name: string;
   phase: "obstacle";
   verticalAnswer: string;
+  /** Absolute column (0-based) used by the vertical answer. Backward compatible with old configs. */
+  verticalColumn?: number;
   clues: ObstacleClue[];
   timeLimitSeconds: number;
   horizontalPoints: number;
