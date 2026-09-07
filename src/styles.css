@@ -159,13 +159,7 @@ textarea { min-height: 70px; resize: vertical; }
 
 .obstacle-editor-canvas {
   position: relative;
-
-  /*
-   * Cho phép bảng rộng hơn viewport.
-   * BTC có thể kéo ngang nếu cần.
-   */
-  min-height: 560px;
-
+  min-height: 500px;
   overflow: auto;
 
   border: 1px solid rgba(255,255,255,.1);
@@ -214,8 +208,6 @@ textarea { min-height: 70px; resize: vertical; }
 
   font-size: 9px;
   font-weight: 900;
-
-  flex-shrink: 0;
 }
 
 .clue-cells {
@@ -238,20 +230,12 @@ textarea { min-height: 70px; resize: vertical; }
 
 .clue-cells span.cross-cell {
   border-color: #fbbf24;
-
   box-shadow:
     0 0 0 2px
     rgba(251,191,36,.15)
     inset;
 }
 
-/*
- * Trục hàng dọc Admin.
- *
- * Không dùng left: 50%.
- * Trục này dùng chung hệ tọa độ
- * với các ô của hàng ngang.
- */
 .vertical-guide {
   position: absolute;
 
@@ -260,17 +244,9 @@ textarea { min-height: 70px; resize: vertical; }
 
   width: 2px;
 
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(251,191,36,0),
-      rgba(251,191,36,.55),
-      rgba(251,191,36,0)
-    );
+  background: rgba(251,191,36,.18);
 
   pointer-events: none;
-
-  z-index: 0;
 }
 
 .canvas-empty {
@@ -291,16 +267,14 @@ textarea { min-height: 70px; resize: vertical; }
 
 .obstacle-clue-editor {
   display: grid;
-
   grid-template-columns:
     42px
     minmax(300px, 1fr)
-    150px
+    130px
     auto
     auto;
 
   gap: 10px;
-
   align-items: center;
 
   padding: 12px;
@@ -323,18 +297,9 @@ textarea { min-height: 70px; resize: vertical; }
   gap: 8px;
 }
 
-.cross-position-preview {
-  color: #fbbf24;
-  font-size: 10px;
-  font-weight: 800;
-}
-
 .move-buttons {
   display: grid;
-
-  grid-template-columns:
-    repeat(4, 34px);
-
+  grid-template-columns: repeat(4, 34px);
   gap: 4px;
 }
 
@@ -343,30 +308,23 @@ textarea { min-height: 70px; resize: vertical; }
   height: 34px;
 
   border-radius: 7px;
-
-  border: 1px solid
-    rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.1);
 
   color: #fff;
-
-  background:
-    rgba(255,255,255,.05);
+  background: rgba(255,255,255,.05);
 }
 
 
 /* =========================================================
-   GAME STAGE
+   PUBLIC SCREEN
    ========================================================= */
 
 .obstacle-stage {
   margin-top: 16px;
 
-  background:
-    rgba(255,255,255,.035);
+  background: rgba(255,255,255,.035);
 
-  border:
-    1px solid rgba(255,255,255,.1);
-
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 20px;
 
   padding: 16px;
@@ -376,12 +334,10 @@ textarea { min-height: 70px; resize: vertical; }
 
 .stage-toolbar {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
 
   gap: 12px;
-
   margin-bottom: 12px;
 }
 
@@ -392,22 +348,16 @@ textarea { min-height: 70px; resize: vertical; }
 
 .stage-actions {
   display: flex;
-
   gap: 8px;
-
   flex-wrap: wrap;
-
   justify-content: flex-end;
 }
 
 .vertical-button,
 .audience-button {
-  border:
-    1px solid
-    rgba(251,191,36,.45);
+  border: 1px solid rgba(251,191,36,.45);
 
-  background:
-    rgba(251,191,36,.1);
+  background: rgba(251,191,36,.1);
 
   color: #fde68a;
 
@@ -419,51 +369,30 @@ textarea { min-height: 70px; resize: vertical; }
 }
 
 .audience-button {
-  border-color:
-    rgba(96,165,250,.4);
+  border-color: rgba(96,165,250,.4);
 
-  background:
-    rgba(37,99,235,.12);
+  background: rgba(37,99,235,.12);
 
   color: #bfdbfe;
 }
 
 
 /* =========================================================
-   PUZZLE BOARD
+   KHUNG BẢNG Ô CHỮ
    ========================================================= */
 
-/*
- * Đây là lớp ngoài.
- *
- * Mục đích:
- * - căn giữa bảng
- * - không làm thay đổi hệ tọa độ bên trong
- * - cho phép scroll ngang trên màn hình nhỏ
- */
-.puzzle-board-wrap {
-  width: 100%;
-
-  overflow-x: auto;
-  overflow-y: hidden;
-
-  display: flex;
-  justify-content: center;
-
-  border-radius: 16px;
-}
-
-/*
- * Bảng thực tế có kích thước cố định.
- *
- * Tất cả ô dùng cùng một hệ pixel.
- */
 .puzzle-board {
   position: relative;
 
-  flex: 0 0 auto;
+  /*
+   * Tăng khoảng đệm để các hàng dài
+   * không sát mép khung.
+   */
+  min-height: 640px;
 
-  overflow: hidden;
+  padding: 28px 48px;
+
+  overflow: auto;
 
   border-radius: 16px;
 
@@ -474,9 +403,14 @@ textarea { min-height: 70px; resize: vertical; }
       rgba(3,9,17,.65) 60%
     );
 
-  border:
-    1px solid
-    rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.07);
+
+  /*
+   * Các hàng ngang hiện được tính bằng
+   * left: 50% + offset
+   * nên toàn bộ bảng luôn lấy chính giữa
+   * khung này làm mốc.
+   */
 }
 
 
@@ -491,7 +425,6 @@ textarea { min-height: 70px; resize: vertical; }
 
   border: 0;
   background: transparent;
-
   color: #fff;
 
   padding: 0;
@@ -508,8 +441,7 @@ textarea { min-height: 70px; resize: vertical; }
 }
 
 .puzzle-row:not(:disabled):hover {
-  transform:
-    translateY(-2px);
+  transform: translateY(-2px);
 }
 
 .puzzle-row .cells {
@@ -523,18 +455,21 @@ textarea { min-height: 70px; resize: vertical; }
 
   box-sizing: border-box;
 
-  border:
-    1px solid
-    rgba(255,255,255,.2);
+  /*
+   * Tất cả ô chưa giải đều giống nhau.
+   *
+   * QUAN TRỌNG:
+   * Không còn màu đặc biệt cho ô giao
+   * để người chơi không biết hàng dọc nằm ở đâu.
+   */
+  border: 1px solid rgba(255,255,255,.2);
 
-  background:
-    rgba(255,255,255,.065);
+  background: rgba(255,255,255,.065);
 
   display: grid;
   place-items: center;
 
   font-style: normal;
-
   font-weight: 950;
   font-size: 20px;
 
@@ -549,20 +484,20 @@ textarea { min-height: 70px; resize: vertical; }
 
 
 /*
- * Ô giao với hàng dọc.
+ * Ô giao:
+ *
+ * KHÔNG đánh dấu gì khi chưa giải.
+ * Class này chỉ còn để logic xác định
+ * vị trí giao trong React.
  */
 .puzzle-row .cell.crossing-cell {
-  border-color:
-    rgba(251,191,36,.65);
-
-  box-shadow:
-    inset 0 0 0 1px
-    rgba(251,191,36,.18);
+  border-color: rgba(255,255,255,.2);
+  background: rgba(255,255,255,.065);
 }
 
 
 /*
- * Đáp án được reveal.
+ * Khi đáp án hàng ngang được REVEAL
  */
 .puzzle-row.solved .cell {
   color: #f8fafc;
@@ -583,10 +518,14 @@ textarea { min-height: 70px; resize: vertical; }
 
 
 /*
- * Ô giao sau khi reveal.
+ * Sau khi hàng dọc đã được giải,
+ * ô giao có thể nổi bật.
+ *
+ * Trước thời điểm này:
+ * KHÔNG CÓ DẤU HIỆU GÌ.
  */
 .puzzle-row.solved
-.cell.crossing-cell {
+  .cell.crossing-cell {
   background:
     linear-gradient(
       180deg,
@@ -594,35 +533,28 @@ textarea { min-height: 70px; resize: vertical; }
       rgba(217,119,6,.45)
     );
 
-  border-color:
-    #fbbf24;
+  border-color: #fbbf24;
 
-  color:
-    #111827;
+  color: #111827;
 }
 
 
 /*
- * Hàng đang xử lý.
+ * Hàng đang được xử lý.
  */
 .puzzle-row.active {
-  outline:
-    2px solid
-    #fbbf24;
-
-  outline-offset:
-    2px;
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 
 /*
- * Hàng dành cho khán giả.
+ * Hàng không có đội nào đúng.
+ * Được dành cho khán giả.
  */
 .puzzle-row.dimmed {
   opacity: .22;
-
-  filter:
-    grayscale(.8);
+  filter: grayscale(.8);
 }
 
 
@@ -630,18 +562,25 @@ textarea { min-height: 70px; resize: vertical; }
    HÀNG DỌC
    ========================================================= */
 
+/*
+ * Đây là phần quan trọng nhất.
+ *
+ * Khi CHƯA giải:
+ *
+ * - không background
+ * - không border
+ * - không box-shadow
+ * - không màu chữ
+ *
+ * => người chơi hoàn toàn không biết
+ * hàng dọc nằm ở đâu.
+ */
 .vertical-answer {
   position: absolute;
 
-  z-index: 5;
+  z-index: 3;
 
   display: grid;
-
-  grid-template-columns:
-    40px;
-
-  grid-auto-rows:
-    40px;
 
   gap: 0;
 
@@ -651,18 +590,20 @@ textarea { min-height: 70px; resize: vertical; }
   pointer-events: none;
 }
 
+
+/*
+ * Ô hàng dọc mặc định:
+ * HOÀN TOÀN VÔ HÌNH.
+ */
 .vertical-answer span {
   width: 40px;
   height: 40px;
 
   box-sizing: border-box;
 
-  border:
-    1px solid
-    rgba(251,191,36,.6);
+  border: 1px solid transparent;
 
-  background:
-    rgba(251,191,36,.08);
+  background: transparent;
 
   display: grid;
   place-items: center;
@@ -670,29 +611,40 @@ textarea { min-height: 70px; resize: vertical; }
   font-weight: 950;
   font-size: 20px;
 
-  color: #fde68a;
+  color: transparent;
+
+  box-shadow: none;
 
   transition:
     background .3s ease,
     color .3s ease,
-    box-shadow .3s ease;
+    box-shadow .3s ease,
+    border-color .3s ease;
 }
 
 
 /*
- * Chưa giải.
+ * Chưa giải hàng dọc:
+ * không được lộ bất kỳ dấu hiệu nào.
  */
 .vertical-answer
-span.hidden-letter {
+  span.hidden-letter {
   color: transparent;
+
+  background: transparent;
+
+  border-color: transparent;
+
+  box-shadow: none;
 }
 
 
 /*
- * Đã giải.
+ * Khi hàng dọc đã giải:
+ * mới hiển thị các ô.
  */
 .vertical-answer
-span.revealed {
+  span.revealed {
   color: #111827;
 
   background:
@@ -702,8 +654,7 @@ span.revealed {
       #fbbf24
     );
 
-  border-color:
-    #f59e0b;
+  border-color: #f59e0b;
 
   box-shadow:
     0 0 14px
@@ -714,15 +665,21 @@ span.revealed {
 }
 
 
+/*
+ * Cho trạng thái solved rõ ràng.
+ */
+.vertical-answer.vertical-solved {
+  z-index: 4;
+}
+
+
 /* =========================================================
-   GRADING
+   CHẤM ĐIỂM
    ========================================================= */
 
 .team-grade-grid {
   display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 
   gap: 9px;
 
@@ -734,14 +691,10 @@ span.revealed {
 
   text-align: left;
 
-  border:
-    1px solid
-    rgba(255,255,255,.1);
-
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 12px;
 
-  background:
-    rgba(255,255,255,.045);
+  background: rgba(255,255,255,.045);
 
   color: #fff;
 
@@ -749,8 +702,7 @@ span.revealed {
 
   display: grid;
 
-  grid-template-columns:
-    10px 1fr;
+  grid-template-columns: 10px 1fr;
 
   gap: 8px;
 
@@ -783,64 +735,51 @@ span.revealed {
 
 .team-grade.correct b,
 .team-grade.selected b {
-  color:
-    #4ade80;
+  color: #4ade80;
 }
 
 .grading-actions {
   display: grid;
 
-  grid-template-columns:
-    1fr 1fr;
+  grid-template-columns: 1fr 1fr;
 
   gap: 10px;
 }
 
 
 /* =========================================================
-   MODALS
+   MODAL
    ========================================================= */
 
 .stage-modal {
   position: fixed;
-
   inset: 0;
 
   z-index: 50;
 
   display: grid;
-
   place-items: center;
 
   padding: 20px;
 
-  background:
-    rgba(0,0,0,.76);
+  background: rgba(0,0,0,.76);
 
-  backdrop-filter:
-    blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 .question-stage-card,
 .vertical-stage-card,
 .vertical-win-card {
-  width:
-    min(1100px, 100%);
+  width: min(1100px, 100%);
 
   text-align: center;
 
-  border:
-    1px solid
-    rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.14);
 
   border-radius: 24px;
 
   padding:
-    clamp(
-      24px,
-      5vw,
-      58px
-    );
+    clamp(24px,5vw,58px);
 
   background:
     radial-gradient(
@@ -859,151 +798,65 @@ span.revealed {
 
 .question-stage-card h2 {
   font-size:
-    clamp(
-      30px,
-      5vw,
-      64px
-    );
+    clamp(30px,5vw,64px);
 
-  line-height:
-    1.08;
+  line-height: 1.08;
 
-  margin:
-    22px auto;
+  margin: 22px auto;
 
-  max-width:
-    1000px;
+  max-width: 1000px;
 }
 
 .big-timer {
-  font-variant-numeric:
-    tabular-nums;
+  font-variant-numeric: tabular-nums;
 
   font-size:
-    clamp(
-      70px,
-      11vw,
-      130px
-    );
+    clamp(70px,11vw,130px);
 
-  font-weight:
-    950;
+  font-weight: 950;
 
-  letter-spacing:
-    -.06em;
+  letter-spacing: -.06em;
 }
 
 .answer-preview {
-  color:
-    #61758e;
+  color: #61758e;
 
-  font-size:
-    11px;
+  font-size: 11px;
 
-  margin:
-    18px;
+  margin: 18px;
 }
 
 .answer-preview strong {
-  color:
-    #fbbf24;
+  color: #fbbf24;
 }
 
 .modal-close {
-  margin-top:
-    12px;
+  margin-top: 12px;
 }
 
 .vertical-stage-card h2 {
   font-size:
-    clamp(
-      38px,
-      7vw,
-      82px
-    );
+    clamp(38px,7vw,82px);
 
-  letter-spacing:
-    .12em;
+  letter-spacing: .12em;
 
-  color:
-    #fbbf24;
+  color: #fbbf24;
 
-  margin:
-    20px 0;
+  margin: 20px 0;
 }
 
 .vertical-win-card h2 {
   font-size:
-    clamp(
-      40px,
-      8vw,
-      90px
-    );
+    clamp(40px,8vw,90px);
 
-  margin:
-    16px 0;
+  margin: 16px 0;
 
-  color:
-    #fbbf24;
+  color: #fbbf24;
 }
 
 .vertical-win-card p {
-  color:
-    #a9bad0;
-
-  font-size:
-    18px;
-}
-
-
-/* =========================================================
-   FINISHED
-   ========================================================= */
-
-.finished-overlay {
-  position: absolute;
-
-  inset: 0;
-
-  z-index: 20;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  gap: 18px;
-
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(37,99,235,.22),
-      rgba(3,9,17,.92)
-    );
-
-  backdrop-filter:
-    blur(4px);
-
-  text-align: center;
-}
-
-.finished-overlay > div {
-  font-size:
-    64px;
-}
-
-.finished-overlay strong {
-  font-size:
-    clamp(
-      28px,
-      5vw,
-      56px
-    );
-
-  letter-spacing:
-    .04em;
+  color: #a9bad0;
+  font-size: 18px;
 }
 
 
@@ -1014,21 +867,18 @@ span.revealed {
 @keyframes revealCell {
   from {
     opacity: 0;
-    transform:
-      scale(.6);
+    transform: scale(.6);
   }
 
   to {
     opacity: 1;
-    transform:
-      scale(1);
+    transform: scale(1);
   }
 }
 
 @keyframes stageIn {
   from {
     opacity: 0;
-
     transform:
       translateY(18px)
       scale(.98);
@@ -1036,7 +886,6 @@ span.revealed {
 
   to {
     opacity: 1;
-
     transform:
       translateY(0)
       scale(1);
@@ -1050,13 +899,11 @@ span.revealed {
 
 @media (max-width: 1000px) {
   .obstacle-settings-grid {
-    grid-template-columns:
-      1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .team-grade-grid {
-    grid-template-columns:
-      1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 
   .obstacle-clue-editor {
@@ -1067,13 +914,13 @@ span.revealed {
   }
 
   .obstacle-clue-editor
-  .move-buttons,
+    .move-buttons,
   .obstacle-clue-editor
-  > .danger-button {
-    grid-column:
-      span 1;
+    > .danger-button {
+    grid-column: span 1;
   }
 }
+
 
 @media (max-width: 700px) {
   .nav-module-tabs {
@@ -1081,55 +928,42 @@ span.revealed {
   }
 
   .nav-module {
-    padding:
-      8px 7px;
-
-    font-size:
-      9px;
+    padding: 8px 7px;
+    font-size: 9px;
   }
 
   .obstacle-settings-grid,
   .team-grade-grid,
   .grading-actions {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
   .stage-toolbar,
   .grading-head {
-    flex-direction:
-      column;
-
-    align-items:
-      stretch;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .obstacle-clue-editor {
     grid-template-columns:
-      36px 1fr;
+      36px
+      1fr;
   }
 
-  .obstacle-clue-editor
-  > label,
-  .obstacle-clue-editor
-  .move-buttons,
-  .obstacle-clue-editor
-  > .danger-button {
-    grid-column:
-      2;
-  }
-
-  /*
-   * Bảng vẫn giữ kích thước nội bộ,
-   * nhưng có scroll ngang.
-   */
-  .puzzle-board-wrap {
-    justify-content:
-      flex-start;
+  .obstacle-clue-editor > label,
+  .obstacle-clue-editor .move-buttons,
+  .obstacle-clue-editor > .danger-button {
+    grid-column: 2;
   }
 
   .puzzle-board {
-    min-height:
-      540px;
+    min-height: 540px;
+
+    /*
+     * Trên màn hình nhỏ vẫn giữ
+     * khoảng thở hai bên.
+     */
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
