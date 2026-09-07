@@ -137,25 +137,210 @@ textarea { min-height: 70px; resize: vertical; }
 .stage-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .vertical-button, .audience-button { border: 1px solid rgba(251,191,36,.45); background: rgba(251,191,36,.1); color: #fde68a; border-radius: 10px; padding: 11px 14px; font-weight: 950; }
 .audience-button { border-color: rgba(96,165,250,.4); background: rgba(37,99,235,.12); color: #bfdbfe; }
-.puzzle-board { position: relative; min-height: 640px; overflow: auto; border-radius: 16px; background: radial-gradient(circle at 50% 30%, rgba(30,64,175,.18), rgba(3,9,17,.65) 60%); border: 1px solid rgba(255,255,255,.07); padding: 12px; }
-.puzzle-row { position: absolute; display: flex; align-items: center; gap: 5px; border: 0; background: transparent; color: #fff; padding: 3px; border-radius: 8px; transition: transform .25s ease, opacity .25s ease, filter .25s ease; }
-.puzzle-row:not(:disabled):hover { transform: scale(1.03); }
-.puzzle-row > b { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.08); color: #8ea3bc; font-size: 9px; }
-.puzzle-row .cells { display: flex; gap: 2px; }
-.puzzle-row .cell { width: 38px; height: 38px; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.065); display: grid; place-items: center; font-style: normal; font-weight: 950; font-size: 19px; }
-.puzzle-row.solved .cell { background: rgba(37,99,235,.32); border-color: rgba(147,197,253,.6); animation: revealCell .42s ease both; }
-.puzzle-row.active { outline: 2px solid #fbbf24; }
-.puzzle-row.dimmed { opacity: .22; filter: grayscale(.8); }
-.vertical-answer { position: absolute; z-index: 3; top: 24px; left: 50%; transform: translateX(-50%); display: grid; gap: 4px; padding: 5px; }
-.vertical-answer span { width: 38px; height: 38px; border: 1px solid rgba(251,191,36,.5); background: rgba(251,191,36,.08); display: grid; place-items: center; font-weight: 950; font-size: 18px; color: #fde68a; }
-.vertical-answer span.hidden-letter { color: transparent; }
-.finished-overlay { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; align-content: center; gap: 16px; background: rgba(2,8,18,.88); backdrop-filter: blur(7px); font-size: 34px; }
-.finished-overlay strong { letter-spacing: .08em; }
-.grading-panel { margin-top: 16px; padding: 20px; border-radius: 18px; border: 1px solid rgba(251,191,36,.25); background: rgba(251,191,36,.045); }
-.grading-head { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
-.grading-head h2 { margin: 7px 0 0; font-size: clamp(20px, 2.8vw, 34px); }
-.grading-answer { text-align: right; color: #7f92aa; font-size: 10px; font-weight: 900; letter-spacing: .15em; }
-.grading-answer strong { display: block; color: #fde68a; font-size: 22px; margin-top: 4px; }
+.puzzle-board {
+  position: relative;
+  min-height: 640px;
+  overflow: auto;
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      rgba(30, 64, 175, 0.18),
+      rgba(3, 9, 17, 0.65) 60%
+    );
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px;
+}
+
+.puzzle-row {
+  position: absolute;
+  display: block;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    filter 0.25s ease;
+  cursor: pointer;
+}
+
+.puzzle-row:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.puzzle-row .cells {
+  display: flex;
+  gap: 0;
+}
+
+.puzzle-row .cell {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255, 255, 255, 0.2);
+
+  background: rgba(255, 255, 255, 0.065);
+
+  display: grid;
+  place-items: center;
+
+  font-style: normal;
+  font-weight: 950;
+  font-size: 20px;
+
+  color: transparent;
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+/*
+ * Ô giao với hàng dọc.
+ * Khi chưa giải: chỉ tạo điểm giao thị giác.
+ */
+.puzzle-row .cell.crossing-cell {
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+/*
+ * Khi đáp án được REVEAL,
+ * toàn bộ chữ mới xuất hiện.
+ */
+.puzzle-row.solved .cell {
+  color: #f8fafc;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(37, 99, 235, 0.38),
+      rgba(30, 64, 175, 0.28)
+    );
+
+  border-color: rgba(147, 197, 253, 0.65);
+
+  animation:
+    revealCell 0.42s ease both;
+}
+
+/*
+ * Ô giao sau khi REVEAL nổi bật hơn.
+ */
+.puzzle-row.solved
+  .cell.crossing-cell {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(251, 191, 36, 0.65),
+      rgba(217, 119, 6, 0.45)
+    );
+
+  border-color: #fbbf24;
+  color: #111827;
+}
+
+/*
+ * Hàng đang được xử lý.
+ */
+.puzzle-row.active {
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+/*
+ * Hàng không có đội nào trả lời đúng.
+ * Hàng này sẽ được dành cho khán giả.
+ */
+.puzzle-row.dimmed {
+  opacity: 0.22;
+  filter: grayscale(0.8);
+}
+
+/*
+ * HÀNG DỌC
+ *
+ * Không còn:
+ * left: 50%;
+ * transform: translateX(-50%);
+ *
+ * Hàng dọc sử dụng cùng hệ tọa độ
+ * với các hàng ngang nên luôn giao chính xác.
+ */
+.vertical-answer {
+  position: absolute;
+  z-index: 3;
+
+  display: grid;
+  gap: 0;
+
+  padding: 0;
+  margin: 0;
+
+  pointer-events: none;
+}
+
+.vertical-answer span {
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(251, 191, 36, 0.5);
+
+  background: rgba(251, 191, 36, 0.08);
+
+  display: grid;
+  place-items: center;
+
+  font-weight: 950;
+  font-size: 20px;
+
+  color: #fde68a;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/*
+ * Chưa giải hàng dọc:
+ * không để lộ chữ.
+ */
+.vertical-answer
+  span.hidden-letter {
+  color: transparent;
+}
+
+/*
+ * Đã giải hàng dọc.
+ */
+.vertical-answer
+  span.revealed {
+  color: #111827;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fde68a,
+      #fbbf24
+    );
+
+  border-color: #f59e0b;
+
+  box-shadow:
+    0 0 14px
+    rgba(251, 191, 36, 0.35);
+
+  animation:
+    revealCell 0.42s ease both;
+}
 .team-grade-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 18px 0; }
 .team-grade { min-height: 76px; text-align: left; border: 1px solid rgba(255,255,255,.1); border-radius: 12px; background: rgba(255,255,255,.045); color: #fff; padding: 11px; display: grid; grid-template-columns: 10px 1fr; gap: 8px; align-items: center; }
 .team-grade > span { width: 10px; height: 40px; border-radius: 5px; }
