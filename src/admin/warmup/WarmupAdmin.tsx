@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import type { TeamId } from "../../core/types/game";
 import { TEAM_NAMES, useGameStore } from "../../core/store/gameStore";
 import type { QuestionSet, TeamQuestionSetMap } from "../../modules/warmup/types/warmup";
 import { TEAM_IDS, useWarmupStore } from "../../modules/warmup/store/warmupStore";
