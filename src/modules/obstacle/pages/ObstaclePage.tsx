@@ -1,9 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { addScore } from "../../../core/scoring/scoring";
 import { useGameStore } from "../../../core/store/gameStore";
 import type { TeamId } from "../../../core/types/game";
 import { Scoreboard } from "../../../components/Scoreboard";
+
 import { useObstacleStore } from "../store/obstacleStore";
+
 import type {
   ObstacleClueStatus,
   ObstaclePhase,
@@ -17,137 +25,237 @@ const TEAM_IDS: TeamId[] = [
   "team-4",
 ];
 
-const teamShort = (name: string) =>
-  name.replace("Ban do Giám đốc quản lý", "Ban GĐ quản lý");
-
 /*
- * Cột cố định của hàng dọc.
+ * ==============================
+ * HỆ TỌA ĐỘ BẢNG Ô CHỮ
+ * ==============================
  *
- * verticalIndex của từng câu xác định:
- * "ô thứ mấy của đáp án ngang sẽ giao với hàng dọc".
- *
- * Ví dụ:
- * verticalColumn = 10
- * verticalIndex = 4
- * => hàng ngang bắt đầu tại cột 6.
+ * Tất cả hàng ngang và hàng dọc
+ * đều sử dụng cùng một hệ tọa độ.
  */
-const VERTICAL_COLUMN = 10;
 
 const CELL_SIZE = 40;
 const ROW_HEIGHT = 58;
-const BOARD_LEFT = 34;
-const BOARD_TOP = 28;
+
+/*
+ * Kích thước vùng chơi.
+ *
+ * BOARD_WIDTH lớn hơn chiều rộng thực tế
+ * của các hàng để tạo khoảng thở hai bên.
+ */
+const BOARD_WIDTH = 1120;
+const BOARD_HEIGHT = 640;
+
+/*
+ * Cột chuẩn của hàng dọc.
+ *
+ * Đây là cột LOGIC, không phải pixel.
+ */
+const VERTICAL_COLUMN = 14;
 
 export function ObstaclePage() {
-  const teams = useGameStore((s) => s.teams);
-  const { puzzles } = useObstacleStore();
+  const teams = useGameStore(
+    (s) => s.teams,
+  );
+
+  const { puzzles } =
+    useObstacleStore();
+
   const puzzle = puzzles[0];
 
-  const [phase, setPhase] = useState<ObstaclePhase>("teams");
-  const [selectedClueId, setSelectedClueId] = useState<string | null>(null);
-  const [questionOpen, setQuestionOpen] = useState(false);
+  const [phase, setPhase] =
+    useState<ObstaclePhase>("teams");
 
-  const [secondsLeft, setSecondsLeft] = useState(
-    puzzle?.timeLimitSeconds ?? 60,
-  );
+  const [selectedClueId, setSelectedClueId] =
+    useState<string | null>(null);
 
-  const [timerRunning, setTimerRunning] = useState(false);
+  const [questionOpen, setQuestionOpen] =
+    useState(false);
 
-  const [statusMap, setStatusMap] = useState<
-    Record<string, ObstacleClueStatus>
-  >({});
+  const [secondsLeft, setSecondsLeft] =
+    useState(
+      puzzle?.timeLimitSeconds ?? 60,
+    );
 
-  const [answers, setAnswers] = useState<TeamAnswerMap>({
-    "team-1": "unanswered",
-    "team-2": "unanswered",
-    "team-3": "unanswered",
-    "team-4": "unanswered",
-  });
+  const [timerRunning, setTimerRunning] =
+    useState(false);
 
-  const [showScoreboard, setShowScoreboard] = useState(false);
+  const [statusMap, setStatusMap] =
+    useState<
+      Record<
+        string,
+        ObstacleClueStatus
+      >
+    >({});
 
-  const [verticalSolved, setVerticalSolved] = useState(false);
-  const [verticalModal, setVerticalModal] = useState(false);
-  const [verticalTeam, setVerticalTeam] = useState<TeamId | null>(null);
-  const [verticalResultOpen, setVerticalResultOpen] = useState(false);
-  const [verticalAwarded, setVerticalAwarded] = useState(false);
+  const [answers, setAnswers] =
+    useState<TeamAnswerMap>({
+      "team-1": "unanswered",
+      "team-2": "unanswered",
+      "team-3": "unanswered",
+      "team-4": "unanswered",
+    });
 
-  const selectedClue = puzzle?.clues.find(
-    (clue) => clue.id === selectedClueId,
-  );
+  const [showScoreboard, setShowScoreboard] =
+    useState(false);
+
+  const [verticalSolved, setVerticalSolved] =
+    useState(false);
+
+  const [verticalModal, setVerticalModal] =
+    useState(false);
+
+  const [verticalTeam, setVerticalTeam] =
+    useState<TeamId | null>(null);
+
+  const [verticalResultOpen, setVerticalResultOpen] =
+    useState(false);
+
+  const [verticalAwarded, setVerticalAwarded] =
+    useState(false);
+
+  const selectedClue =
+    puzzle?.clues.find(
+      (clue) =>
+        clue.id === selectedClueId,
+    );
 
   const sortedClues = useMemo(
     () =>
       [...(puzzle?.clues ?? [])].sort(
-        (a, b) => a.order - b.order,
+        (a, b) =>
+          a.order - b.order,
       ),
     [puzzle],
   );
 
   /*
-   * Tính vị trí ngang của từng hàng.
+   * ==============================
+   * TÍNH HỆ TỌA ĐỘ
+   * ==============================
    *
-   * Hàng dọc luôn nằm tại VERTICAL_COLUMN.
-   * verticalIndex là vị trí giao trên hàng ngang.
+   * verticalIndex là ZERO-BASED.
    *
-   * Vì vậy các hàng sẽ tự động so le giống bảng ô chữ
-   * trong thiết kế mong muốn.
+   * Ví dụ:
+   *
+   * VERTICAL_COLUMN = 14
+   * verticalIndex = 3
+   *
+   * => hàng ngang bắt đầu ở:
+   *
+   * 14 - 3 = 11
+   *
+   * Và ô thứ 4 của hàng ngang
+   * sẽ nằm đúng tại cột 14.
    */
-  const getRowLeft = useCallback((verticalIndex: number) => {
-    const safeIndex = Math.max(0, verticalIndex);
 
-    return (
-      BOARD_LEFT +
-      (VERTICAL_COLUMN - safeIndex) * CELL_SIZE
-    );
-  }, []);
+  const getRowLeft = useCallback(
+    (verticalIndex: number) => {
+      const safeIndex = Math.max(
+        0,
+        verticalIndex,
+      );
 
-  /*
-   * Hàng dọc cũng được đặt bằng chính hệ tọa độ
-   * với các hàng ngang, không còn position: 50%.
-   */
-  const verticalLeft = useMemo(
-    () =>
-      BOARD_LEFT +
-      VERTICAL_COLUMN * CELL_SIZE,
+      const column =
+        VERTICAL_COLUMN -
+        safeIndex;
+
+      return column * CELL_SIZE;
+    },
     [],
   );
 
+  /*
+   * Hàng dọc nằm chính xác trên
+   * VERTICAL_COLUMN.
+   */
+  const verticalLeft =
+    VERTICAL_COLUMN * CELL_SIZE;
+
+  /*
+   * ==============================
+   * TIMER
+   * ==============================
+   */
+
   useEffect(() => {
-    if (!timerRunning || secondsLeft <= 0) return;
+    if (
+      !timerRunning ||
+      secondsLeft <= 0
+    ) {
+      return;
+    }
 
-    const timer = window.setInterval(() => {
-      setSecondsLeft((value) => Math.max(0, value - 1));
-    }, 1000);
+    const timer =
+      window.setInterval(() => {
+        setSecondsLeft(
+          (value) =>
+            Math.max(
+              0,
+              value - 1,
+            ),
+        );
+      }, 1000);
 
-    return () => window.clearInterval(timer);
-  }, [timerRunning, secondsLeft]);
+    return () =>
+      window.clearInterval(
+        timer,
+      );
+  }, [
+    timerRunning,
+    secondsLeft,
+  ]);
 
   useEffect(() => {
-    if (secondsLeft === 0 && timerRunning) {
+    if (
+      secondsLeft === 0 &&
+      timerRunning
+    ) {
       setTimerRunning(false);
     }
-  }, [secondsLeft, timerRunning]);
+  }, [
+    secondsLeft,
+    timerRunning,
+  ]);
+
+  /*
+   * ==============================
+   * MỞ CÂU HỎI
+   * ==============================
+   */
 
   const openClue = useCallback(
     (id: string) => {
-      if (phase === "finished") return;
+      if (
+        phase === "finished"
+      ) {
+        return;
+      }
 
-      const current = statusMap[id];
+      const current =
+        statusMap[id];
 
       const allowed =
         phase === "teams"
-          ? current === undefined || current === "available"
-          : current === "missed" ||
-            current === "audience-missed";
+          ? current ===
+              undefined ||
+            current ===
+              "available"
+          : current ===
+              "missed" ||
+            current ===
+              "audience-missed";
 
-      if (!allowed) return;
+      if (!allowed) {
+        return;
+      }
 
       setSelectedClueId(id);
       setQuestionOpen(true);
 
       setSecondsLeft(
-        puzzle?.timeLimitSeconds ?? 60,
+        puzzle?.timeLimitSeconds ??
+          60,
       );
 
       setTimerRunning(true);
@@ -161,109 +269,218 @@ export function ObstaclePage() {
       }));
 
       setAnswers({
-        "team-1": "unanswered",
-        "team-2": "unanswered",
-        "team-3": "unanswered",
-        "team-4": "unanswered",
+        "team-1":
+          "unanswered",
+        "team-2":
+          "unanswered",
+        "team-3":
+          "unanswered",
+        "team-4":
+          "unanswered",
       });
     },
-    [phase, statusMap, puzzle?.timeLimitSeconds],
+    [
+      phase,
+      statusMap,
+      puzzle?.timeLimitSeconds,
+    ],
   );
 
-  const finishQuestion = useCallback(
-    (mode: "solve" | "miss") => {
-      if (!selectedClueId) return;
+  /*
+   * ==============================
+   * KẾT THÚC CÂU
+   * ==============================
+   */
 
-      setTimerRunning(false);
-      setQuestionOpen(false);
+  const finishQuestion =
+    useCallback(
+      (
+        mode:
+          | "solve"
+          | "miss",
+      ) => {
+        if (
+          !selectedClueId
+        ) {
+          return;
+        }
 
-      setStatusMap((map) => ({
-        ...map,
-        [selectedClueId]:
-          mode === "solve"
-            ? phase === "audience"
-              ? "audience-solved"
-              : "solved"
-            : phase === "audience"
-              ? "audience-missed"
-              : "missed",
-      }));
-    },
-    [selectedClueId, phase],
-  );
+        setTimerRunning(false);
+        setQuestionOpen(false);
 
-  const awardHorizontal = () => {
-    if (!selectedClueId || !selectedClue) return;
+        setStatusMap(
+          (map) => ({
+            ...map,
+            [selectedClueId]:
+              mode === "solve"
+                ? phase ===
+                  "audience"
+                  ? "audience-solved"
+                  : "solved"
+                : phase ===
+                  "audience"
+                ? "audience-missed"
+                : "missed",
+          }),
+        );
+      },
+      [
+        selectedClueId,
+        phase,
+      ],
+    );
 
-    /*
-     * Mỗi đội được tick đúng sẽ nhận điểm riêng.
-     *
-     * Điểm vẫn đi qua CORE để đảm bảo bảng điểm
-     * luôn cộng dồn với các vòng trước.
-     */
-    TEAM_IDS.forEach((teamId) => {
+  /*
+   * ==============================
+   * CHẤM HÀNG NGANG
+   * ==============================
+   */
+
+  const awardHorizontal =
+    () => {
       if (
-        answers[teamId] === "correct" &&
+        !selectedClueId ||
+        !selectedClue
+      ) {
+        return;
+      }
+
+      if (
         phase === "teams"
       ) {
+        TEAM_IDS.forEach(
+          (teamId) => {
+            if (
+              answers[
+                teamId
+              ] === "correct"
+            ) {
+              addScore(
+                teamId,
+                puzzle.horizontalPoints,
+                "obstacle",
+              );
+            }
+          },
+        );
+      }
+
+      finishQuestion(
+        "solve",
+      );
+    };
+
+  const markNoTeamCorrect =
+    () => {
+      finishQuestion(
+        "miss",
+      );
+    };
+
+  /*
+   * ==============================
+   * HÀNG DỌC
+   * ==============================
+   */
+
+  const startVertical =
+    () => {
+      setVerticalModal(true);
+      setVerticalTeam(null);
+    };
+
+  const resolveVertical =
+    (
+      correct: boolean,
+    ) => {
+      setVerticalModal(false);
+
+      if (
+        !correct ||
+        !verticalTeam
+      ) {
+        return;
+      }
+
+      if (
+        !verticalAwarded
+      ) {
         addScore(
-          teamId,
-          puzzle.horizontalPoints,
+          verticalTeam,
+          puzzle.verticalPoints,
           "obstacle",
         );
       }
-    });
 
-    finishQuestion("solve");
-  };
-
-  const markNoTeamCorrect = () => {
-    finishQuestion("miss");
-  };
-
-  const startVertical = () => {
-    setVerticalModal(true);
-    setVerticalTeam(null);
-  };
-
-  const resolveVertical = (correct: boolean) => {
-    setVerticalModal(false);
-
-    if (!correct || !verticalTeam) return;
-
-    if (!verticalAwarded) {
-      addScore(
-        verticalTeam,
-        puzzle.verticalPoints,
-        "obstacle",
+      setVerticalAwarded(
+        true,
       );
-    }
 
-    setVerticalAwarded(true);
-    setVerticalSolved(true);
-    setVerticalResultOpen(true);
-  };
+      setVerticalSolved(
+        true,
+      );
+
+      setVerticalResultOpen(
+        true,
+      );
+    };
+
+  /*
+   * ==============================
+   * RESET
+   * ==============================
+   */
 
   const resetGame = () => {
     setPhase("teams");
-    setSelectedClueId(null);
-    setQuestionOpen(false);
-    setTimerRunning(false);
-    setSecondsLeft(puzzle.timeLimitSeconds);
+
+    setSelectedClueId(
+      null,
+    );
+
+    setQuestionOpen(
+      false,
+    );
+
+    setTimerRunning(
+      false,
+    );
+
+    setSecondsLeft(
+      puzzle.timeLimitSeconds,
+    );
 
     setStatusMap({});
 
-    setVerticalSolved(false);
-    setVerticalAwarded(false);
-    setVerticalResultOpen(false);
-    setVerticalModal(false);
-    setVerticalTeam(null);
+    setVerticalSolved(
+      false,
+    );
+
+    setVerticalAwarded(
+      false,
+    );
+
+    setVerticalResultOpen(
+      false,
+    );
+
+    setVerticalModal(
+      false,
+    );
+
+    setVerticalTeam(
+      null,
+    );
 
     setAnswers({
-      "team-1": "unanswered",
-      "team-2": "unanswered",
-      "team-3": "unanswered",
-      "team-4": "unanswered",
+      "team-1":
+        "unanswered",
+      "team-2":
+        "unanswered",
+      "team-3":
+        "unanswered",
+      "team-4":
+        "unanswered",
     });
   };
 
@@ -271,24 +488,38 @@ export function ObstaclePage() {
     return (
       <main className="game-page">
         <div className="ready-panel">
-          <h2>Chưa có bộ ô chữ</h2>
+          <h2>
+            Chưa có bộ ô chữ
+          </h2>
+
           <p>
-            Vào Admin Part 2 để tạo bộ ô chữ.
+            Vào Admin Part 2 để tạo
+            bộ ô chữ.
           </p>
         </div>
       </main>
     );
   }
 
-  const timerText = `${String(
-    Math.floor(secondsLeft / 60),
-  ).padStart(2, "0")}:${String(
-    secondsLeft % 60,
-  ).padStart(2, "0")}`;
+  const timerText =
+    `${String(
+      Math.floor(
+        secondsLeft / 60,
+      ),
+    ).padStart(2, "0")}:${String(
+      secondsLeft % 60,
+    ).padStart(2, "0")}`;
 
-  const verticalLetters = puzzle.verticalAnswer
-    .replace(/\s/g, "")
-    .split("");
+  const verticalLetters =
+    puzzle.verticalAnswer
+      .replace(/\s/g, "")
+      .split("");
+
+  /*
+   * ==============================
+   * RENDER
+   * ==============================
+   */
 
   return (
     <main className="game-page obstacle-game">
@@ -298,12 +529,15 @@ export function ObstaclePage() {
             GAME SHOW • VÒNG 2
           </div>
 
-          <h1>VƯỢT CHƯỚNG NGẠI VẬT</h1>
+          <h1>
+            VƯỢT CHƯỚNG NGẠI VẬT
+          </h1>
         </div>
 
         <div
           className={`timer ${
-            secondsLeft <= 10 && timerRunning
+            secondsLeft <= 10 &&
+            timerRunning
               ? "danger"
               : ""
           }`}
@@ -316,7 +550,10 @@ export function ObstaclePage() {
         <button
           className="ghost-button scoreboard-toggle"
           onClick={() =>
-            setShowScoreboard((value) => !value)
+            setShowScoreboard(
+              (value) =>
+                !value,
+            )
           }
         >
           {showScoreboard
@@ -327,7 +564,9 @@ export function ObstaclePage() {
 
       {showScoreboard && (
         <div className="scoreboard-collapsible">
-          <Scoreboard teams={teams} />
+          <Scoreboard
+            teams={teams}
+          />
         </div>
       )}
 
@@ -335,7 +574,8 @@ export function ObstaclePage() {
         <div className="stage-toolbar">
           <div>
             <span className="section-label">
-              {phase === "audience"
+              {phase ===
+              "audience"
                 ? "🎤 PHẦN THI KHÁN GIẢ"
                 : "BẢNG Ô CHỮ"}
             </span>
@@ -350,41 +590,53 @@ export function ObstaclePage() {
           <div className="stage-actions">
             <button
               className="vertical-button"
-              onClick={startVertical}
+              onClick={
+                startVertical
+              }
               disabled={
                 verticalSolved ||
-                phase === "finished"
+                phase ===
+                  "finished"
               }
             >
               ↕ HÀNG DỌC
             </button>
 
-            {phase === "teams" && (
+            {phase ===
+              "teams" && (
               <button
                 className="audience-button"
                 onClick={() =>
-                  setPhase("audience")
+                  setPhase(
+                    "audience",
+                  )
                 }
               >
                 🎤 CHUYỂN SANG KHÁN GIẢ
               </button>
             )}
 
-            {phase === "audience" && (
+            {phase ===
+              "audience" && (
               <button
                 className="primary-button"
                 onClick={() =>
-                  setPhase("finished")
+                  setPhase(
+                    "finished",
+                  )
                 }
               >
                 KẾT THÚC
               </button>
             )}
 
-            {phase === "finished" && (
+            {phase ===
+              "finished" && (
               <button
                 className="primary-button"
-                onClick={resetGame}
+                onClick={
+                  resetGame
+                }
               >
                 ↻ VÁN MỚI
               </button>
@@ -392,200 +644,266 @@ export function ObstaclePage() {
           </div>
         </div>
 
-        <div className="puzzle-board">
-          {/* HÀNG DỌC */}
+        {/* =========================
+            KHUNG BẢNG Ô CHỮ
+        ========================== */}
+
+        <div className="puzzle-board-wrap">
           <div
-            className="vertical-answer"
+            className="puzzle-board"
             style={{
-              left: verticalLeft,
-              top: BOARD_TOP,
+              width: BOARD_WIDTH,
+              minHeight:
+                BOARD_HEIGHT,
             }}
           >
-            {verticalLetters.map(
-              (char, index) => (
-                <span
-                  key={`${char}-${index}`}
-                  className={
-                    verticalSolved
-                      ? "revealed"
-                      : "hidden-letter"
+            {/* =========================
+                HÀNG DỌC
+            ========================== */}
+
+            <div
+              className="vertical-answer"
+              style={{
+                left:
+                  verticalLeft,
+                top: 28,
+              }}
+            >
+              {verticalLetters.map(
+                (
+                  char,
+                  index,
+                ) => (
+                  <span
+                    key={`${char}-${index}`}
+                    className={
+                      verticalSolved
+                        ? "revealed"
+                        : "hidden-letter"
+                    }
+                  >
+                    {verticalSolved
+                      ? char
+                      : ""}
+                  </span>
+                ),
+              )}
+            </div>
+
+            {/* =========================
+                HÀNG NGANG
+            ========================== */}
+
+            {sortedClues.map(
+              (clue) => {
+                const status =
+                  statusMap[
+                    clue.id
+                  ] ??
+                  "available";
+
+                const isVisible =
+                  status ===
+                    "solved" ||
+                  status ===
+                    "audience-solved";
+
+                const isDim =
+                  status ===
+                    "missed" ||
+                  status ===
+                    "audience-missed" ||
+                  (verticalSolved &&
+                    !isVisible);
+
+                const canOpen =
+                  phase ===
+                  "teams"
+                    ? status ===
+                        "available"
+                    : status ===
+                        "missed" ||
+                      status ===
+                        "audience-missed";
+
+                const letters =
+                  clue.answer
+                    .replace(
+                      /\s/g,
+                      "",
+                    )
+                    .split("");
+
+                /*
+                 * Tính X dựa trực tiếp
+                 * vào vị trí giao.
+                 */
+                const rowLeft =
+                  getRowLeft(
+                    clue.verticalIndex,
+                  );
+
+                return (
+                  <button
+                    key={clue.id}
+                    className={`puzzle-row ${
+                      isVisible
+                        ? "solved"
+                        : ""
+                    } ${
+                      isDim
+                        ? "dimmed"
+                        : ""
+                    } ${
+                      status ===
+                        "active" ||
+                      status ===
+                        "audience-active"
+                        ? "active"
+                        : ""
+                    }`}
+                    style={{
+                      left:
+                        rowLeft,
+                      top:
+                        28 +
+                        clue.y *
+                          ROW_HEIGHT,
+                    }}
+                    disabled={
+                      !canOpen
+                    }
+                    onClick={() =>
+                      openClue(
+                        clue.id,
+                      )
+                    }
+                    title={`Hàng ngang ${clue.order}`}
+                  >
+                    <span className="cells">
+                      {letters.map(
+                        (
+                          letter,
+                          index,
+                        ) => (
+                          <i
+                            key={
+                              index
+                            }
+                            className={`cell ${
+                              isVisible
+                                ? "reveal-cell"
+                                : ""
+                            } ${
+                              index ===
+                              clue.verticalIndex
+                                ? "crossing-cell"
+                                : ""
+                            }`}
+                          >
+                            {isVisible
+                              ? letter
+                              : ""}
+                          </i>
+                        ),
+                      )}
+                    </span>
+                  </button>
+                );
+              },
+            )}
+
+            {phase ===
+              "finished" && (
+              <div className="finished-overlay">
+                <div>🏁</div>
+
+                <strong>
+                  HOÀN THÀNH Ô CHỮ
+                </strong>
+
+                <button
+                  className="primary-button"
+                  onClick={
+                    resetGame
                   }
                 >
-                  {verticalSolved ? char : ""}
-                </span>
-              ),
+                  CHƠI VÁN MỚI
+                </button>
+              </div>
             )}
           </div>
-
-          {/* CÁC HÀNG NGANG */}
-          {sortedClues.map((clue) => {
-            const status =
-              statusMap[clue.id] ??
-              "available";
-
-            const isVisible =
-              status === "solved" ||
-              status === "audience-solved";
-
-            const isDim =
-              status === "missed" ||
-              status === "audience-missed" ||
-              (verticalSolved && !isVisible);
-
-            const canOpen =
-              phase === "teams"
-                ? status === "available"
-                : status === "missed" ||
-                  status === "audience-missed";
-
-            const letters = clue.answer
-              .replace(/\s/g, "")
-              .split("");
-
-            /*
-             * verticalIndex = vị trí ô giao với hàng dọc.
-             *
-             * Ví dụ:
-             * verticalIndex = 4
-             * => hàng ngang lùi sang trái 4 ô
-             * so với cột hàng dọc.
-             */
-            const rowLeft = getRowLeft(
-              clue.verticalIndex,
-            );
-
-            return (
-              <button
-                key={clue.id}
-                className={`puzzle-row ${
-                  isVisible ? "solved" : ""
-                } ${
-                  isDim ? "dimmed" : ""
-                } ${
-                  status === "active" ||
-                  status ===
-                    "audience-active"
-                    ? "active"
-                    : ""
-                }`}
-                style={{
-                  left: rowLeft,
-                  top:
-                    BOARD_TOP +
-                    clue.y * ROW_HEIGHT,
-                }}
-                disabled={!canOpen}
-                onClick={() =>
-                  openClue(clue.id)
-                }
-                title={`Hàng ngang ${clue.order}`}
-              >
-                <span className="cells">
-                  {letters.map(
-                    (letter, index) => (
-                      <i
-                        key={index}
-                        className={`cell ${
-                          isVisible
-                            ? "reveal-cell"
-                            : ""
-                        } ${
-                          index ===
-                          clue.verticalIndex
-                            ? "crossing-cell"
-                            : ""
-                        }`}
-                      >
-                        {isVisible
-                          ? letter
-                          : ""}
-                      </i>
-                    ),
-                  )}
-                </span>
-              </button>
-            );
-          })}
-
-          {phase === "finished" && (
-            <div className="finished-overlay">
-              <div>🏁</div>
-
-              <strong>
-                HOÀN THÀNH Ô CHỮ
-              </strong>
-
-              <button
-                className="primary-button"
-                onClick={resetGame}
-              >
-                CHƠI VÁN MỚI
-              </button>
-            </div>
-          )}
         </div>
       </section>
 
       {/* =========================
           CÂU HỎI
       ========================== */}
-      {questionOpen && selectedClue && (
-        <div className="stage-modal">
-          <section className="question-stage-card">
-            <div className="eyebrow">
-              HÀNG NGANG{" "}
-              {String(
-                selectedClue.order,
-              ).padStart(2, "0")}
-            </div>
 
-            <div className="big-timer">
-              {timerText}
-            </div>
+      {questionOpen &&
+        selectedClue && (
+          <div className="stage-modal">
+            <section className="question-stage-card">
+              <div className="eyebrow">
+                HÀNG NGANG{" "}
+                {String(
+                  selectedClue.order,
+                ).padStart(
+                  2,
+                  "0",
+                )}
+              </div>
 
-            <h2>
-              {selectedClue.question ||
-                "Chưa nhập câu hỏi"}
-            </h2>
+              <div className="big-timer">
+                {timerText}
+              </div>
 
-            <button
-              className="primary-button"
-              onClick={() =>
-                setTimerRunning(
-                  (value) => !value,
-                )
-              }
-            >
-              {timerRunning
-                ? "Ⅱ TẠM DỪNG"
-                : "▶ TIẾP TỤC"}
-            </button>
+              <h2>
+                {selectedClue.question ||
+                  "Chưa nhập câu hỏi"}
+              </h2>
 
-            <button
-              className="ghost-button modal-close"
-              onClick={() => {
-                setTimerRunning(false);
-                setQuestionOpen(false);
-              }}
-            >
-              QUAY LẠI BẢNG Ô CHỮ
-            </button>
-          </section>
-        </div>
-      )}
+              <button
+                className="primary-button"
+                onClick={() =>
+                  setTimerRunning(
+                    (value) =>
+                      !value,
+                  )
+                }
+              >
+                {timerRunning
+                  ? "Ⅱ TẠM DỪNG"
+                  : "▶ TIẾP TỤC"}
+              </button>
+
+              <button
+                className="ghost-button modal-close"
+                onClick={() => {
+                  setTimerRunning(
+                    false,
+                  );
+
+                  setQuestionOpen(
+                    false,
+                  );
+                }}
+              >
+                QUAY LẠI BẢNG Ô CHỮ
+              </button>
+            </section>
+          </div>
+        )}
 
       {/* =========================
-          XÁC NHẬN ĐÚNG / SAI
-          
-          LƯU Ý:
-          Không hiển thị đáp án ở đây.
-          Đáp án chỉ xuất hiện sau khi
-          MC bấm ĐÚNG / REVEAL.
+          CHẤM HÀNG NGANG
       ========================== */}
+
       {!questionOpen &&
         selectedClue &&
-        statusMap[selectedClue.id] ===
-          "active" && (
+        statusMap[
+          selectedClue.id
+        ] === "active" && (
           <section className="grading-panel">
             <div className="grading-head">
               <div>
@@ -594,68 +912,83 @@ export function ObstaclePage() {
                 </div>
 
                 <h2>
-                  “{selectedClue.question}”
+                  “{
+                    selectedClue.question
+                  }”
                 </h2>
               </div>
             </div>
 
             <div className="team-grade-grid">
-              {teams.map((team) => (
-                <button
-                  key={team.id}
-                  className={`team-grade ${
-                    answers[team.id] ===
-                    "correct"
-                      ? "correct"
-                      : answers[
-                            team.id
-                          ] === "wrong"
-                        ? "wrong"
+              {teams.map(
+                (team) => (
+                  <button
+                    key={team.id}
+                    className={`team-grade ${
+                      answers[
+                        team.id
+                      ] ===
+                      "correct"
+                        ? "correct"
                         : ""
-                  }`}
-                  onClick={() =>
-                    setAnswers((map) => ({
-                      ...map,
-                      [team.id]:
-                        map[team.id] ===
-                        "correct"
-                          ? "unanswered"
-                          : "correct",
-                    }))
-                  }
-                >
-                  <span
-                    style={{
-                      background:
-                        team.color,
-                    }}
-                  />
+                    }`}
+                    onClick={() =>
+                      setAnswers(
+                        (map) => ({
+                          ...map,
+                          [team.id]:
+                            map[
+                              team.id
+                            ] ===
+                            "correct"
+                              ? "unanswered"
+                              : "correct",
+                        }),
+                      )
+                    }
+                  >
+                    <span
+                      style={{
+                        background:
+                          team.color,
+                      }}
+                    />
 
-                  <strong>
-                    {teamShort(team.name)}
-                  </strong>
+                    <strong>
+                      {team.name.replace(
+                        "Ban do Giám đốc quản lý",
+                        "Ban GĐ quản lý",
+                      )}
+                    </strong>
 
-                  <b>
-                    {answers[team.id] ===
-                    "correct"
-                      ? `✓ +${puzzle.horizontalPoints}`
-                      : "CHƯA TICK"}
-                  </b>
-                </button>
-              ))}
+                    <b>
+                      {answers[
+                        team.id
+                      ] ===
+                      "correct"
+                        ? `✓ +${puzzle.horizontalPoints}`
+                        : "CHƯA TICK"}
+                    </b>
+                  </button>
+                ),
+              )}
             </div>
 
             <div className="grading-actions">
               <button
                 className="answer-button correct"
-                onClick={awardHorizontal}
+                onClick={
+                  awardHorizontal
+                }
               >
                 ＋ ĐÚNG / REVEAL
               </button>
 
               <button
                 className="answer-button wrong"
-                onClick={markNoTeamCorrect}
+                onClick={
+                  markNoTeamCorrect
+                }
               >
                 − KHÔNG AI ĐÚNG / LÀM MỜ
               </button>
@@ -666,6 +999,7 @@ export function ObstaclePage() {
       {/* =========================
           HÀNG DỌC
       ========================== */}
+
       {verticalModal && (
         <div className="stage-modal">
           <section className="vertical-stage-card">
@@ -675,63 +1009,78 @@ export function ObstaclePage() {
 
             <h2>
               {verticalLetters
-                .map(() => "_")
+                .map(
+                  () => "_",
+                )
                 .join(" ")}
             </h2>
 
             <div className="team-grade-grid">
-              {teams.map((team) => (
-                <button
-                  key={team.id}
-                  className={`team-grade ${
-                    verticalTeam ===
-                    team.id
-                      ? "selected"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    setVerticalTeam(
-                      team.id,
-                    )
-                  }
-                >
-                  <span
-                    style={{
-                      background:
-                        team.color,
-                    }}
-                  />
+              {teams.map(
+                (team) => (
+                  <button
+                    key={team.id}
+                    className={`team-grade ${
+                      verticalTeam ===
+                      team.id
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setVerticalTeam(
+                        team.id,
+                      )
+                    }
+                  >
+                    <span
+                      style={{
+                        background:
+                          team.color,
+                      }}
+                    />
 
-                  <strong>
-                    {teamShort(team.name)}
-                  </strong>
+                    <strong>
+                      {team.name.replace(
+                        "Ban do Giám đốc quản lý",
+                        "Ban GĐ quản lý",
+                      )}
+                    </strong>
 
-                  <b>
-                    {verticalTeam ===
-                    team.id
-                      ? "ĐANG TRẢ LỜI"
-                      : "CHỌN ĐỘI"}
-                  </b>
-                </button>
-              ))}
+                    <b>
+                      {verticalTeam ===
+                      team.id
+                        ? "ĐANG TRẢ LỜI"
+                        : "CHỌN ĐỘI"}
+                    </b>
+                  </button>
+                ),
+              )}
             </div>
 
             <div className="grading-actions">
               <button
                 className="answer-button correct"
-                disabled={!verticalTeam}
+                disabled={
+                  !verticalTeam
+                }
                 onClick={() =>
-                  resolveVertical(true)
+                  resolveVertical(
+                    true,
+                  )
                 }
               >
                 ✓ CHÍNH XÁC / +
-                {puzzle.verticalPoints}
+                {
+                  puzzle.verticalPoints
+                }
               </button>
 
               <button
                 className="answer-button wrong"
                 onClick={() =>
-                  resolveVertical(false)
+                  resolveVertical(
+                    false,
+                  )
                 }
               >
                 − BỎ QUA
@@ -744,6 +1093,7 @@ export function ObstaclePage() {
       {/* =========================
           KẾT QUẢ HÀNG DỌC
       ========================== */}
+
       {verticalResultOpen && (
         <div className="stage-modal">
           <section className="vertical-win-card">
@@ -752,7 +1102,9 @@ export function ObstaclePage() {
             </div>
 
             <h2>
-              {puzzle.verticalAnswer}
+              {
+                puzzle.verticalAnswer
+              }
             </h2>
 
             <p>
@@ -763,7 +1115,11 @@ export function ObstaclePage() {
                       verticalTeam,
                   )?.name
                 : ""}{" "}
-              +{puzzle.verticalPoints} điểm
+              +
+              {
+                puzzle.verticalPoints
+              }{" "}
+              điểm
             </p>
 
             <button
