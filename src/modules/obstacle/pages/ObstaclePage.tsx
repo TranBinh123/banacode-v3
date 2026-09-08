@@ -1,3 +1,4 @@
+```tsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { addScore } from "../../../core/scoring/scoring";
 import { useGameStore } from "../../../core/store/gameStore";
@@ -14,6 +15,7 @@ const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
 const CELL_STEP_X = 40;
 const ROW_CELL_OFFSET_X = 36;
+const ROW_CELL_OFFSET_Y = 3;
 const ROW_STEP_Y = 64;
 const BOARD_LEFT = 72;
 const BOARD_TOP = 16;
@@ -59,30 +61,35 @@ export function ObstaclePage() {
     () => [...(puzzle?.clues ?? [])].sort((a, b) => a.order - b.order),
     [puzzle],
   );
+
   /*
- * Cột giao chung của toàn bộ bảng.
- *
- * Mọi hàng ngang đều được render sao cho:
- *
- *   x + verticalIndex = verticalColumn
- *
- * Vì vậy tất cả ô giao luôn nằm trên
- * cùng một đường thẳng đứng.
- */
-const verticalColumn = useMemo(() => {
-  if (!puzzle?.clues.length) return 6;
+   * Cột giao chung của toàn bộ bảng.
+   *
+   * Mỗi hàng ngang được render sao cho:
+   *
+   *   x + verticalIndex = verticalColumn
+   *
+   * Vì vậy ô giao của tất cả các hàng ngang
+   * luôn nằm trên cùng một đường thẳng đứng.
+   */
+  const verticalColumn = useMemo(() => {
+    if (!puzzle?.clues.length) return 6;
 
-  const total = puzzle.clues.reduce(
-    (sum, clue) =>
-      sum + clue.x + clue.verticalIndex,
-    0,
-  );
+    const total = puzzle.clues.reduce(
+      (sum, clue) => sum + clue.x + clue.verticalIndex,
+      0,
+    );
 
-  return Math.round(
-    total / puzzle.clues.length,
-  );
-}, [puzzle]);
+    return Math.round(total / puzzle.clues.length);
+  }, [puzzle]);
 
+  /*
+   * Ghép từng chữ của đáp án hàng dọc
+   * với từng hàng ngang theo thứ tự từ trên xuống.
+   *
+   * index của verticalLetters sẽ tương ứng với
+   * vị trí hàng ngang mà chữ đó giao nhau.
+   */
   const verticalLetters = useMemo(() => {
     if (!puzzle) return [];
 
@@ -139,10 +146,7 @@ const verticalColumn = useMemo(() => {
 
       setStatusMap((map) => ({
         ...map,
-        [id]:
-          phase === "audience"
-            ? "audience-active"
-            : "active",
+        [id]: phase === "audience" ? "audience-active" : "active",
       }));
 
       setAnswers(emptyAnswers());
@@ -176,15 +180,8 @@ const verticalColumn = useMemo(() => {
     if (!selectedClue || !puzzle) return;
 
     TEAM_IDS.forEach((teamId) => {
-      if (
-        answers[teamId] === "correct" &&
-        phase === "teams"
-      ) {
-        addScore(
-          teamId,
-          puzzle.horizontalPoints,
-          "obstacle",
-        );
+      if (answers[teamId] === "correct" && phase === "teams") {
+        addScore(teamId, puzzle.horizontalPoints, "obstacle");
       }
     });
 
@@ -383,29 +380,36 @@ const verticalColumn = useMemo(() => {
 
         <div className="puzzle-board">
           {/*
-            HÀNG DỌC ĐƯỢC ĐẶT TRỰC TIẾP TRÊN Ô GIAO.
-
-            Không tính một "verticalColumn" độc lập nữa.
-            Mỗi chữ lấy chính clue.x + clue.verticalIndex
-            của hàng ngang tương ứng.
-
-            Công thức này dùng cùng CELL_STEP_X và
-            ROW_CELL_OFFSET_X với hàng ngang nên hai ô
-            có cùng tọa độ tuyệt đối.
-          */}
+           * HÀNG DỌC ĐƯỢC ĐẶT ĐÚNG LÊN Ô GIAO
+           * CỦA HÀNG NGANG.
+           *
+           * X:
+           *   dùng verticalColumn làm trục giao chung,
+           *   sau đó cộng ROW_CELL_OFFSET_X để bù phần
+           *   số thứ tự + khoảng cách trước ô chữ.
+           *
+           * Y:
+           *   dùng đúng vị trí hàng ngang và cộng
+           *   ROW_CELL_OFFSET_Y = 3px vì .puzzle-row
+           *   có padding-top: 3px.
+           *
+           * Nhờ vậy ô hàng dọc sẽ chồng chính xác lên
+           * ô chữ cái tương ứng của hàng ngang.
+           */}
           <div className="vertical-answer">
             {verticalLetters.map(
               ({ char, clue, index }) => {
                 if (!clue) return null;
 
                 const crossingLeft =
-  BOARD_LEFT +
-  verticalColumn * CELL_STEP_X +
-  ROW_CELL_OFFSET_X;
+                  BOARD_LEFT +
+                  verticalColumn * CELL_STEP_X +
+                  ROW_CELL_OFFSET_X;
 
                 const crossingTop =
                   BOARD_TOP +
-                  clue.y * ROW_STEP_Y;
+                  clue.y * ROW_STEP_Y +
+                  ROW_CELL_OFFSET_Y;
 
                 return (
                   <span
@@ -420,9 +424,7 @@ const verticalColumn = useMemo(() => {
                       top: `${crossingTop}px`,
                     }}
                   >
-                    {verticalSolved
-                      ? char
-                      : ""}
+                    {verticalSolved ? char : ""}
                   </span>
                 );
               },
@@ -436,25 +438,19 @@ const verticalColumn = useMemo(() => {
 
             const isVisible =
               status === "solved" ||
-              status ===
-                "audience-solved";
+              status === "audience-solved";
 
             const isDim =
               status === "missed" ||
-              status ===
-                "audience-missed";
+              status === "audience-missed";
 
             const canOpen =
               phase === "teams"
                 ? status === "available"
-                : status ===
-                      "available" ||
-                    status ===
-                      "active" ||
-                    status ===
-                      "missed" ||
-                    status ===
-                      "audience-missed";
+                : status === "available" ||
+                  status === "active" ||
+                  status === "missed" ||
+                  status === "audience-missed";
 
             const letters = clue.answer
               .replace(/\s/g, "")
@@ -473,33 +469,38 @@ const verticalColumn = useMemo(() => {
                     : ""
                 } ${
                   status === "active" ||
-                  status ===
-                    "audience-active"
+                  status === "audience-active"
                     ? "active"
                     : ""
                 }`}
-           style={{
-  /*
-   * Không dùng trực tiếp clue.x nữa.
-   *
-   * Hàng được đặt dựa trên cột giao chung:
-   *
-   *   left = verticalColumn - verticalIndex
-   *
-   * Nhờ đó ô giao của mọi hàng ngang
-   * luôn nằm chính xác trên cùng một trục.
-   */
-  left:
-    (verticalColumn -
-      clue.verticalIndex) *
-      CELL_STEP_X +
-    BOARD_LEFT,
+                style={{
+                  /*
+                   * Hàng ngang được đặt dựa trên
+                   * cột giao chung.
+                   *
+                   *   left =
+                   *     verticalColumn
+                   *     - verticalIndex
+                   *
+                   * Vì vậy:
+                   *
+                   *   left + verticalIndex
+                   *     = verticalColumn
+                   *
+                   * Tất cả các ô giao đều nằm trên
+                   * cùng một trục X.
+                   */
+                  left:
+                    (verticalColumn -
+                      clue.verticalIndex) *
+                      CELL_STEP_X +
+                    BOARD_LEFT,
 
-  top:
-    clue.y *
-      ROW_STEP_Y +
-    BOARD_TOP,
-}}
+                  top:
+                    clue.y *
+                      ROW_STEP_Y +
+                    BOARD_TOP,
+                }}
                 disabled={!canOpen}
                 onClick={() =>
                   openClue(clue.id)
@@ -608,8 +609,7 @@ const verticalColumn = useMemo(() => {
         ] === "active" ||
           statusMap[
             selectedClue.id
-          ] ===
-            "audience-active") && (
+          ] === "audience-active") && (
           <section className="grading-panel">
             <div className="grading-head">
               <div>
@@ -852,3 +852,4 @@ const verticalColumn = useMemo(() => {
     </main>
   );
 }
+```
