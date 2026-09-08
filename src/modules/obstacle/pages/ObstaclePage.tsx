@@ -15,7 +15,7 @@ const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 const CELL_STEP_X = 40;
 const ROW_CELL_OFFSET_X = -29;
 const ROW_CELL_OFFSET_Y = -24;
-const ROW_STEP_Y = 48; // Đã giảm từ 64 xuống 48
+const ROW_STEP_Y = 48; // đã giảm khoảng cách
 const BOARD_LEFT = 72;
 const BOARD_TOP = 16;
 
@@ -61,43 +61,21 @@ export function ObstaclePage() {
     [puzzle],
   );
 
-  /*
-   * Cột giao chung của toàn bộ bảng.
-   *
-   * Mỗi hàng ngang được render sao cho:
-   *
-   *   x + verticalIndex = verticalColumn
-   *
-   * Vì vậy ô giao của tất cả các hàng ngang
-   * luôn nằm trên cùng một đường thẳng đứng.
-   */
   const verticalColumn = useMemo(() => {
     if (!puzzle?.clues.length) return 6;
-
     const total = puzzle.clues.reduce(
       (sum, clue) => sum + clue.x + clue.verticalIndex,
       0,
     );
-
     return Math.round(total / puzzle.clues.length);
   }, [puzzle]);
 
-  /*
-   * Ghép từng chữ của đáp án hàng dọc
-   * với từng hàng ngang theo thứ tự từ trên xuống.
-   *
-   * index của verticalLetters sẽ tương ứng với
-   * vị trí hàng ngang mà chữ đó giao nhau.
-   */
   const verticalLetters = useMemo(() => {
     if (!puzzle) return [];
-
     const letters = puzzle.verticalAnswer.replace(/\s/g, "").split("");
-
     const rows = [...puzzle.clues].sort(
       (a, b) => a.y - b.y || a.order - b.order,
     );
-
     return letters.map((char, index) => ({
       char,
       clue: rows[index],
@@ -107,11 +85,9 @@ export function ObstaclePage() {
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) return;
-
     const timer = window.setInterval(() => {
       setSecondsLeft((value) => Math.max(0, value - 1));
     }, 1000);
-
     return () => window.clearInterval(timer);
   }, [timerRunning, secondsLeft]);
 
@@ -124,9 +100,7 @@ export function ObstaclePage() {
   const openClue = useCallback(
     (id: string) => {
       if (phase === "finished") return;
-
       const current = statusMap[id];
-
       const allowed =
         phase === "teams"
           ? current === undefined || current === "available"
@@ -135,19 +109,16 @@ export function ObstaclePage() {
             current === "active" ||
             current === "missed" ||
             current === "audience-missed";
-
       if (!allowed) return;
 
       setSelectedClueId(id);
       setQuestionOpen(true);
       setSecondsLeft(puzzle?.timeLimitSeconds ?? 60);
       setTimerRunning(true);
-
       setStatusMap((map) => ({
         ...map,
         [id]: phase === "audience" ? "audience-active" : "active",
       }));
-
       setAnswers(emptyAnswers());
     },
     [phase, statusMap, puzzle?.timeLimitSeconds],
@@ -156,10 +127,8 @@ export function ObstaclePage() {
   const finishQuestion = useCallback(
     (mode: "solve" | "miss") => {
       if (!selectedClueId) return;
-
       setTimerRunning(false);
       setQuestionOpen(false);
-
       setStatusMap((map) => ({
         ...map,
         [selectedClueId]:
@@ -175,28 +144,25 @@ export function ObstaclePage() {
     [selectedClueId, phase],
   );
 
-  const awardHorizontal = useCallback(() => {
+  const handleCorrect = useCallback(() => {
     if (!selectedClue || !puzzle) return;
-
-    TEAM_IDS.forEach((teamId) => {
-      if (answers[teamId] === "correct" && phase === "teams") {
-        addScore(teamId, puzzle.horizontalPoints, "obstacle");
-      }
-    });
-
+    // Cộng điểm cho các đội đã tick đúng (nếu đang ở phase teams)
+    if (phase === "teams") {
+      TEAM_IDS.forEach((teamId) => {
+        if (answers[teamId] === "correct") {
+          addScore(teamId, puzzle.horizontalPoints, "obstacle");
+        }
+      });
+    }
     finishQuestion("solve");
-  }, [
-    selectedClue,
-    puzzle,
-    answers,
-    phase,
-    finishQuestion,
-  ]);
+  }, [selectedClue, puzzle, answers, phase, finishQuestion]);
 
-  const markNoTeamCorrect = useCallback(
-    () => finishQuestion("miss"),
-    [finishQuestion],
-  );
+  const handleWrong = useCallback(() => {
+    finishQuestion("miss");
+  }, [finishQuestion]);
+
+  // Khi ở phase audience, nút "ĐÚNG / REVEAL" sẽ gọi handleCorrect (vẫn giải)
+  // và nút "KHÔNG ĐÚNG / LÀM MỜ" gọi handleWrong
 
   const enterAudience = useCallback(() => {
     setPhase("audience");
@@ -204,16 +170,13 @@ export function ObstaclePage() {
     setTimerRunning(false);
     setSelectedClueId(null);
     setAnswers(emptyAnswers());
-
     setStatusMap((map) => {
       const next = { ...map };
-
       Object.keys(next).forEach((id) => {
         if (next[id] === "active") {
           next[id] = "available";
         }
       });
-
       return next;
     });
   }, []);
@@ -225,17 +188,10 @@ export function ObstaclePage() {
 
   const resolveVertical = (correct: boolean) => {
     setVerticalModal(false);
-
     if (!correct || !verticalTeam || !puzzle) return;
-
     if (!verticalAwarded) {
-      addScore(
-        verticalTeam,
-        puzzle.verticalPoints,
-        "obstacle",
-      );
+      addScore(verticalTeam, puzzle.verticalPoints, "obstacle");
     }
-
     setVerticalAwarded(true);
     setVerticalSolved(true);
     setVerticalResultOpen(true);
@@ -277,22 +233,22 @@ export function ObstaclePage() {
     ? statusMap[selectedClue.id] === "audience-active"
     : false;
 
+  // Kiểm tra xem câu hỏi hiện tại có đang ở trạng thái active (chờ chấm) không
+  const isClueActive = selectedClue
+    ? statusMap[selectedClue.id] === "active" ||
+      statusMap[selectedClue.id] === "audience-active"
+    : false;
+
   return (
     <main className="game-page obstacle-game">
       <header className="game-header obstacle-header">
         <div>
-          <div className="eyebrow">
-            GAME SHOW • VÒNG 2
-          </div>
-
+          <div className="eyebrow">GAME SHOW • VÒNG 2</div>
           <h1>VƯỢT CHƯỚNG NGẠI VẬT</h1>
         </div>
-
         <div
           className={`timer ${
-            secondsLeft <= 10 && timerRunning
-              ? "danger"
-              : ""
+            secondsLeft <= 10 && timerRunning ? "danger" : ""
           }`}
         >
           {timerText}
@@ -302,13 +258,9 @@ export function ObstaclePage() {
       <div className="scoreboard-toggle-row">
         <button
           className="ghost-button scoreboard-toggle"
-          onClick={() =>
-            setShowScoreboard((value) => !value)
-          }
+          onClick={() => setShowScoreboard((value) => !value)}
         >
-          {showScoreboard
-            ? "ẨN BẢNG ĐIỂM"
-            : "BẢNG ĐIỂM"}
+          {showScoreboard ? "ẨN BẢNG ĐIỂM" : "BẢNG ĐIỂM"}
         </button>
       </div>
 
@@ -326,51 +278,33 @@ export function ObstaclePage() {
                 ? "🎤 PHẦN THI KHÁN GIẢ"
                 : "BẢNG Ô CHỮ"}
             </span>
-
             <small>
-              {verticalSolved
-                ? " • HÀNG DỌC ĐÃ ĐƯỢC GIẢI"
-                : ""}
+              {verticalSolved ? " • HÀNG DỌC ĐÃ ĐƯỢC GIẢI" : ""}
             </small>
           </div>
-
           <div className="stage-actions">
             <button
               className="vertical-button"
               onClick={startVertical}
-              disabled={
-                verticalSolved ||
-                phase === "finished"
-              }
+              disabled={verticalSolved || phase === "finished"}
             >
               ↕ HÀNG DỌC
             </button>
-
             {phase === "teams" && (
-              <button
-                className="audience-button"
-                onClick={enterAudience}
-              >
+              <button className="audience-button" onClick={enterAudience}>
                 🎤 CHUYỂN SANG KHÁN GIẢ
               </button>
             )}
-
             {phase === "audience" && (
               <button
                 className="primary-button"
-                onClick={() =>
-                  setPhase("finished")
-                }
+                onClick={() => setPhase("finished")}
               >
                 KẾT THÚC
               </button>
             )}
-
             {phase === "finished" && (
-              <button
-                className="primary-button"
-                onClick={resetGame}
-              >
+              <button className="primary-button" onClick={resetGame}>
                 ↻ VÁN MỚI
               </button>
             )}
@@ -378,71 +312,36 @@ export function ObstaclePage() {
         </div>
 
         <div className="puzzle-board">
-          {/*
-           * HÀNG DỌC ĐƯỢC ĐẶT ĐÚNG LÊN Ô GIAO
-           * CỦA HÀNG NGANG.
-           *
-           * X:
-           *   dùng verticalColumn làm trục giao chung,
-           *   sau đó cộng ROW_CELL_OFFSET_X để bù phần
-           *   số thứ tự + khoảng cách trước ô chữ.
-           *
-           * Y:
-           *   dùng đúng vị trí hàng ngang và cộng
-           *   ROW_CELL_OFFSET_Y = 3px vì .puzzle-row
-           *   có padding-top: 3px.
-           *
-           * Nhờ vậy ô hàng dọc sẽ chồng chính xác lên
-           * ô chữ cái tương ứng của hàng ngang.
-           */}
           <div className="vertical-answer">
-            {verticalLetters.map(
-              ({ char, clue, index }) => {
-                if (!clue) return null;
-
-                const crossingLeft =
-                  BOARD_LEFT +
-                  verticalColumn * CELL_STEP_X +
-                  ROW_CELL_OFFSET_X;
-
-                const crossingTop =
-                  BOARD_TOP +
-                  clue.y * ROW_STEP_Y +
-                  ROW_CELL_OFFSET_Y;
-
-                return (
-                  <span
-                    key={`${clue.id}-${index}`}
-                    className={
-                      verticalSolved
-                        ? "revealed"
-                        : "hidden-letter"
-                    }
-                    style={{
-                      left: `${crossingLeft}px`,
-                      top: `${crossingTop}px`,
-                    }}
-                  >
-                    {verticalSolved ? char : ""}
-                  </span>
-                );
-              },
-            )}
+            {verticalLetters.map(({ char, clue, index }) => {
+              if (!clue) return null;
+              const crossingLeft =
+                BOARD_LEFT +
+                verticalColumn * CELL_STEP_X +
+                ROW_CELL_OFFSET_X;
+              const crossingTop =
+                BOARD_TOP + clue.y * ROW_STEP_Y + ROW_CELL_OFFSET_Y;
+              return (
+                <span
+                  key={`${clue.id}-${index}`}
+                  className={verticalSolved ? "revealed" : "hidden-letter"}
+                  style={{
+                    left: `${crossingLeft}px`,
+                    top: `${crossingTop}px`,
+                  }}
+                >
+                  {verticalSolved ? char : ""}
+                </span>
+              );
+            })}
           </div>
 
           {sortedClues.map((clue) => {
-            const status =
-              statusMap[clue.id] ??
-              "available";
-
+            const status = statusMap[clue.id] ?? "available";
             const isVisible =
-              status === "solved" ||
-              status === "audience-solved";
-
+              status === "solved" || status === "audience-solved";
             const isDim =
-              status === "missed" ||
-              status === "audience-missed";
-
+              status === "missed" || status === "audience-missed";
             const canOpen =
               phase === "teams"
                 ? status === "available"
@@ -450,84 +349,35 @@ export function ObstaclePage() {
                   status === "active" ||
                   status === "missed" ||
                   status === "audience-missed";
-
-            const letters = clue.answer
-              .replace(/\s/g, "")
-              .split("");
+            const letters = clue.answer.replace(/\s/g, "").split("");
 
             return (
               <button
                 key={clue.id}
-                className={`puzzle-row ${
-                  isVisible
-                    ? "solved"
-                    : ""
+                className={`puzzle-row ${isVisible ? "solved" : ""} ${
+                  isDim ? "dimmed" : ""
                 } ${
-                  isDim
-                    ? "dimmed"
-                    : ""
-                } ${
-                  status === "active" ||
-                  status === "audience-active"
+                  status === "active" || status === "audience-active"
                     ? "active"
                     : ""
                 }`}
                 style={{
-                  /*
-                   * Hàng ngang được đặt dựa trên
-                   * cột giao chung.
-                   *
-                   *   left =
-                   *     verticalColumn
-                   *     - verticalIndex
-                   *
-                   * Vì vậy:
-                   *
-                   *   left + verticalIndex
-                   *     = verticalColumn
-                   *
-                   * Tất cả các ô giao đều nằm trên
-                   * cùng một trục X.
-                   */
                   left:
-                    (verticalColumn -
-                      clue.verticalIndex) *
-                      CELL_STEP_X +
+                    (verticalColumn - clue.verticalIndex) * CELL_STEP_X +
                     BOARD_LEFT,
-
-                  top:
-                    clue.y *
-                      ROW_STEP_Y +
-                    BOARD_TOP,
+                  top: clue.y * ROW_STEP_Y + BOARD_TOP,
                 }}
                 disabled={!canOpen}
-                onClick={() =>
-                  openClue(clue.id)
-                }
+                onClick={() => openClue(clue.id)}
                 title={`Hàng ngang ${clue.order}`}
               >
-                <b>
-                  {String(
-                    clue.order,
-                  ).padStart(2, "0")}
-                </b>
-
+                <b>{String(clue.order).padStart(2, "0")}</b>
                 <span className="cells">
-                  {letters.map(
-                    (
-                      letter,
-                      index,
-                    ) => (
-                      <i
-                        key={index}
-                        className="cell"
-                      >
-                        {isVisible
-                          ? letter
-                          : ""}
-                      </i>
-                    ),
-                  )}
+                  {letters.map((letter, idx) => (
+                    <i key={idx} className="cell">
+                      {isVisible ? letter : ""}
+                    </i>
+                  ))}
                 </span>
               </button>
             );
@@ -536,15 +386,8 @@ export function ObstaclePage() {
           {phase === "finished" && (
             <div className="finished-overlay">
               <div>🏁</div>
-
-              <strong>
-                HOÀN THÀNH Ô CHỮ
-              </strong>
-
-              <button
-                className="primary-button"
-                onClick={resetGame}
-              >
+              <strong>HOÀN THÀNH Ô CHỮ</strong>
+              <button className="primary-button" onClick={resetGame}>
                 CHƠI VÁN MỚI
               </button>
             </div>
@@ -552,195 +395,121 @@ export function ObstaclePage() {
         </div>
       </section>
 
-      {questionOpen &&
-        selectedClue && (
-          <div className="stage-modal">
-            <section className="question-stage-card">
-              <div className="eyebrow">
-                HÀNG NGANG{" "}
-                {String(
-                  selectedClue.order,
-                ).padStart(2, "0")}
-                {isAudienceActive
-                  ? " • KHÁN GIẢ"
-                  : ""}
-              </div>
+      {/* =========================================================
+          MODAL CÂU HỎI (tích hợp chấm điểm)
+          ========================================================= */}
+      {questionOpen && selectedClue && (
+        <div className="stage-modal">
+          <div className="question-stage-card">
+            <div className="eyebrow">
+              HÀNG NGANG {String(selectedClue.order).padStart(2, "0")}
+              {isAudienceActive ? " • KHÁN GIẢ" : ""}
+            </div>
 
-              <div className="big-timer">
-                {timerText}
-              </div>
+            <div className="big-timer">{timerText}</div>
 
-              <h2>
-                {selectedClue.question ||
-                  "Chưa nhập câu hỏi"}
-              </h2>
+            <h2>{selectedClue.question || "Chưa nhập câu hỏi"}</h2>
 
+            {/* Nút điều khiển timer */}
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center", marginBottom: "16px" }}>
               <button
                 className="primary-button"
-                onClick={() =>
-                  setTimerRunning(
-                    (value) => !value,
-                  )
-                }
+                onClick={() => setTimerRunning((v) => !v)}
+                style={{ minWidth: "120px" }}
               >
-                {timerRunning
-                  ? "Ⅱ TẠM DỪNG"
-                  : "▶ TIẾP TỤC"}
+                {timerRunning ? "Ⅱ TẠM DỪNG" : "▶ TIẾP TỤC"}
               </button>
-
               <button
-                className="ghost-button modal-close"
+                className="ghost-button"
                 onClick={() => {
                   setTimerRunning(false);
                   setQuestionOpen(false);
+                  // Không tự động đánh dấu, quay về bảng
                 }}
               >
-                QUAY LẠI BẢNG Ô CHỮ
+                QUAY LẠI BẢNG
               </button>
-            </section>
-          </div>
-        )}
+            </div>
 
-      {!questionOpen &&
-        selectedClue &&
-        (statusMap[
-          selectedClue.id
-        ] === "active" ||
-          statusMap[
-            selectedClue.id
-          ] === "audience-active") && (
-          <section className="grading-panel">
-            <div className="grading-head">
-              <div>
-                <div className="eyebrow">
-                  {isAudienceActive
-                    ? "KHÁN GIẢ • XÁC NHẬN ĐÁP ÁN"
-                    : "XÁC NHẬN CÂU HỎI"}
+            {/* =========================================================
+                KHU VỰC CHẤM ĐIỂM (ngay trong modal)
+                ========================================================= */}
+            {isClueActive && (
+              <>
+                {!isAudienceActive && (
+                  <div className="team-grade-grid">
+                    {teams.map((team) => (
+                      <button
+                        key={team.id}
+                        className={`team-grade ${
+                          answers[team.id] === "correct" ? "correct" : ""
+                        }`}
+                        onClick={() =>
+                          setAnswers((map) => ({
+                            ...map,
+                            [team.id]:
+                              map[team.id] === "correct"
+                                ? "unanswered"
+                                : "correct",
+                          }))
+                        }
+                      >
+                        <span style={{ background: team.color }} />
+                        <strong>{teamShort(team.name)}</strong>
+                        <b>
+                          {answers[team.id] === "correct"
+                            ? `✓ +${puzzle.horizontalPoints}`
+                            : "CHƯA TICK"}
+                        </b>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="grading-actions">
+                  {isAudienceActive ? (
+                    <>
+                      <button
+                        className="answer-button correct"
+                        onClick={handleCorrect}
+                      >
+                        ＋ ĐÚNG / REVEAL
+                      </button>
+                      <button
+                        className="answer-button wrong"
+                        onClick={handleWrong}
+                      >
+                        − KHÔNG ĐÚNG / LÀM MỜ
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="answer-button correct"
+                        onClick={handleCorrect}
+                      >
+                        ＋ ĐÚNG / REVEAL
+                      </button>
+                      <button
+                        className="answer-button wrong"
+                        onClick={handleWrong}
+                      >
+                        − KHÔNG AI ĐÚNG / LÀM MỜ
+                      </button>
+                    </>
+                  )}
                 </div>
-
-                <h2>
-                  “{selectedClue.question}”
-                </h2>
-              </div>
-
-              <div className="grading-answer">
-                ĐÁP ÁN
-                <br />
-                <strong>
-                  {selectedClue.answer}
-                </strong>
-              </div>
-            </div>
-
-            {!isAudienceActive && (
-              <div className="team-grade-grid">
-                {teams.map((team) => (
-                  <button
-                    key={team.id}
-                    className={`team-grade ${
-                      answers[
-                        team.id
-                      ] === "correct"
-                        ? "correct"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setAnswers(
-                        (map) => ({
-                          ...map,
-                          [team.id]:
-                            map[
-                              team.id
-                            ] ===
-                            "correct"
-                              ? "unanswered"
-                              : "correct",
-                        }),
-                      )
-                    }
-                  >
-                    <span
-                      style={{
-                        background:
-                          team.color,
-                      }}
-                    />
-
-                    <strong>
-                      {teamShort(
-                        team.name,
-                      )}
-                    </strong>
-
-                    <b>
-                      {answers[
-                        team.id
-                      ] === "correct"
-                        ? `✓ +${puzzle.horizontalPoints}`
-                        : "CHƯA TICK"}
-                    </b>
-                  </button>
-                ))}
-              </div>
+              </>
             )}
+          </div>
+        </div>
+      )}
 
-            <div className="grading-actions">
-              {isAudienceActive ? (
-                <>
-                  <button
-                    className="answer-button correct"
-                    onClick={() =>
-                      finishQuestion(
-                        "solve",
-                      )
-                    }
-                  >
-                    ＋ ĐÚNG / REVEAL
-                  </button>
-
-                  <button
-                    className="answer-button wrong"
-                    onClick={() =>
-                      finishQuestion(
-                        "miss",
-                      )
-                    }
-                  >
-                    − KHÔNG ĐÚNG / LÀM MỜ
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="answer-button correct"
-                    onClick={
-                      awardHorizontal
-                    }
-                  >
-                    ＋ ĐÚNG / REVEAL
-                  </button>
-
-                  <button
-                    className="answer-button wrong"
-                    onClick={
-                      markNoTeamCorrect
-                    }
-                  >
-                    − KHÔNG AI ĐÚNG / LÀM MỜ
-                  </button>
-                </>
-              )}
-            </div>
-          </section>
-        )}
-
+      {/* Modal hàng dọc và kết quả vẫn giữ nguyên */}
       {verticalModal && (
         <div className="stage-modal">
           <section className="vertical-stage-card">
-            <div className="eyebrow">
-              ĐOÁN Ô CHỮ HÀNG DỌC
-            </div>
-
+            <div className="eyebrow">ĐOÁN Ô CHỮ HÀNG DỌC</div>
             <h2>
               {puzzle.verticalAnswer
                 .replace(/\s/g, "")
@@ -748,63 +517,34 @@ export function ObstaclePage() {
                 .map(() => "_ ")
                 .join("")}
             </h2>
-
             <div className="team-grade-grid">
               {teams.map((team) => (
                 <button
                   key={team.id}
                   className={`team-grade ${
-                    verticalTeam ===
-                    team.id
-                      ? "selected"
-                      : ""
+                    verticalTeam === team.id ? "selected" : ""
                   }`}
-                  onClick={() =>
-                    setVerticalTeam(
-                      team.id,
-                    )
-                  }
+                  onClick={() => setVerticalTeam(team.id)}
                 >
-                  <span
-                    style={{
-                      background:
-                        team.color,
-                    }}
-                  />
-
-                  <strong>
-                    {teamShort(
-                      team.name,
-                    )}
-                  </strong>
-
+                  <span style={{ background: team.color }} />
+                  <strong>{teamShort(team.name)}</strong>
                   <b>
-                    {verticalTeam ===
-                    team.id
-                      ? "ĐANG TRẢ LỜI"
-                      : "CHỌN ĐỘI"}
+                    {verticalTeam === team.id ? "ĐANG TRẢ LỜI" : "CHỌN ĐỘI"}
                   </b>
                 </button>
               ))}
             </div>
-
             <div className="grading-actions">
               <button
                 className="answer-button correct"
                 disabled={!verticalTeam}
-                onClick={() =>
-                  resolveVertical(true)
-                }
+                onClick={() => resolveVertical(true)}
               >
-                ✓ CHÍNH XÁC / +
-                {puzzle.verticalPoints}
+                ✓ CHÍNH XÁC / +{puzzle.verticalPoints}
               </button>
-
               <button
                 className="answer-button wrong"
-                onClick={() =>
-                  resolveVertical(false)
-                }
+                onClick={() => resolveVertical(false)}
               >
                 − BỎ QUA
               </button>
@@ -816,32 +556,17 @@ export function ObstaclePage() {
       {verticalResultOpen && (
         <div className="stage-modal">
           <section className="vertical-win-card">
-            <div className="eyebrow">
-              CHÍNH XÁC!
-            </div>
-
-            <h2>
-              {puzzle.verticalAnswer}
-            </h2>
-
+            <div className="eyebrow">CHÍNH XÁC!</div>
+            <h2>{puzzle.verticalAnswer}</h2>
             <p>
               {verticalTeam
-                ? teams.find(
-                    (team) =>
-                      team.id ===
-                      verticalTeam,
-                  )?.name
+                ? teams.find((team) => team.id === verticalTeam)?.name
                 : ""}{" "}
               +{puzzle.verticalPoints} điểm
             </p>
-
             <button
               className="primary-button"
-              onClick={() =>
-                setVerticalResultOpen(
-                  false,
-                )
-              }
+              onClick={() => setVerticalResultOpen(false)}
             >
               TIẾP TỤC
             </button>
