@@ -25,13 +25,6 @@ export type QuestionPhase =
   | 'intro'           // giới thiệu độ khó
   | 'star_decision'   // chọn dùng sao hay không
   | 'playing'         // hiển thị câu hỏi, timer đang chạy
-  | 'result'          // kết quả của đội chính (đúng/sai) – có thể bỏ qua
+  | 'result'          // kết quả của đội chính (đúng/sai)
   | 'steal'           // cơ hội cướp cho đội khác
   | 'resolved';       // đã kết thúc câu hỏi
-
-// Dùng để lưu kết quả trả lời
-export type AnswerResult = {
-  correct: boolean;
-  points: number;
-  teamId: TeamId | null; // đội đã trả lời (đội chính hoặc đội cướp)
-};
