@@ -1,4 +1,4 @@
-import type { TeamId } from "../../../types/game";
+import type { TeamId } from "../../../core/types/game";
 
 export type FinishQuestion = {
   id: string;
