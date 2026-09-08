@@ -47,7 +47,7 @@ export function FinishPage() {
     finish.selectPackage(pendingTeamId, pendingPackageId);
   };
 
-// Cập nhật điểm lên Bảng điểm tổng (Truyền đúng type GamePhase: "finish")
+  // Cập nhật điểm lên Bảng điểm tổng (Tham số thứ 3 chuẩn kiểu GamePhase: "finish")
   const handleMarkCorrect = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     const pts = finish.starActive ? currentQuestion.points * 2 : currentQuestion.points;
@@ -72,26 +72,6 @@ export function FinishPage() {
   const handleStealWrong = () => {
     if (!finish.selectedStealTeamId || !currentQuestion) return;
     addScore(finish.selectedStealTeamId, -Math.floor(currentQuestion.points / 2), "finish");
-    finish.markStealWrong();
-  };
-
-  const handleMarkWrong = () => {
-    if (!finish.currentTeamId || !currentQuestion) return;
-    if (finish.starActive) {
-      addScore(finish.currentTeamId, -currentQuestion.points, "Trừ điểm Ngôi sao hy vọng");
-    }
-    finish.markWrong();
-  };
-
-  const handleStealCorrect = () => {
-    if (!finish.selectedStealTeamId || !currentQuestion) return;
-    addScore(finish.selectedStealTeamId, currentQuestion.points, "Cướp điểm thành công");
-    finish.markStealCorrect();
-  };
-
-  const handleStealWrong = () => {
-    if (!finish.selectedStealTeamId || !currentQuestion) return;
-    addScore(finish.selectedStealTeamId, -Math.floor(currentQuestion.points / 2), "Trừ điểm cướp sai");
     finish.markStealWrong();
   };
 
