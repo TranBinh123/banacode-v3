@@ -5,10 +5,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type {
-  Team,
-  TeamId,
-} from "../../../core/types/game";
+import type { Team, TeamId } from "../../../core/types/game";
 import { addScore } from "../../../core/scoring/scoring";
 import { Scoreboard } from "../../../components/Scoreboard";
 import { useWarmupStore } from "../store/warmupStore";
@@ -16,8 +13,8 @@ import { TeamSelector } from "../components/TeamSelector";
 import { WarmupControls } from "../components/WarmupControls";
 import { QuestionStatusBar } from "../components/QuestionStatusBar";
 import type {
-  QuestionSet,
   QuestionStatus,
+  QuestionSet,
   WarmupQuestion,
 } from "../types/warmup";
 
@@ -44,11 +41,8 @@ export function WarmupPage({ teams }: Props) {
   const [usedSetIds, setUsedSetIds] =
     useState<string[]>([]);
 
-  const [active, setActive] =
-    useState(false);
-
-  const [paused, setPaused] =
-    useState(false);
+  const [active, setActive] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const [secondsLeft, setSecondsLeft] =
     useState(TOTAL_SECONDS);
@@ -62,27 +56,30 @@ export function WarmupPage({ teams }: Props) {
   const [currentIndex, setCurrentIndex] =
     useState(0);
 
-  const [finished, setFinished] =
-    useState(false);
+  const [finished, setFinished] = useState(false);
 
   const [showScoreboard, setShowScoreboard] =
     useState(true);
 
-  const transitionLock =
-    useRef(false);
+  const transitionLock = useRef(false);
 
   const currentQuestion =
     questions[currentIndex];
 
-  const selectedTeam =
-    teams.find(
-      (team) => team.id === selectedTeamId,
-    );
+  const selectedTeam = teams.find(
+    (team) => team.id === selectedTeamId,
+  );
 
-  const selectedSet =
-    questionSets.find(
-      (set) => set.id === selectedSetId,
-    );
+  const selectedSet = questionSets.find(
+    (set) => set.id === selectedSetId,
+  );
+
+  const availableSets = questionSets.filter(
+    (set) => !usedSetIds.includes(set.id),
+  );
+
+  const allTeamsPlayed =
+    usedTeamIds.length >= teams.length;
 
   const resetTurn = useCallback(() => {
     setSelectedTeamId(null);
@@ -99,10 +96,9 @@ export function WarmupPage({ teams }: Props) {
 
   const chooseTeam = useCallback(
     (teamId: TeamId) => {
-      if (
-        active ||
-        usedTeamIds.includes(teamId)
-      ) {
+      if (active) return;
+
+      if (usedTeamIds.includes(teamId)) {
         return;
       }
 
@@ -118,11 +114,13 @@ export function WarmupPage({ teams }: Props) {
       teamId: TeamId,
       questionSet: QuestionSet,
     ) => {
-      if (
-        active ||
-        usedTeamIds.includes(teamId) ||
-        usedSetIds.includes(questionSet.id)
-      ) {
+      if (active) return;
+
+      if (usedTeamIds.includes(teamId)) {
+        return;
+      }
+
+      if (usedSetIds.includes(questionSet.id)) {
         return;
       }
 
@@ -132,6 +130,12 @@ export function WarmupPage({ teams }: Props) {
         );
         return;
       }
+
+      const orderedQuestions = [
+        ...questionSet.questions,
+      ].sort(
+        (a, b) => a.order - b.order,
+      );
 
       setSelectedTeamId(teamId);
       setSelectedSetId(questionSet.id);
@@ -146,18 +150,16 @@ export function WarmupPage({ teams }: Props) {
         questionSet.id,
       ]);
 
-      setQuestions(
-        [...questionSet.questions].sort(
-          (a, b) => a.order - b.order,
-        ),
-      );
+      setQuestions(orderedQuestions);
 
       const initialStatuses =
-        Array(10).fill(
+        Array(orderedQuestions.length).fill(
           "unanswered",
         ) as QuestionStatus[];
 
-      initialStatuses[0] = "current";
+      if (initialStatuses.length > 0) {
+        initialStatuses[0] = "current";
+      }
 
       setStatuses(initialStatuses);
       setCurrentIndex(0);
@@ -195,13 +197,11 @@ export function WarmupPage({ teams }: Props) {
       return;
     }
 
-    const timer =
-      window.setInterval(() => {
-        setSecondsLeft(
-          (value) =>
-            Math.max(0, value - 1),
-        );
-      }, 1000);
+    const timer = window.setInterval(() => {
+      setSecondsLeft((value) =>
+        Math.max(0, value - 1),
+      );
+    }, 1000);
 
     return () =>
       window.clearInterval(timer);
@@ -242,13 +242,12 @@ export function WarmupPage({ teams }: Props) {
 
       window.setTimeout(() => {
         setStatuses((latest) => {
-          const resolved =
-            latest.map(
-              (status, index) =>
-                index === currentIndex
-                  ? result
-                  : status,
-            );
+          const resolved = latest.map(
+            (status, index) =>
+              index === currentIndex
+                ? result
+                : status,
+          );
 
           const nextUnanswered =
             resolved.findIndex(
@@ -346,19 +345,23 @@ export function WarmupPage({ teams }: Props) {
         return;
       }
 
-      if (key === "d")
+      if (key === "d") {
         resolve("correct");
+      }
 
-      if (key === "s")
+      if (key === "s") {
         resolve("wrong");
+      }
 
-      if (key === "c")
+      if (key === "c") {
         resolve("skipped");
+      }
 
-      if (key === "p")
+      if (key === "p") {
         setPaused(
           (value) => !value,
         );
+      }
     };
 
     window.addEventListener(
@@ -396,18 +399,6 @@ export function WarmupPage({ teams }: Props) {
           "unanswered",
         );
 
-  const availableSets =
-    questionSets.filter(
-      (set) =>
-        !usedSetIds.includes(
-          set.id,
-        ),
-    );
-
-  const allTeamsPlayed =
-    usedTeamIds.length >=
-    teams.length;
-
   return (
     <main className="game-page warmup-page">
       <header className="game-header">
@@ -417,6 +408,10 @@ export function WarmupPage({ teams }: Props) {
           </div>
 
           <h1>KHỞI ĐỘNG</h1>
+
+          <p className="warmup-subtitle">
+            Mở đầu hành trình • 120 giây
+          </p>
         </div>
 
         <div
@@ -475,19 +470,18 @@ export function WarmupPage({ teams }: Props) {
             {selectedTeam && (
               <section className="warmup-set-selection">
                 <div className="section-label">
-                  2. CHỌN BỘ CÂU HỎI
+                  CHỌN BỘ CÂU HỎI
                 </div>
 
                 <div className="warmup-selection-heading">
                   <div>
+                    <span>
+                      ĐỘI ĐANG CHỌN
+                    </span>
+
                     <strong>
                       {selectedTeam.name}
                     </strong>
-
-                    <span>
-                      Đội được tự chọn một
-                      bộ câu hỏi chưa sử dụng.
-                    </span>
                   </div>
 
                   <button
@@ -505,6 +499,12 @@ export function WarmupPage({ teams }: Props) {
                   </button>
                 </div>
 
+                <p className="warmup-selection-help">
+                  Đội được tự chọn một
+                  bộ câu hỏi chưa được
+                  sử dụng.
+                </p>
+
                 <div className="warmup-set-grid">
                   {availableSets.map(
                     (set) => {
@@ -515,12 +515,7 @@ export function WarmupPage({ teams }: Props) {
                       return (
                         <button
                           key={set.id}
-                          className={`warmup-set-card ${
-                            selectedSetId ===
-                            set.id
-                              ? "selected"
-                              : ""
-                          }`}
+                          className="warmup-set-card"
                           disabled={!valid}
                           onClick={() =>
                             startTeam(
@@ -552,14 +547,52 @@ export function WarmupPage({ teams }: Props) {
           </>
         )}
 
+      {!active &&
+        !finished &&
+        !selectedTeam &&
+        !allTeamsPlayed && (
+          <section className="ready-panel">
+            <div className="ready-icon">
+              ▶
+            </div>
+
+            <h2>
+              Chọn đội để bắt đầu
+            </h2>
+
+            <p>
+              Chọn một đội, sau đó đội
+              sẽ tự chọn bộ câu hỏi.
+              Đồng hồ 02:00 bắt đầu
+              ngay khi bộ câu hỏi được
+              chọn.
+            </p>
+
+            <div className="shortcut-hint">
+              Phím nhanh chọn đội:
+              {" "}
+              <kbd>1</kbd>
+              {" "}
+              <kbd>2</kbd>
+              {" "}
+              <kbd>3</kbd>
+              {" "}
+              <kbd>4</kbd>
+            </div>
+          </section>
+        )}
+
       {active &&
-        selectedTeam &&
-        selectedSet && (
+        currentQuestion &&
+        selectedTeam && (
           <section className="question-panel">
             <div className="live-meta">
               <span>
-                {selectedTeam.name} •{" "}
-                {selectedSet.name}
+                {selectedTeam.name}
+              </span>
+
+              <span>
+                {selectedSet?.name}
               </span>
 
               <span>
@@ -576,7 +609,8 @@ export function WarmupPage({ teams }: Props) {
             </div>
 
             <div className="question-text">
-              {currentQuestion?.question}
+              {currentQuestion.question ||
+                "CÂU HỎI ĐANG ĐƯỢC CHUẨN BỊ"}
             </div>
 
             <QuestionStatusBar
@@ -611,37 +645,6 @@ export function WarmupPage({ teams }: Props) {
               }
             />
           </section>
-        )}
-
-      {!active &&
-        !finished &&
-        !selectedTeamId &&
-        !allTeamsPlayed && (
-          <div className="ready-panel">
-            <div className="ready-icon">
-              ▶
-            </div>
-
-            <h2>
-              Chọn đội để bắt đầu
-            </h2>
-
-            <p>
-              Sau khi chọn đội, đội sẽ
-              tự chọn một bộ câu hỏi còn
-              trống. Timer 02:00 bắt đầu
-              ngay khi bộ câu hỏi được
-              chọn.
-            </p>
-
-            <div className="shortcut-hint">
-              Phím nhanh chọn đội:{" "}
-              <kbd>1</kbd>{" "}
-              <kbd>2</kbd>{" "}
-              <kbd>3</kbd>{" "}
-              <kbd>4</kbd>
-            </div>
-          </div>
         )}
 
       {finished &&
