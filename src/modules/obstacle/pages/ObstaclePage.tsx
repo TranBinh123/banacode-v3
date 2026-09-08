@@ -9,13 +9,14 @@ import type {
   ObstaclePhase,
   TeamAnswerMap,
 } from "../types/obstacle";
+import "./obstacle.css"; // <-- Import CSS riêng
 
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
 const CELL_STEP_X = 40;
 const ROW_CELL_OFFSET_X = -29;
 const ROW_CELL_OFFSET_Y = -24;
-const ROW_STEP_Y = 64;
+const ROW_STEP_Y = 48; // Đã giảm từ 64 xuống 48
 const BOARD_LEFT = 72;
 const BOARD_TOP = 16;
 
