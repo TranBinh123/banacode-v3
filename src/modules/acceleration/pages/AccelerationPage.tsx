@@ -4,7 +4,6 @@ import { useGameStore } from "../../../core/store/gameStore";
 import type { TeamId } from "../../../core/types/game";
 import { Scoreboard } from "../../../components/Scoreboard";
 import { useAccelerationStore } from "../store/accelerationStore";
-import "./acceleration.css"; // <-- thêm dòng này
 
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
