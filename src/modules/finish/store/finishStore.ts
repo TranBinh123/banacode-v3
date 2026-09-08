@@ -63,8 +63,8 @@ type FinishStore = {
 
   // Actions
   selectPackage: (teamId: TeamId, packageId: string) => boolean;
-  startQuestion: () => void;
-  decideStar: (useStar: boolean) => void;
+  startQuestion: () => void; // Chuyển từ intro sang playing
+  decideStar: (useStar: boolean) => void; // Quyết định sao -> chuyển sang intro
   startTimer: () => void;
   tickTimer: () => void;
   markCorrect: () => void;
@@ -102,7 +102,7 @@ const createInitialState = (): Omit<
   currentTeamId: null,
   currentPackageId: null,
   currentQuestionIndex: 0,
-  questionPhase: "intro",
+  questionPhase: "star_decision", // Mặc định là star_decision khi vào vòng mới
   starActive: false,
   starDecisionPending: false,
   selectedStealTeamId: null,
@@ -125,8 +125,8 @@ export const useFinishStore = create<FinishStore>()(
         const pkg = state.packages.find((p) => p.id === packageId);
         if (!pkg || pkg.selectedBy !== null) return false;
 
-        // Xáo trộn câu hỏi trong gói
         const shuffledQuestions = shuffle(pkg.questions);
+        const starUsed = pkg.starUsed;
 
         set({
           packages: state.packages.map((p) =>
@@ -138,43 +138,15 @@ export const useFinishStore = create<FinishStore>()(
           currentTeamId: teamId,
           currentPackageId: packageId,
           currentQuestionIndex: 0,
-          questionPhase: "intro",
+          questionPhase: starUsed ? "intro" : "star_decision",
           starActive: false,
-          starDecisionPending: false,
+          starDecisionPending: !starUsed,
           selectedStealTeamId: null,
           selectionOrder: [...state.selectionOrder, teamId],
           timerSeconds: 30,
           isTimerRunning: false,
         });
         return true;
-      },
-
-      startQuestion: () => {
-        const state = get();
-        if (state.questionPhase !== "intro") return;
-
-        const pkg = state.packages.find((p) => p.id === state.currentPackageId);
-        if (!pkg) return;
-
-        const question = pkg.questions[state.currentQuestionIndex];
-        if (!question) return;
-
-        // Nếu gói chưa dùng sao, hiển thị quyết định sao
-        if (!pkg.starUsed) {
-          set({
-            questionPhase: "star_decision",
-            starDecisionPending: true,
-          });
-        } else {
-          // Vào thẳng câu hỏi
-          set({
-            questionPhase: "playing",
-            starActive: false,
-            starDecisionPending: false,
-            timerSeconds: question.isVideo ? 30 : 30,
-            isTimerRunning: false,
-          });
-        }
       },
 
       decideStar: (useStar) => {
@@ -191,7 +163,7 @@ export const useFinishStore = create<FinishStore>()(
             ),
             starActive: true,
             starDecisionPending: false,
-            questionPhase: "playing",
+            questionPhase: "intro", // Chuyển sang intro sau khi quyết định sao
             timerSeconds: 30,
             isTimerRunning: false,
           });
@@ -199,11 +171,28 @@ export const useFinishStore = create<FinishStore>()(
           set({
             starActive: false,
             starDecisionPending: false,
-            questionPhase: "playing",
+            questionPhase: "intro",
             timerSeconds: 30,
             isTimerRunning: false,
           });
         }
+      },
+
+      startQuestion: () => {
+        const state = get();
+        if (state.questionPhase !== "intro") return;
+
+        const pkg = state.packages.find((p) => p.id === state.currentPackageId);
+        if (!pkg) return;
+
+        const question = pkg.questions[state.currentQuestionIndex];
+        if (!question) return;
+
+        set({
+          questionPhase: "playing",
+          timerSeconds: question.isVideo ? 30 : 30,
+          isTimerRunning: false,
+        });
       },
 
       startTimer: () => {
@@ -214,9 +203,7 @@ export const useFinishStore = create<FinishStore>()(
         const state = get();
         if (!state.isTimerRunning) return;
         if (state.timerSeconds <= 1) {
-          // Hết giờ -> tự động coi là sai
           set({ isTimerRunning: false, timerSeconds: 0 });
-          // Gọi markWrong để xử lý
           get().markWrong();
         } else {
           set({ timerSeconds: state.timerSeconds - 1 });
@@ -232,8 +219,6 @@ export const useFinishStore = create<FinishStore>()(
       markWrong: () => {
         const state = get();
         if (state.questionPhase !== "playing") return;
-        // Nếu đang có sao, đội chính bị trừ điểm (đã được xử lý ở page)
-        // Chuyển sang pha cướp nếu còn đội khác
         const remainingTeams = TEAM_IDS.filter(id => id !== state.currentTeamId);
         if (remainingTeams.length > 0) {
           set({
@@ -242,7 +227,6 @@ export const useFinishStore = create<FinishStore>()(
             isTimerRunning: false,
           });
         } else {
-          // Không còn đội nào để cướp -> kết thúc câu hỏi
           set({ questionPhase: "resolved", isTimerRunning: false });
         }
       },
@@ -274,15 +258,15 @@ export const useFinishStore = create<FinishStore>()(
         if (!pkg) return;
         const nextIndex = state.currentQuestionIndex + 1;
         if (nextIndex >= pkg.questions.length) {
-          // Hết câu hỏi trong gói -> chuyển đội tiếp theo
           get().nextTeam();
           return;
         }
+        const starUsed = pkg.starUsed;
         set({
           currentQuestionIndex: nextIndex,
-          questionPhase: "intro",
+          questionPhase: starUsed ? "intro" : "star_decision",
           starActive: false,
-          starDecisionPending: false,
+          starDecisionPending: !starUsed,
           selectedStealTeamId: null,
           timerSeconds: 30,
           isTimerRunning: false,
@@ -298,13 +282,14 @@ export const useFinishStore = create<FinishStore>()(
         if (nextTeamId) {
           const nextPkg = state.packages.find((p) => p.selectedBy === nextTeamId);
           if (nextPkg) {
+            const starUsed = nextPkg.starUsed;
             set({
               currentTeamId: nextTeamId,
               currentPackageId: nextPkg.id,
               currentQuestionIndex: 0,
-              questionPhase: "intro",
+              questionPhase: starUsed ? "intro" : "star_decision",
               starActive: false,
-              starDecisionPending: false,
+              starDecisionPending: !starUsed,
               selectedStealTeamId: null,
               timerSeconds: 30,
               isTimerRunning: false,
@@ -313,13 +298,12 @@ export const useFinishStore = create<FinishStore>()(
           }
         }
 
-        // Không còn đội nào -> kết thúc
         set({
           status: "finished",
           currentTeamId: null,
           currentPackageId: null,
           currentQuestionIndex: 0,
-          questionPhase: "intro",
+          questionPhase: "star_decision",
           starActive: false,
           starDecisionPending: false,
           selectedStealTeamId: null,
