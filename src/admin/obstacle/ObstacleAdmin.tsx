@@ -44,35 +44,37 @@ export function ObstacleAdmin() {
    * Nếu tất cả các hàng được căn đúng,
    * các giá trị này sẽ bằng nhau.
    */
-  const verticalCells = useMemo(() => {
-    if (!puzzle) return [];
-
-    return puzzle.clues.map((clue) => ({
-      clue,
-      x: clue.x + clue.verticalIndex,
-      y: clue.y,
-    }));
-  }, [puzzle]);
+/*
+ * Tất cả ô giao phải nằm trên cùng một cột.
+ *
+ * Mỗi hàng có:
+ *
+ *   x + verticalIndex = verticalColumn
+ *
+ * Vì vậy khi hiển thị, vị trí X của hàng
+ * luôn được tính ngược từ cột giao chung.
+ */
+const verticalColumn = useMemo(() => {
+  if (!puzzle?.clues.length) return 6;
 
   /*
-   * Cột hàng dọc dùng giá trị trung bình của
-   * các điểm giao.
+   * Lấy vị trí giao hiện tại làm cơ sở.
    *
-   * Cách này giúp Admin nhìn thấy ngay nếu một
-   * hàng đang lệch khỏi trục chung.
+   * Đây chỉ là cột tham chiếu. Sau đó toàn bộ
+   * hàng ngang sẽ được render theo:
+   *
+   *   verticalColumn - verticalIndex
    */
-  const verticalColumn = useMemo(() => {
-    if (!verticalCells.length) return 6;
+  const total = puzzle.clues.reduce(
+    (sum, clue) =>
+      sum + clue.x + clue.verticalIndex,
+    0,
+  );
 
-    const total = verticalCells.reduce(
-      (sum, item) => sum + item.x,
-      0,
-    );
-
-    return Math.round(
-      total / verticalCells.length,
-    );
-  }, [verticalCells]);
+  return Math.round(
+    total / puzzle.clues.length,
+  );
+}, [puzzle]);
 
   const createPuzzle = () => {
     const id = `obstacle-${Date.now()}`;
@@ -169,23 +171,47 @@ export function ObstacleAdmin() {
         })),
     });
   };
+const moveClue = (
+  id: string,
+  dx: number,
+  dy: number,
+) => {
+  if (!puzzle) return;
 
-  const moveClue = (
-    id: string,
-    dx: number,
-    dy: number,
-  ) => {
-    const clue = puzzle?.clues.find(
-      (item) => item.id === id,
-    );
+  const clue = puzzle.clues.find(
+    (item) => item.id === id,
+  );
 
-    if (!clue) return;
+  if (!clue) return;
 
+  /*
+   * ← / →:
+   * Di chuyển TOÀN BỘ bảng theo chiều ngang.
+   *
+   * Như vậy trục dọc vẫn luôn thẳng hàng.
+   */
+  if (dx !== 0) {
+    updatePuzzle({
+      ...puzzle,
+      clues: puzzle.clues.map((item) => ({
+        ...item,
+        x: Math.max(0, item.x + dx),
+      })),
+    });
+
+    return;
+  }
+
+  /*
+   * ↑ / ↓:
+   * Chỉ di chuyển riêng hàng đang chọn theo Y.
+   */
+  if (dy !== 0) {
     updateClue(id, {
-      x: Math.max(0, clue.x + dx),
       y: Math.max(0, clue.y + dy),
     });
-  };
+  }
+};
 
   /*
    * Khi kéo một hàng lên hàng khác,
@@ -409,9 +435,10 @@ export function ObstacleAdmin() {
         </div>
 
         <p className="admin-help">
-          Kéo từng hàng ngang để thay đổi vị trí
-          theo chiều dọc. Dùng các nút
-          ← ↑ ↓ → để căn chỉnh chính xác.
+        Kéo từng hàng ngang để thay đổi vị trí
+theo chiều dọc. Dùng ↑ ↓ để thay đổi
+vị trí từng hàng. Dùng ← → để di chuyển
+toàn bộ bảng theo chiều ngang.
           <br />
           <strong>
             Vị trí giao được tính từ 1:
@@ -452,17 +479,28 @@ export function ObstacleAdmin() {
                     ? "dragging"
                     : ""
                 }`}
-                style={{
-                  left:
-                    clue.x *
-                      CELL_SIZE +
-                    10,
+style={{
+  /*
+   * Căn hàng theo ô giao chung.
+   *
+   * Ví dụ:
+   * verticalColumn = 10
+   * verticalIndex = 3
+   *
+   * => hàng bắt đầu tại cột 7
+   * => ô thứ 4 nằm đúng cột 10.
+   */
+  left:
+    (verticalColumn -
+      clue.verticalIndex) *
+      CELL_SIZE +
+    10,
 
-                  top:
-                    clue.y *
-                      ROW_HEIGHT +
-                    10,
-                }}
+  top:
+    clue.y *
+      ROW_HEIGHT +
+    10,
+}}
                 onDragStart={() =>
                   setDragId(clue.id)
                 }
