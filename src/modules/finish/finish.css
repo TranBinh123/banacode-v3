@@ -1,2336 +1,1085 @@
-.finish-page {
-  min-height: calc(100vh - 76px);
-  padding: 32px;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.95), transparent 28%),
-    radial-gradient(circle at 85% 20%, rgba(255, 236, 179, 0.65), transparent 30%),
-    linear-gradient(135deg, #fff8e7 0%, #fffdf8 45%, #eef8ff 100%);
-  color: #182338;
-}
+import { useMemo, useState } from "react";
+import { useFinishStore } from "../store/finishStore";
+import { useGameStore } from "../../../core/store/gameStore";
+import type { TeamId } from "../../../core/types/game";
 
-.finish-page-inner {
-  width: min(1500px, 100%);
-  margin: 0 auto;
-}
+const youtubeEmbedUrl = (url: string) => {
+  if (!url) return "";
 
-/* =========================
-   HERO
-   ========================= */
+  try {
+    const parsed = new URL(url);
 
-.finish-hero {
-  text-align: center;
-  padding: 26px 20px 30px;
-}
+    if (parsed.hostname.includes("youtu.be")) {
+      const videoId = parsed.pathname.replace("/", "");
 
-.finish-round-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 92px;
-  padding: 7px 16px;
-  border-radius: 999px;
-  background: #182338;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-}
+      return videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : "";
+    }
 
-.finish-hero h1,
-.finish-finale h1,
-.finish-empty h1,
-.finish-game-title h1 {
-  margin: 10px 0 0;
-  font-size: clamp(42px, 6vw, 82px);
-  line-height: 0.95;
-  font-weight: 950;
-  letter-spacing: -0.045em;
-  text-transform: uppercase;
-  background: linear-gradient(
-    90deg,
-    #ff8a00,
-    #ff3d81,
-    #7657ff,
-    #009fe3
+    if (parsed.hostname.includes("youtube.com")) {
+      const videoId = parsed.searchParams.get("v");
+
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}`;
+      }
+
+      if (parsed.pathname.startsWith("/embed/")) {
+        return url;
+      }
+    }
+  } catch {
+    return "";
+  }
+
+  return "";
+};
+
+export function FinishPage() {
+  const finish = useFinishStore();
+
+  const teams = useGameStore(
+    (state) => state.teams,
   );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
 
-.finish-hero-line {
-  width: min(280px, 60%);
-  height: 5px;
-  margin: 20px auto 14px;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    #ffb000,
-    #ff4f81,
-    #7757ff
+  const addScore = useGameStore(
+    (state) => state.addScore,
   );
-}
 
-.finish-hero p {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  color: #657085;
-}
-
-/* =========================
-   PACKAGE SELECTION
-   ========================= */
-
-.finish-selection-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin: 0 auto 28px;
-  padding: 18px 24px;
-  border: 1px solid rgba(255, 174, 0, 0.25);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 14px 40px rgba(44, 53, 80, 0.08);
-}
-
-.finish-selection-banner span {
-  color: #8a94a8;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-
-.finish-selection-banner strong {
-  color: #ff6b00;
-  font-size: 19px;
-  font-weight: 950;
-}
-
-.finish-selection-banner small {
-  color: #69758a;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.finish-package-public-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 22px;
-}
-
-.finish-public-package {
-  position: relative;
-  min-height: 240px;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
-  border: 2px solid rgba(255, 167, 0, 0.22);
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 75% 20%, rgba(255, 255, 255, 0.95), transparent 28%),
-    linear-gradient(145deg, #fffdf7, #fff0c8);
-  box-shadow: 0 18px 45px rgba(54, 55, 75, 0.1);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.finish-public-package::before {
-  content: "";
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  top: -65px;
-  right: -45px;
-  border-radius: 50%;
-  background: rgba(255, 187, 0, 0.25);
-}
-
-.finish-public-package:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 24px 55px rgba(54, 55, 75, 0.15);
-}
-
-.finish-public-package.taken {
-  opacity: 0.62;
-  filter: grayscale(0.35);
-}
-
-.finish-public-package-number {
-  position: absolute;
-  top: 18px;
-  left: 22px;
-  color: rgba(255, 133, 0, 0.22);
-  font-size: 74px;
-  line-height: 1;
-  font-weight: 950;
-}
-
-.finish-public-package-content {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  padding: 24px;
-}
-
-.finish-public-package-content strong {
-  display: block;
-  color: #202b40;
-  font-size: clamp(24px, 2.4vw, 38px);
-  font-weight: 950;
-}
-
-.finish-public-package-content span {
-  display: inline-block;
-  margin-top: 8px;
-  color: #ff7100;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-/* =========================
-   SCOREBOARD
-   ========================= */
-
-.finish-scoreboard {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.finish-score-team {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  min-width: 0;
-  padding: 12px 15px;
-  border: 1px solid rgba(45, 56, 80, 0.1);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 8px 22px rgba(40, 47, 68, 0.06);
-}
-
-.finish-score-team span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: #59657a;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.finish-score-team strong {
-  flex: 0 0 auto;
-  color: #182338;
-  font-size: 21px;
-  font-weight: 950;
-}
-
-.finish-score-team.active {
-  border-color: rgba(255, 121, 0, 0.4);
-  background: #fff4dc;
-}
-
-.finish-selection-banner + .finish-package-public-grid + .finish-scoreboard {
-  margin-top: 28px;
-}
-
-/* =========================
-   GAME HEADER
-   ========================= */
-
-.finish-game-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 26px;
-}
-
-.finish-game-title h1 {
-  font-size: clamp(36px, 4vw, 58px);
-}
-
-.finish-game-meta {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-}
-
-.finish-game-meta > div {
-  min-width: 92px;
-  padding: 12px 16px;
-  border: 1px solid rgba(55, 65, 90, 0.1);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 8px 22px rgba(40, 47, 68, 0.06);
-}
-
-.finish-game-meta span {
-  display: block;
-  margin-bottom: 4px;
-  color: #8791a4;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-.finish-game-meta strong {
-  display: block;
-  color: #202b40;
-  font-size: 18px;
-  font-weight: 950;
-}
-
-.finish-game-meta small {
-  margin-left: 2px;
-  color: #8b95a7;
-  font-size: 11px;
-}
-
-.finish-game-meta .finish-current-team {
-  min-width: 220px;
-}
-
-.finish-current-team strong {
-  color: #ff6700;
-}
-
-/* =========================
-   QUESTION
-   ========================= */
-
-.finish-question-area {
-  min-height: 520px;
-}
-
-.finish-question-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 14px;
-}
-
-.finish-question-topline span {
-  color: #7b8699;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-}
-
-.finish-question-topline strong {
-  padding: 7px 13px;
-  border-radius: 999px;
-  background: #fff0a8;
-  color: #9a6200;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-}
-
-.finish-question-display {
-  position: relative;
-  min-height: 400px;
-  padding: clamp(28px, 5vw, 65px);
-  overflow: hidden;
-  border: 1px solid rgba(57, 68, 95, 0.1);
-  border-radius: 32px;
-  background:
-    radial-gradient(circle at 10% 15%, rgba(255, 211, 82, 0.28), transparent 25%),
-    radial-gradient(circle at 90% 85%, rgba(123, 87, 255, 0.16), transparent 28%),
-    rgba(255, 255, 255, 0.88);
-  box-shadow:
-    0 25px 70px rgba(37, 47, 70, 0.11),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
-
-.finish-question-display::before {
-  content: "";
-  position: absolute;
-  width: 280px;
-  height: 280px;
-  top: -150px;
-  right: -90px;
-  border-radius: 50%;
-  border: 40px solid rgba(255, 180, 0, 0.08);
-}
-
-.finish-question-display h2 {
-  position: relative;
-  z-index: 1;
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: center;
-  color: #1c2639;
-  font-size: clamp(27px, 3.2vw, 48px);
-  line-height: 1.2;
-  font-weight: 850;
-  letter-spacing: -0.025em;
-}
-
-.finish-active-star {
-  position: relative;
-  z-index: 2;
-  width: fit-content;
-  margin: -42px auto 24px;
-  padding: 9px 18px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #ffd43b, #ff8d00);
-  color: #5e3b00;
-  font-size: 12px;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-  box-shadow: 0 10px 28px rgba(255, 161, 0, 0.28);
-}
-
-.finish-public-video {
-  position: relative;
-  z-index: 2;
-  width: min(950px, 100%);
-  aspect-ratio: 16 / 9;
-  margin: 34px auto 0;
-  overflow: hidden;
-  border-radius: 22px;
-  background: #111827;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
-}
-
-.finish-public-video iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-.finish-public-video-empty {
-  width: min(900px, 100%);
-  margin: 35px auto 0;
-  padding: 70px 20px;
-  border-radius: 20px;
-  background: #eef1f6;
-  color: #7c879a;
-  text-align: center;
-  font-weight: 900;
-  letter-spacing: 0.15em;
-}
-
-/* =========================
-   STAR DECISION
-   ========================= */
-
-.finish-public-star-decision {
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 50px 20px;
-  text-align: center;
-  border-radius: 34px;
-  background:
-    radial-gradient(circle, rgba(255, 221, 87, 0.42), transparent 32%),
-    linear-gradient(135deg, #fffdf1, #fff3c7);
-  border: 2px solid rgba(255, 187, 0, 0.22);
-  box-shadow: 0 25px 70px rgba(105, 75, 15, 0.1);
-}
-
-.finish-star-glow,
-.finish-finale-star {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 92px;
-  height: 92px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #ffe15b, #ff9900);
-  color: #fff;
-  font-size: 48px;
-  box-shadow:
-    0 0 0 12px rgba(255, 192, 0, 0.1),
-    0 0 55px rgba(255, 174, 0, 0.35);
-}
-
-.finish-star-caption {
-  margin-top: 26px;
-  color: #a66a00;
-  font-size: 13px;
-  font-weight: 950;
-  letter-spacing: 0.2em;
-}
-
-.finish-public-star-decision h2 {
-  margin: 14px 0 0;
-  color: #242d3e;
-  font-size: clamp(28px, 4vw, 50px);
-  font-weight: 950;
-}
-
-.finish-public-star-decision p {
-  margin: 12px 0 0;
-  color: #6e7788;
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-.finish-public-star-decision p strong {
-  color: #db8300;
-}
-
-.finish-star-question {
-  margin-top: 26px;
-  padding: 11px 18px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: #8b7449;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-}
-
-/* =========================
-   STEAL / RESULT
-   ========================= */
-
-.finish-public-result {
-  margin-top: 20px;
-  padding: 25px;
-  text-align: center;
-  border: 1px solid rgba(113, 88, 255, 0.16);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 14px 40px rgba(48, 55, 80, 0.08);
-}
-
-.finish-public-result.steal {
-  border-color: rgba(255, 171, 0, 0.24);
-  background: #fff8df;
-}
-
-.finish-result-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #fff0b0;
-  color: #b36d00;
-  font-size: 22px;
-  font-weight: 950;
-}
-
-.finish-public-result h3 {
-  margin: 10px 0 4px;
-  color: #202a3d;
-  font-size: 22px;
-  font-weight: 950;
-}
-
-.finish-public-result p,
-.finish-public-result strong {
-  display: block;
-  margin: 5px 0;
-  color: #747e90;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.finish-public-result strong {
-  color: #ff7100;
-}
-
-/* =========================
-   RESOLVED
-   ========================= */
-
-.finish-public-resolved {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-  padding: 16px;
-  border-radius: 18px;
-  background: rgba(235, 247, 238, 0.9);
-  color: #367348;
-}
-
-.finish-public-resolved span {
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-}
-
-.finish-public-resolved strong {
-  font-size: 12px;
-  font-weight: 950;
-}
-
-/* =========================
-   FOOTER
-   ========================= */
-
-.finish-public-footer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 22px;
-  align-items: end;
-  margin-top: 28px;
-}
-
-.finish-footer-brand {
-  text-align: right;
-}
-
-.finish-footer-brand span,
-.finish-footer-brand strong {
-  display: block;
-}
-
-.finish-footer-brand span {
-  color: #ff7100;
-  font-size: 12px;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-}
-
-.finish-footer-brand strong {
-  margin-top: 3px;
-  color: #8a93a5;
-  font-size: 9px;
-  font-weight: 850;
-  letter-spacing: 0.12em;
-}
-
-/* =========================
-   FINISH SCREEN
-   ========================= */
-
-.finish-finale {
-  min-height: calc(100vh - 140px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.finish-finale-badge {
-  color: #ff7100;
-  font-size: 13px;
-  font-weight: 950;
-  letter-spacing: 0.2em;
-}
-
-.finish-finale-star {
-  width: 110px;
-  height: 110px;
-  margin: 20px 0;
-  font-size: 58px;
-}
-
-.finish-finale h1 {
-  margin-top: 5px;
-  font-size: clamp(55px, 9vw, 110px);
-}
-
-.finish-finale > p {
-  margin: 16px 0 30px;
-  color: #737e91;
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.2em;
-}
-
-.finish-final-scoreboard {
-  width: min(850px, 100%);
-  display: grid;
-  gap: 9px;
-}
-
-.finish-final-score-row {
-  display: grid;
-  grid-template-columns: 52px 1fr 100px;
-  align-items: center;
-  gap: 15px;
-  padding: 15px 18px;
-  border: 1px solid rgba(55, 65, 90, 0.1);
-  border-radius: 17px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 8px 25px rgba(40, 47, 68, 0.06);
-  text-align: left;
-}
-
-.finish-final-rank {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #f1f3f7;
-  color: #657086;
-  font-size: 13px;
-  font-weight: 950;
-}
-
-.finish-final-score-row strong {
-  color: #263047;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.finish-final-score-row b {
-  color: #ff6900;
-  font-size: 25px;
-  font-weight: 950;
-  text-align: right;
-}
-
-.finish-finale-message {
-  margin-top: 25px;
-  color: #7a8497;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.16em;
-}
-
-/* =========================
-   EMPTY
-   ========================= */
-
-.finish-empty {
-  min-height: calc(100vh - 140px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.finish-empty p {
-  color: #7b8598;
-  font-weight: 700;
-}
-
-/* =========================
-   RESPONSIVE
-   ========================= */
-
-@media (max-width: 1100px) {
-  .finish-page {
-    padding: 22px;
-  }
-
-  .finish-package-public-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .finish-scoreboard {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .finish-game-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .finish-public-footer {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-footer-brand {
-    text-align: left;
-  }
-}
-
-@media (max-width: 720px) {
-  .finish-page {
-    padding: 14px;
-  }
-
-  .finish-package-public-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-scoreboard {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-game-meta {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .finish-game-meta .finish-current-team {
-    min-width: 0;
-    grid-column: 1 / -1;
-  }
-
-  .finish-question-display {
-    min-height: 330px;
-    padding: 30px 18px;
-    border-radius: 22px;
-  }
-
-  .finish-question-display h2 {
-    font-size: 25px;
-  }
-
-  .finish-question-topline {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .finish-public-star-decision {
-    min-height: 420px;
-    border-radius: 24px;
-  }
-
-  .finish-final-score-row {
-    grid-template-columns: 40px 1fr 70px;
-    gap: 8px;
-    padding: 12px;
-  }
-
-  .finish-final-score-row b {
-    font-size: 20px;
-  }
-}
-/* =========================================================
-   FINISH ADMIN PANEL
-   ========================================================= */
-
-.finish-admin {
-  min-height: calc(100vh - 76px);
-  padding: 32px;
-  background:
-    radial-gradient(
-      circle at 10% 10%,
-      rgba(255, 214, 92, 0.18),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 90% 15%,
-      rgba(105, 91, 255, 0.12),
-      transparent 28%
-    ),
-    linear-gradient(
-      135deg,
-      #f8faff 0%,
-      #ffffff 50%,
-      #fff8ed 100%
+  const [pendingTeamId, setPendingTeamId] =
+    useState<TeamId | null>(null);
+
+  const [pendingPackageId, setPendingPackageId] =
+    useState<string | null>(null);
+
+  const currentPackage = useMemo(
+    () =>
+      finish.packages.find(
+        (pkg) =>
+          pkg.id === finish.currentPackageId,
+      ) ?? null,
+    [
+      finish.packages,
+      finish.currentPackageId,
+    ],
+  );
+
+  const currentQuestion =
+    currentPackage?.questions[
+      finish.currentQuestionIndex
+    ] ?? null;
+
+  const currentTeam = finish.currentTeamId
+    ? teams.find(
+        (team) =>
+          team.id === finish.currentTeamId,
+      ) ?? null
+    : null;
+
+  const selectedStealTeam =
+    finish.selectedStealTeamId
+      ? teams.find(
+          (team) =>
+            team.id ===
+            finish.selectedStealTeamId,
+        ) ?? null
+      : null;
+
+  const availableTeams = teams.filter(
+    (team) =>
+      !finish.packages.some(
+        (pkg) =>
+          pkg.selectedBy === team.id,
+      ),
+  );
+
+  const availablePackages =
+    finish.packages.filter(
+      (pkg) => pkg.selectedBy === null,
     );
-  color: #182338;
-}
 
-.finish-admin > * {
-  width: min(1450px, 100%);
-  margin-left: auto;
-  margin-right: auto;
-}
+  const embedUrl =
+    currentQuestion?.isVideo
+      ? youtubeEmbedUrl(
+          currentQuestion.youtubeUrl,
+        )
+      : "";
 
-.finish-admin-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-}
+  const isStarDecision =
+    finish.starDecisionPending &&
+    (finish.currentQuestionIndex === 3 ||
+      finish.currentQuestionIndex === 4);
 
-.finish-kicker {
-  color: #ff7100;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.18em;
-}
+  const isMainResult =
+    finish.resolution ===
+    "awaiting-main-result";
 
-.finish-admin-header h1 {
-  margin: 6px 0 8px;
-  font-size: clamp(38px, 5vw, 64px);
-  line-height: 0.95;
-  font-weight: 950;
-  letter-spacing: -0.04em;
-  background: linear-gradient(
-    90deg,
-    #ff8700,
-    #ff3f7d,
-    #7055ff
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+  const isStealSelection =
+    finish.resolution ===
+    "selecting-steal-team";
 
-.finish-admin-header p {
-  max-width: 700px;
-  margin: 0;
-  color: #7a8598;
-  font-size: 13px;
-  line-height: 1.6;
-}
+  const isStealResult =
+    finish.resolution ===
+    "awaiting-steal-result";
 
-.finish-admin-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+  const isResolved =
+    finish.resolution === "resolved";
 
-.finish-admin-meta span,
-.finish-admin-meta strong {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 900;
-}
+  const handleAssignPackage = () => {
+    if (
+      !pendingTeamId ||
+      !pendingPackageId
+    ) {
+      return;
+    }
 
-.finish-admin-meta span {
-  background: #eef1f7;
-  color: #69758a;
-  letter-spacing: 0.08em;
-}
+    const success =
+      finish.selectPackage(
+        pendingTeamId,
+        pendingPackageId,
+      );
 
-.finish-admin-meta strong {
-  background: #fff0dc;
-  color: #e56600;
-}
+    if (success) {
+      setPendingTeamId(null);
+      setPendingPackageId(null);
+    }
+  };
 
-/* =========================================================
-   ADMIN SELECTION
-   ========================================================= */
+  const handleCorrect = () => {
+    if (
+      finish.resolution ===
+        "awaiting-main-result" &&
+      finish.currentTeamId
+    ) {
+      const points =
+        finish.starActive ? 20 : 10;
 
-.finish-selection-team {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 24px;
-  padding: 18px 22px;
-  border: 1px solid rgba(255, 157, 0, 0.2);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 12px 35px rgba(37, 48, 73, 0.08);
-}
+      addScore(
+        finish.currentTeamId,
+        points,
+        "finish",
+      );
 
-.finish-selection-team span {
-  color: #8993a5;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
+      finish.markCorrect();
 
-.finish-selection-team strong {
-  color: #ff6900;
-  font-size: 20px;
-  font-weight: 950;
-}
+      return;
+    }
 
-.finish-selection-team small {
-  color: #7c8799;
-  font-size: 11px;
-  font-weight: 800;
-}
+    if (
+      finish.resolution ===
+        "awaiting-steal-result" &&
+      finish.selectedStealTeamId &&
+      finish.currentTeamId
+    ) {
+      addScore(
+        finish.selectedStealTeamId,
+        20,
+        "finish",
+      );
 
-.finish-package-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
-}
+      addScore(
+        finish.currentTeamId,
+        -10,
+        "finish",
+      );
 
-.finish-package-card {
-  position: relative;
-  min-height: 210px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: flex-start;
-  padding: 24px;
-  overflow: hidden;
-  border: 2px solid rgba(255, 171, 0, 0.2);
-  border-radius: 24px;
-  background:
-    radial-gradient(
-      circle at 85% 15%,
-      rgba(255, 210, 65, 0.3),
-      transparent 30%
-    ),
-    linear-gradient(
-      145deg,
-      #ffffff,
-      #fff3d2
+      finish.markStealCorrect();
+    }
+  };
+
+  const handleWrong = () => {
+    if (
+      finish.resolution ===
+      "awaiting-main-result"
+    ) {
+      finish.markWrong();
+      return;
+    }
+
+    if (
+      finish.resolution ===
+      "awaiting-steal-result"
+    ) {
+      finish.markStealWrong();
+    }
+  };
+
+  /* =====================================================
+     KẾT THÚC VÒNG 4
+     ===================================================== */
+
+  if (finish.status === "finished") {
+    return (
+      <section className="finish-page">
+        <div className="finish-finale">
+          <div className="finish-finale-badge">
+            VÒNG 4
+          </div>
+
+          <div className="finish-finale-star">
+            ★
+          </div>
+
+          <h1>VỀ ĐÍCH</h1>
+
+          <p>
+            PHẦN THI ĐÃ HOÀN THÀNH
+          </p>
+
+          <div className="finish-final-scoreboard">
+            {teams
+              .slice()
+              .sort(
+                (a, b) =>
+                  b.totalScore -
+                  a.totalScore,
+              )
+              .map((team, index) => (
+                <div
+                  key={team.id}
+                  className="finish-final-score-row"
+                >
+                  <span className="finish-final-rank">
+                    {index + 1}
+                  </span>
+
+                  <strong>
+                    {team.name}
+                  </strong>
+
+                  <b>
+                    {team.totalScore}
+                  </b>
+                </div>
+              ))}
+          </div>
+
+          <div className="finish-finale-message">
+            CHÚC MỪNG CÁC ĐỘI THI!
+          </div>
+
+          <button
+            className="finish-primary-button"
+            onClick={finish.resetRound}
+          >
+            CHƠI LẠI VÒNG 4
+          </button>
+        </div>
+      </section>
     );
-  color: #202b40;
-  text-align: left;
-  cursor: pointer;
-  box-shadow: 0 16px 38px rgba(40, 48, 70, 0.08);
-  transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease;
-}
+  }
 
-.finish-package-card::before {
-  content: "";
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  top: -50px;
-  right: -30px;
-  border-radius: 50%;
-  border: 20px solid rgba(255, 160, 0, 0.08);
-}
+  /* =====================================================
+     CHỌN ĐỘI + GÓI CÂU HỎI
+     ===================================================== */
 
-.finish-package-card:not(:disabled):hover {
-  transform: translateY(-5px);
-  border-color: rgba(255, 130, 0, 0.5);
-  box-shadow: 0 23px 48px rgba(40, 48, 70, 0.14);
-}
+  if (finish.status === "selection") {
+    const selectedTeam = pendingTeamId
+      ? teams.find(
+          (team) =>
+            team.id === pendingTeamId,
+        ) ?? null
+      : null;
 
-.finish-package-card:disabled {
-  cursor: not-allowed;
-}
+    const selectedPackage = pendingPackageId
+      ? finish.packages.find(
+          (pkg) =>
+            pkg.id === pendingPackageId,
+        ) ?? null
+      : null;
 
-.finish-package-card > span {
-  position: relative;
-  z-index: 1;
-  font-size: 30px;
-  font-weight: 950;
-  letter-spacing: -0.03em;
-}
+    return (
+      <section className="finish-page finish-selection-page">
+        <div className="finish-page-inner">
+          <header className="finish-hero finish-selection-hero">
+            <div className="finish-round-label">
+              VÒNG 4
+            </div>
 
-.finish-package-card small {
-  position: relative;
-  z-index: 1;
-  margin-top: 7px;
-  color: #ff7100;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-}
+            <h1>VỀ ĐÍCH</h1>
 
-.finish-package-card.taken {
-  opacity: 0.55;
-  filter: grayscale(0.35);
-}
+            <div className="finish-hero-line" />
 
-/* =========================================================
-   ADMIN MAIN
-   ========================================================= */
+            <p>
+              GHÉP ĐỘI THI VỚI GÓI CÂU HỎI
+            </p>
+          </header>
 
-.finish-admin-main {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+          <main className="finish-assignment-layout">
+            {/* =========================
+                ĐỘI THI
+                ========================= */}
 
-.finish-question-card {
-  position: relative;
-  padding: 30px;
-  overflow: hidden;
-  border: 1px solid rgba(58, 69, 94, 0.1);
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 20px 55px rgba(37, 47, 70, 0.09);
-}
+            <section className="finish-assignment-section finish-team-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">
+                  01
+                </div>
 
-.finish-question-card::before {
-  content: "";
-  position: absolute;
-  width: 220px;
-  height: 220px;
-  top: -120px;
-  right: -60px;
-  border-radius: 50%;
-  background: rgba(255, 190, 0, 0.1);
-}
+                <div>
+                  <span>CHỌN ĐỘI THI</span>
 
-.finish-question-number {
-  position: relative;
-  z-index: 1;
-  color: #ff7100;
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: 0.15em;
-}
+                  <small>
+                    Chọn đội đang chuẩn bị thi
+                  </small>
+                </div>
+              </div>
 
-.finish-question-card h2 {
-  position: relative;
-  z-index: 1;
-  margin: 14px 0 24px;
-  max-width: 1100px;
-  color: #202a3e;
-  font-size: clamp(25px, 3vw, 42px);
-  line-height: 1.2;
-  font-weight: 850;
-  letter-spacing: -0.025em;
-}
+              <div className="finish-assignment-team-list">
+                {availableTeams.length === 0 ? (
+                  <div className="finish-assignment-empty">
+                    TẤT CẢ ĐỘI ĐÃ ĐƯỢC GÁN
+                  </div>
+                ) : (
+                  availableTeams.map((team) => (
+                    <button
+                      key={team.id}
+                      type="button"
+                      className={`finish-team-select-card ${
+                        pendingTeamId === team.id
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setPendingTeamId(team.id)
+                      }
+                    >
+                      <span className="finish-team-select-check">
+                        {pendingTeamId === team.id
+                          ? "✓"
+                          : ""}
+                      </span>
 
-.finish-active-star {
-  margin: 12px 0 18px;
-}
+                      <div className="finish-team-select-name">
+                        {team.name}
+                      </div>
 
-.finish-answer-box {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 190px 1fr;
-  align-items: center;
-  gap: 18px;
-  padding: 15px 18px;
-  border-radius: 16px;
-  background: #f4f6fa;
-}
+                      <div className="finish-team-select-score">
+                        <small>ĐIỂM</small>
 
-.finish-answer-box span {
-  color: #8a94a6;
-  font-size: 9px;
-  font-weight: 950;
-  letter-spacing: 0.12em;
-}
+                        <strong>
+                          {team.totalScore}
+                        </strong>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </section>
 
-.finish-answer-box strong {
-  color: #39445a;
-  font-size: 14px;
-  font-weight: 850;
-}
+            {/* =========================
+                GHÉP
+                ========================= */}
 
-/* =========================================================
-   ADMIN VIDEO
-   ========================================================= */
+            <section className="finish-assignment-section finish-mapping-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">
+                  02
+                </div>
 
-.finish-video-wrapper {
-  position: relative;
-  z-index: 2;
-  width: min(850px, 100%);
-  aspect-ratio: 16 / 9;
-  margin: 24px auto;
-  overflow: hidden;
-  border-radius: 18px;
-  background: #101522;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
-}
+                <div>
+                  <span>GHÉP ĐANG CHỌN</span>
 
-.finish-video-wrapper iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
+                  <small>
+                    Xác nhận đội và gói câu hỏi
+                  </small>
+                </div>
+              </div>
 
-.finish-video-placeholder {
-  margin: 24px 0;
-  padding: 45px 20px;
-  border-radius: 18px;
-  background: #f0f2f6;
-  color: #7c8799;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-}
+              <div className="finish-mapping-card">
+                <div className="finish-mapping-label">
+                  ĐỘI THI
+                </div>
 
-/* =========================================================
-   ADMIN JUDGEMENT
-   ========================================================= */
+                <div
+                  className={`finish-mapping-value ${
+                    selectedTeam
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  {selectedTeam?.name ?? (
+                    <span>
+                      Chưa chọn đội
+                    </span>
+                  )}
+                </div>
 
-.finish-judgement-panel {
-  padding: 22px;
-  border: 1px solid rgba(70, 82, 110, 0.1);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 14px 38px rgba(38, 47, 69, 0.08);
-}
+                <div className="finish-mapping-arrow">
+                  ↓
+                </div>
 
-.finish-judgement-title {
-  color: #263148;
-  font-size: 15px;
-  font-weight: 950;
-  letter-spacing: 0.08em;
-}
+                <div className="finish-mapping-label">
+                  GÓI CÂU HỎI
+                </div>
 
-.finish-judgement-panel p {
-  margin: 7px 0 18px;
-  color: #7c8799;
-  font-size: 12px;
-  font-weight: 700;
-}
+                <div
+                  className={`finish-mapping-value ${
+                    selectedPackage
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  {selectedPackage?.label ?? (
+                    <span>
+                      Chưa chọn gói
+                    </span>
+                  )}
+                </div>
 
-.finish-judgement-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
+                <button
+                  type="button"
+                  className="finish-primary-button finish-assignment-submit"
+                  disabled={
+                    !pendingTeamId ||
+                    !pendingPackageId
+                  }
+                  onClick={
+                    handleAssignPackage
+                  }
+                >
+                  GÁN ĐỘI VÀO GÓI
 
-.finish-correct-button,
-.finish-wrong-button {
-  min-height: 58px;
-  border: 0;
-  border-radius: 16px;
-  font-size: 15px;
-  font-weight: 950;
-  cursor: pointer;
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease;
-}
+                  <span>→</span>
+                </button>
+              </div>
 
-.finish-correct-button {
-  background: #dcf7e4;
-  color: #18733a;
-}
+              <div className="finish-assignment-hint">
+                {!selectedTeam &&
+                  "① Chọn một đội thi bên trái"}
 
-.finish-wrong-button {
-  background: #ffe1e1;
-  color: #b52f35;
-}
+                {selectedTeam &&
+                  !selectedPackage &&
+                  "② Chọn một gói câu hỏi bên phải"}
 
-.finish-correct-button:hover,
-.finish-wrong-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(30, 40, 60, 0.1);
-}
+                {selectedTeam &&
+                  selectedPackage &&
+                  "③ Kiểm tra và xác nhận ghép đội"}
+              </div>
+            </section>
 
-/* =========================================================
-   STAR DECISION ADMIN
-   ========================================================= */
+            {/* =========================
+                GÓI CÂU HỎI
+                ========================= */}
 
-.finish-star-decision {
-  min-height: 510px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 45px 25px;
-  text-align: center;
-  border: 2px solid rgba(255, 186, 0, 0.25);
-  border-radius: 30px;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(255, 215, 72, 0.32),
-      transparent 38%
-    ),
-    linear-gradient(
-      135deg,
-      #fffef4,
-      #fff3c9
+            <section className="finish-assignment-section finish-package-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">
+                  03
+                </div>
+
+                <div>
+                  <span>
+                    CHỌN GÓI CÂU HỎI
+                  </span>
+
+                  <small>
+                    Mỗi gói chỉ được chọn một lần
+                  </small>
+                </div>
+              </div>
+
+              <div className="finish-assignment-package-list">
+                {availablePackages.length ===
+                0 ? (
+                  <div className="finish-assignment-empty">
+                    TẤT CẢ GÓI ĐÃ ĐƯỢC CHỌN
+                  </div>
+                ) : (
+                  availablePackages.map(
+                    (pkg, index) => (
+                      <button
+                        key={pkg.id}
+                        type="button"
+                        className={`finish-package-select-card ${
+                          pendingPackageId ===
+                          pkg.id
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setPendingPackageId(
+                            pkg.id,
+                          )
+                        }
+                      >
+                        <div className="finish-package-select-number">
+                          {String(
+                            index + 1,
+                          ).padStart(
+                            2,
+                            "0",
+                          )}
+                        </div>
+
+                        <div className="finish-package-select-info">
+                          <strong>
+                            {pkg.label}
+                          </strong>
+
+                          <span>
+                            5 CÂU HỎI
+                          </span>
+                        </div>
+
+                        <div className="finish-package-select-arrow">
+                          {pendingPackageId ===
+                          pkg.id
+                            ? "✓"
+                            : "→"}
+                        </div>
+                      </button>
+                    ),
+                  )
+                )}
+              </div>
+            </section>
+          </main>
+
+          {/* =========================
+              TIẾN ĐỘ GÁN
+              ========================= */}
+
+          {finish.selectionOrder.length >
+            0 && (
+            <section className="finish-assigned-summary">
+              <div className="finish-assigned-summary-header">
+                <span>
+                  TIẾN ĐỘ GÁN GÓI
+                </span>
+
+                <strong>
+                  {
+                    finish
+                      .selectionOrder
+                      .length
+                  }{" "}
+                  / 4
+                </strong>
+              </div>
+
+              <div className="finish-assigned-summary-list">
+                {finish.selectionOrder.map(
+                  (teamId, index) => {
+                    const team = teams.find(
+                      (item) =>
+                        item.id === teamId,
+                    );
+
+                    const pkg =
+                      finish.packages.find(
+                        (item) =>
+                          item.selectedBy ===
+                          teamId,
+                      );
+
+                    if (!team || !pkg) {
+                      return null;
+                    }
+
+                    return (
+                      <div
+                        key={teamId}
+                        className="finish-assigned-summary-item"
+                      >
+                        <span>
+                          {String(
+                            index + 1,
+                          ).padStart(
+                            2,
+                            "0",
+                          )}
+                        </span>
+
+                        <strong>
+                          {team.name}
+                        </strong>
+
+                        <b>→</b>
+
+                        <em>
+                          {pkg.label}
+                        </em>
+
+                        <small>
+                          ĐÃ GÁN
+                        </small>
+                      </div>
+                    );
+                  },
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* =========================
+              SCOREBOARD
+              ========================= */}
+
+          <footer className="finish-public-footer">
+            <div className="finish-scoreboard">
+              {teams
+                .slice()
+                .sort(
+                  (a, b) =>
+                    b.totalScore -
+                    a.totalScore,
+                )
+                .map((team) => (
+                  <div
+                    key={team.id}
+                    className="finish-score-team"
+                  >
+                    <span>
+                      {team.name}
+                    </span>
+
+                    <strong>
+                      {team.totalScore}
+                    </strong>
+                  </div>
+                ))}
+            </div>
+
+            <div className="finish-footer-brand">
+              <span>
+                THE BANACODE
+              </span>
+
+              <strong>
+                HÀNH TRÌNH 19 NĂM
+              </strong>
+            </div>
+          </footer>
+        </div>
+      </section>
     );
-  box-shadow: 0 22px 60px rgba(105, 75, 15, 0.1);
-}
-
-.finish-star-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 84px;
-  height: 84px;
-  border-radius: 50%;
-  background: linear-gradient(
-    145deg,
-    #ffe15b,
-    #ff9500
-  );
-  color: white;
-  font-size: 42px;
-  box-shadow:
-    0 0 0 10px rgba(255, 193, 0, 0.1),
-    0 0 45px rgba(255, 174, 0, 0.3);
-}
-
-.finish-star-label {
-  margin-top: 20px;
-  color: #a66a00;
-  font-size: 12px;
-  font-weight: 950;
-  letter-spacing: 0.18em;
-}
-
-.finish-star-decision h2 {
-  margin: 12px 0 5px;
-  color: #242d40;
-  font-size: clamp(25px, 3vw, 40px);
-  line-height: 1.15;
-  font-weight: 950;
-}
-
-.finish-star-decision p {
-  max-width: 600px;
-  margin: 0;
-  color: #747e91;
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.finish-star-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  width: min(620px, 100%);
-  margin-top: 25px;
-}
-
-.finish-star-yes,
-.finish-star-no {
-  min-height: 58px;
-  border-radius: 16px;
-  font-size: 13px;
-  font-weight: 950;
-  cursor: pointer;
-}
-
-.finish-star-yes {
-  border: 0;
-  background: linear-gradient(
-    135deg,
-    #ffd83d,
-    #ff8c00
-  );
-  color: #5e3b00;
-  box-shadow: 0 12px 30px rgba(255, 160, 0, 0.22);
-}
-
-.finish-star-no {
-  border: 1px solid rgba(75, 86, 110, 0.16);
-  background: rgba(255, 255, 255, 0.8);
-  color: #59657a;
-}
-
-/* =========================================================
-   STEAL ADMIN
-   ========================================================= */
-
-.finish-steal-panel {
-  padding: 25px;
-  border: 2px solid rgba(255, 173, 0, 0.2);
-  border-radius: 22px;
-  background: #fff9e8;
-  box-shadow: 0 15px 40px rgba(90, 67, 20, 0.08);
-}
-
-.finish-steal-panel > p {
-  margin: 8px 0 18px;
-  color: #777f90;
-  font-size: 12px;
-}
-
-.finish-steal-team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.finish-steal-team {
-  min-height: 55px;
-  padding: 10px 15px;
-  border: 1px solid rgba(255, 145, 0, 0.2);
-  border-radius: 14px;
-  background: #ffffff;
-  color: #39445a;
-  font-size: 12px;
-  font-weight: 900;
-  cursor: pointer;
-  box-shadow: 0 7px 18px rgba(50, 58, 80, 0.06);
-}
-
-.finish-steal-team:hover {
-  border-color: rgba(255, 120, 0, 0.5);
-  background: #fff3d7;
-}
-
-/* =========================================================
-   ADMIN NEXT
-   ========================================================= */
-
-.finish-next-panel {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
-  border: 1px solid rgba(65, 78, 105, 0.1);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 12px 32px rgba(40, 48, 70, 0.07);
-}
-
-.finish-result-message {
-  color: #687388;
-  font-size: 12px;
-  font-weight: 850;
-}
-
-.finish-primary-button {
-  min-height: 50px;
-  padding: 0 24px;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(
-    135deg,
-    #ff8500,
-    #ff4d72
-  );
-  color: #ffffff;
-  font-size: 12px;
-  font-weight: 950;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(255, 100, 40, 0.2);
-  transition:
-    transform 150ms ease,
-    box-shadow 150ms ease;
-}
-
-.finish-primary-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(255, 100, 40, 0.28);
-}
-
-/* =========================================================
-   ADMIN FOOTER
-   ========================================================= */
-
-.finish-admin-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  margin-top: 18px;
-  padding: 13px 16px;
-  color: #8992a3;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.finish-admin-footer strong {
-  color: #ff7100;
-  font-weight: 950;
-}
-
-/* =========================================================
-   ADMIN CARD / EMPTY
-   ========================================================= */
-
-.finish-admin-card {
-  width: min(700px, 100%);
-  margin: 80px auto;
-  padding: 45px;
-  text-align: center;
-  border: 1px solid rgba(55, 67, 95, 0.1);
-  border-radius: 28px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 20px 55px rgba(38, 47, 69, 0.1);
-}
-
-.finish-admin-card h2 {
-  margin: 0 0 20px;
-  color: #263148;
-}
-
-.finish-admin-card p {
-  margin: 0 0 25px;
-  color: #7b8597;
-}
-
-/* =========================================================
-   ADMIN RESPONSIVE
-   ========================================================= */
-
-@media (max-width: 1100px) {
-  .finish-admin {
-    padding: 22px;
   }
 
-  .finish-package-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  /* =====================================================
+     FALLBACK
+     ===================================================== */
 
-  .finish-selection-team {
-    grid-template-columns: 1fr;
-    gap: 7px;
-  }
-}
+  if (
+    !currentPackage ||
+    !currentQuestion
+  ) {
+    return (
+      <section className="finish-page">
+        <div className="finish-empty">
+          <div className="finish-round-label">
+            VÒNG 4
+          </div>
 
-@media (max-width: 720px) {
-  .finish-admin {
-    padding: 14px;
-  }
+          <h1>VỀ ĐÍCH</h1>
 
-  .finish-admin-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .finish-package-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-question-card {
-    padding: 22px 17px;
-  }
-
-  .finish-answer-box {
-    grid-template-columns: 1fr;
-    gap: 7px;
-  }
-
-  .finish-judgement-actions,
-  .finish-star-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-steal-team-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-next-panel {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .finish-primary-button {
-    width: 100%;
-  }
-
-  .finish-admin-footer {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-/* =========================================================
-   FINISH — PACKAGE / TEAM ASSIGNMENT
-   ========================================================= */
-
-.finish-assignment-panel {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  margin-top: 28px;
-}
-
-.finish-assignment-column {
-  padding: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-}
-
-.finish-assignment-title {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 22px;
-}
-
-.finish-assignment-title > span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.finish-assignment-title > div {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.finish-assignment-title strong {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 0.03em;
-}
-
-.finish-assignment-title small {
-  opacity: 0.55;
-  font-size: 12px;
-}
-
-/* TEAM GRID */
-
-.finish-assignment-team-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.finish-assignment-team {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 68px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.045);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.finish-assignment-team:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.09);
-}
-
-.finish-assignment-team.selected {
-  border-color: #facc15;
-  background: rgba(250, 204, 21, 0.12);
-  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.2);
-}
-
-.finish-assignment-team span {
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.finish-assignment-team strong {
-  min-width: 36px;
-  text-align: right;
-  font-size: 22px;
-  font-weight: 900;
-}
-
-/* PACKAGE GRID */
-
-.finish-assignment-package-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.finish-assignment-package {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  min-height: 110px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.045);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.finish-assignment-package:hover {
-  transform: translateY(-3px);
-  border-color: rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.09);
-}
-
-.finish-assignment-package.selected {
-  border-color: #facc15;
-  background: rgba(250, 204, 21, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(250, 204, 21, 0.2),
-    0 12px 30px rgba(0, 0, 0, 0.15);
-}
-
-.finish-assignment-package > span {
-  margin-bottom: 8px;
-  opacity: 0.45;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-.finish-assignment-package strong {
-  font-size: 20px;
-  font-weight: 900;
-}
-
-.finish-assignment-package small {
-  margin-top: 5px;
-  opacity: 0.55;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* CONFIRM BAR */
-
-.finish-assignment-confirm {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 18px;
-  margin-top: 20px;
-  padding: 20px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.finish-assignment-confirm > div:not(.finish-assignment-arrow) {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.finish-assignment-confirm span {
-  opacity: 0.45;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-}
-
-.finish-assignment-confirm strong {
-  overflow: hidden;
-  font-size: 15px;
-  font-weight: 900;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.finish-assignment-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  font-weight: 300;
-  opacity: 0.5;
-}
-
-/* ASSIGNED LIST */
-
-.finish-assigned-list {
-  margin-top: 24px;
-  padding: 20px 24px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.finish-assigned-list-title {
-  margin-bottom: 14px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  opacity: 0.5;
-}
-
-.finish-assigned-empty {
-  display: block;
-  padding: 10px 0;
-  opacity: 0.45;
-  font-size: 13px;
-}
-
-.finish-assigned-row {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 30px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.finish-assigned-row > span {
-  opacity: 0.4;
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.finish-assigned-row strong {
-  overflow: hidden;
-  font-size: 13px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.finish-assigned-row b {
-  text-align: center;
-  opacity: 0.4;
-}
-
-.finish-assigned-row em {
-  overflow: hidden;
-  color: inherit;
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* MOBILE */
-
-@media (max-width: 900px) {
-  .finish-assignment-panel {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-assignment-confirm {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .finish-assignment-arrow {
-    transform: rotate(90deg);
-  }
-
-  .finish-assignment-confirm .finish-primary-button {
-    width: 100%;
-  }
-}
-
-@media (max-width: 560px) {
-  .finish-assignment-column {
-    padding: 18px;
-  }
-
-  .finish-assignment-team-grid,
-  .finish-assignment-package-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .finish-assigned-list {
-    padding: 16px;
-  }
-
-  .finish-assigned-row {
-    grid-template-columns: 26px minmax(0, 1fr);
-    gap: 8px;
-    padding: 8px 0;
-  }
-
-  .finish-assigned-row b,
-  .finish-assigned-row em {
-    grid-column: 2;
-  }
-}
-/* =========================================================
-   VÒNG 4 — GIAO DIỆN GÁN ĐỘI / GÓI CÂU HỎI
-   ========================================================= */
-
-.finish-selection-page {
-  min-height: 100vh;
-}
-
-.finish-selection-hero {
-  margin-bottom: 30px;
-}
-
-/* =========================
-   MAIN 3-COLUMN LAYOUT
-   ========================= */
-
-.finish-assignment-layout {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.05fr)
-    minmax(280px, 0.85fr)
-    minmax(0, 1.05fr);
-  gap: 24px;
-  align-items: stretch;
-}
-
-.finish-assignment-section {
-  min-width: 0;
-  padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 22px;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255, 255, 255, 0.075),
-      rgba(255, 255, 255, 0.025)
+          <p>
+            Chưa có câu hỏi đang diễn ra.
+          </p>
+        </div>
+      </section>
     );
-  box-shadow:
-    0 18px 50px rgba(0, 0, 0, 0.12);
-}
-
-.finish-mapping-section {
-  background:
-    linear-gradient(
-      145deg,
-      rgba(250, 204, 21, 0.09),
-      rgba(255, 255, 255, 0.025)
-    );
-  border-color: rgba(250, 204, 21, 0.2);
-}
-
-/* =========================
-   SECTION HEADER
-   ========================= */
-
-.finish-assignment-section-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
-}
-
-.finish-assignment-index {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-}
-
-.finish-assignment-section-header > div:last-child {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.finish-assignment-section-header span {
-  font-size: 16px;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-}
-
-.finish-assignment-section-header small {
-  opacity: 0.48;
-  font-size: 11px;
-}
-
-/* =========================
-   TEAM CARDS
-   ========================= */
-
-.finish-assignment-team-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.finish-team-select-card {
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 68px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.035);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.finish-team-select-card:hover {
-  transform: translateX(3px);
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.finish-team-select-card.selected {
-  border-color: #facc15;
-  background: rgba(250, 204, 21, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(250, 204, 21, 0.18),
-    0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-.finish-team-select-check {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.finish-team-select-card.selected
-  .finish-team-select-check {
-  border-color: #facc15;
-  background: #facc15;
-  color: #111;
-}
-
-.finish-team-select-name {
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 850;
-  line-height: 1.35;
-  text-overflow: ellipsis;
-}
-
-.finish-team-select-score {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-}
-
-.finish-team-select-score small {
-  opacity: 0.4;
-  font-size: 8px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-}
-
-.finish-team-select-score strong {
-  font-size: 20px;
-  font-weight: 950;
-}
-
-/* =========================
-   PACKAGE CARDS
-   ========================= */
-
-.finish-assignment-package-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.finish-package-select-card {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 30px;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 74px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.035);
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition:
-    transform 0.18s ease,
-    border-color 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.finish-package-select-card:hover {
-  transform: translateX(-3px);
-  border-color: rgba(255, 255, 255, 0.28);
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.finish-package-select-card.selected {
-  border-color: #facc15;
-  background: rgba(250, 204, 21, 0.12);
-  box-shadow:
-    0 0 0 1px rgba(250, 204, 21, 0.18),
-    0 10px 25px rgba(0, 0, 0, 0.12);
-}
-
-.finish-package-select-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.07);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.finish-package-select-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.finish-package-select-info strong {
-  overflow: hidden;
-  font-size: 15px;
-  font-weight: 900;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.finish-package-select-info span {
-  opacity: 0.45;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-}
-
-.finish-package-select-arrow {
-  font-size: 20px;
-  font-weight: 900;
-  opacity: 0.45;
-}
-
-.finish-package-select-card.selected
-  .finish-package-select-arrow {
-  color: #facc15;
-  opacity: 1;
-}
-
-/* =========================
-   MAPPING CENTER
-   ========================= */
-
-.finish-mapping-card {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  min-height: 350px;
-  padding: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.finish-mapping-label {
-  margin-bottom: 7px;
-  opacity: 0.42;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-}
-
-.finish-mapping-value {
-  display: flex;
-  align-items: center;
-  min-height: 58px;
-  padding: 0 15px;
-  border: 1px dashed rgba(255, 255, 255, 0.14);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
-  font-size: 13px;
-  font-weight: 850;
-}
-
-.finish-mapping-value span {
-  opacity: 0.3;
-  font-weight: 600;
-}
-
-.finish-mapping-value.active {
-  border-style: solid;
-  border-color: rgba(250, 204, 21, 0.35);
-  background: rgba(250, 204, 21, 0.08);
-}
-
-.finish-mapping-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 45px;
-  font-size: 25px;
-  opacity: 0.45;
-}
-
-.finish-assignment-submit {
-  width: 100%;
-  margin-top: auto;
-  padding: 15px 18px;
-  font-weight: 900;
-}
-
-.finish-assignment-submit span {
-  margin-left: 8px;
-}
-
-.finish-assignment-submit:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.finish-assignment-hint {
-  min-height: 30px;
-  margin-top: 12px;
-  text-align: center;
-  opacity: 0.42;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-/* =========================
-   EMPTY STATE
-   ========================= */
-
-.finish-assignment-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  opacity: 0.35;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-}
-
-/* =========================
-   ASSIGNED SUMMARY
-   ========================= */
-
-.finish-assigned-summary {
-  margin-top: 24px;
-  padding: 18px 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.finish-assigned-summary-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.finish-assigned-summary-header span {
-  opacity: 0.42;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-}
-
-.finish-assigned-summary-header strong {
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.finish-assigned-summary-list {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.finish-assigned-summary-item {
-  display: grid;
-  grid-template-columns: 25px minmax(0, 1fr);
-  gap: 3px 8px;
-  padding: 10px 12px;
-  border-radius: 11px;
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.finish-assigned-summary-item > span {
-  grid-row: span 2;
-  opacity: 0.3;
-  font-size: 9px;
-  font-weight: 900;
-}
-
-.finish-assigned-summary-item strong {
-  overflow: hidden;
-  font-size: 10px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.finish-assigned-summary-item b {
-  display: none;
-}
-
-.finish-assigned-summary-item em {
-  overflow: hidden;
-  color: #facc15;
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.finish-assigned-summary-item small {
-  display: none;
-}
-
-/* =========================
-   RESPONSIVE
-   ========================= */
-
-@media (max-width: 1100px) {
-  .finish-assignment-layout {
-    grid-template-columns:
-      1fr
-      1fr;
   }
 
-  .finish-mapping-section {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
+  /* =====================================================
+     ĐANG THI
+     ===================================================== */
 
-  .finish-team-section {
-    grid-column: 1;
-  }
+  return (
+    <section className="finish-page">
+      <div className="finish-page-inner">
+        {/* =========================
+            GAME HEADER
+            ========================= */}
 
-  .finish-package-section {
-    grid-column: 2;
-  }
+        <header className="finish-game-header">
+          <div className="finish-game-title">
+            <div className="finish-round-label">
+              VÒNG 4
+            </div>
 
-  .finish-mapping-card {
-    min-height: auto;
-  }
+            <h1>VỀ ĐÍCH</h1>
+          </div>
 
-  .finish-assignment-submit {
-    margin-top: 20px;
-  }
-}
+          <div className="finish-game-meta">
+            <div>
+              <span>GÓI</span>
 
-@media (max-width: 700px) {
-  .finish-assignment-layout {
-    display: flex;
-    flex-direction: column;
-  }
+              <strong>
+                {currentPackage.label}
+              </strong>
+            </div>
 
-  .finish-team-section,
-  .finish-package-section,
-  .finish-mapping-section {
-    width: 100%;
-  }
+            <div>
+              <span>CÂU</span>
 
-  .finish-assigned-summary-list {
-    grid-template-columns: 1fr;
-  }
+              <strong>
+                {finish.currentQuestionIndex +
+                  1}
+
+                <small>
+                  /
+                  {
+                    currentPackage
+                      .questions.length
+                  }
+                </small>
+              </strong>
+            </div>
+
+            <div className="finish-current-team">
+              <span>ĐANG THI</span>
+
+              <strong>
+                {currentTeam?.name ??
+                  "ĐỘI THI"}
+              </strong>
+            </div>
+          </div>
+        </header>
+
+        {/* =========================
+            QUESTION AREA
+            ========================= */}
+
+        <main className="finish-question-area">
+          {/* =========================
+              STAR DECISION
+              ========================= */}
+
+          {isStarDecision ? (
+            <div className="finish-public-star-decision">
+              <div className="finish-star-glow">
+                ★
+              </div>
+
+              <div className="finish-star-caption">
+                NGÔI SAO HY VỌNG
+              </div>
+
+              <h2>
+                {currentTeam?.name}
+              </h2>
+
+              <p>
+                Có muốn sử dụng
+                <br />
+
+                <strong>
+                  NGÔI SAO HY VỌNG
+                </strong>{" "}
+                cho câu hỏi này?
+              </p>
+
+              <div className="finish-star-question">
+                MC/KỸ THUẬT ĐANG CHỜ
+                QUYẾT ĐỊNH
+              </div>
+
+              <div className="finish-control-panel">
+                <button
+                  className="finish-star-yes"
+                  onClick={() =>
+                    finish.decideStar(true)
+                  }
+                >
+                  ★ DÙNG NGÔI SAO
+                </button>
+
+                <button
+                  className="finish-star-no"
+                  onClick={() =>
+                    finish.decideStar(false)
+                  }
+                >
+                  KHÔNG DÙNG
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* =========================
+                  QUESTION
+                  ========================= */}
+
+              <div className="finish-question-topline">
+                <span>
+                  CÂU{" "}
+                  {finish.currentQuestionIndex +
+                    1}
+                </span>
+
+                {finish.starActive && (
+                  <strong>
+                    ★ NGÔI SAO HY VỌNG
+                  </strong>
+                )}
+              </div>
+
+              <div className="finish-question-display">
+                <h2>
+                  {currentQuestion.text ||
+                    "CÂU HỎI ĐANG ĐƯỢC CHUẨN BỊ"}
+                </h2>
+
+                {/* =========================
+                    VIDEO
+                    ========================= */}
+
+                {currentQuestion.isVideo &&
+                  embedUrl && (
+                    <div className="finish-public-video">
+                      <iframe
+                        src={embedUrl}
+                        title={`Video câu hỏi ${
+                          finish.currentQuestionIndex +
+                          1
+                        }`}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+
+                {currentQuestion.isVideo &&
+                  !embedUrl && (
+                    <div className="finish-public-video-empty">
+                      VIDEO CÂU HỎI CHƯA CÓ URL
+                    </div>
+                  )}
+              </div>
+
+              {/* =========================
+                  MC / KỸ THUẬT
+                  ========================= */}
+
+              <div className="finish-live-control-panel">
+                <div className="finish-live-control-header">
+                  <div>
+                    <span>
+                      KHU VỰC MC / KỸ THUẬT
+                    </span>
+
+                    <strong>
+                      {currentTeam?.name}
+                    </strong>
+                  </div>
+
+                  <div className="finish-live-answer">
+                    <span>
+                      ĐÁP ÁN THAM KHẢO
+                    </span>
+
+                    <strong>
+                      {currentQuestion.answer ||
+                        "Chưa nhập đáp án."}
+                    </strong>
+                  </div>
+                </div>
+
+                {/* =========================
+                    CHẤM ĐỘI CHÍNH
+                    ========================= */}
+
+                {isMainResult && (
+                  <div className="finish-judgement-panel">
+                    <div className="finish-judgement-title">
+                      {finish.starActive
+                        ? "★ NGÔI SAO HY VỌNG"
+                        : "KẾT QUẢ CÂU HỎI"}
+                    </div>
+
+                    <p>
+                      {finish.starActive
+                        ? "Đúng +20 điểm · Sai → các đội còn lại được quyền cướp."
+                        : "Đúng +10 điểm · Sai 0 điểm"}
+                    </p>
+
+                    <div className="finish-judgement-actions">
+                      <button
+                        className="finish-correct-button"
+                        onClick={
+                          handleCorrect
+                        }
+                      >
+                        ✓ ĐÚNG
+                      </button>
+
+                      <button
+                        className="finish-wrong-button"
+                        onClick={
+                          handleWrong
+                        }
+                      >
+                        ✕ SAI
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* =========================
+                    CHỌN ĐỘI CƯỚP
+                    ========================= */}
+
+                {isStealSelection && (
+                  <div className="finish-steal-panel">
+                    <div className="finish-judgement-title">
+                      CƠ HỘI CƯỚP ĐIỂM
+                    </div>
+
+                    <p>
+                      Chọn một trong các đội
+                      còn lại để trả lời.
+                    </p>
+
+                    <div className="finish-steal-team-grid">
+                      {teams
+                        .filter(
+                          (team) =>
+                            team.id !==
+                            finish.currentTeamId,
+                        )
+                        .map((team) => (
+                          <button
+                            key={team.id}
+                            className="finish-steal-team"
+                            onClick={() =>
+                              finish.selectStealTeam(
+                                team.id,
+                              )
+                            }
+                          >
+                            {team.name}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* =========================
+                    CHẤM ĐỘI CƯỚP
+                    ========================= */}
+
+                {isStealResult && (
+                  <div className="finish-judgement-panel">
+                    <div className="finish-judgement-title">
+                      ĐỘI TRẢ LỜI CƯỚP
+                    </div>
+
+                    <strong className="finish-steal-selected-team">
+                      {selectedStealTeam?.name ??
+                        "ĐỘI CƯỚP ĐIỂM"}
+                    </strong>
+
+                    <p>
+                      Đúng +20 điểm · Đội
+                      Ngôi sao −10 điểm
+                    </p>
+
+                    <div className="finish-judgement-actions">
+                      <button
+                        className="finish-correct-button"
+                        onClick={
+                          handleCorrect
+                        }
+                      >
+                        ✓ ĐÚNG
+                      </button>
+
+                      <button
+                        className="finish-wrong-button"
+                        onClick={
+                          handleWrong
+                        }
+                      >
+                        ✕ SAI
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* =========================
+                    NEXT
+                    ========================= */}
+
+                {isResolved && (
+                  <div className="finish-next-panel">
+                    <div className="finish-result-message">
+                      Câu hỏi đã được chấm.
+                    </div>
+
+                    {finish.currentQuestionIndex ===
+                    4 ? (
+                      <button
+                        className="finish-primary-button"
+                        onClick={
+                          finish.nextTeam
+                        }
+                      >
+                        HOÀN THÀNH GÓI →
+                      </button>
+                    ) : (
+                      <button
+                        className="finish-primary-button"
+                        onClick={
+                          finish.advanceQuestion
+                        }
+                      >
+                        CÂU TIẾP THEO →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </main>
+
+        {/* =========================
+            SCOREBOARD
+            ========================= */}
+
+        <footer className="finish-public-footer">
+          <div className="finish-scoreboard">
+            {teams
+              .slice()
+              .sort(
+                (a, b) =>
+                  b.totalScore -
+                  a.totalScore,
+              )
+              .map((team) => (
+                <div
+                  key={team.id}
+                  className={`finish-score-team ${
+                    team.id ===
+                    finish.currentTeamId
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <span>
+                    {team.name}
+                  </span>
+
+                  <strong>
+                    {team.totalScore}
+                  </strong>
+                </div>
+              ))}
+          </div>
+
+          <div className="finish-footer-brand">
+            <span>
+              THE BANACODE
+            </span>
+
+            <strong>
+              HÀNH TRÌNH 19 NĂM
+            </strong>
+          </div>
+        </footer>
+      </div>
+    </section>
+  );
 }
