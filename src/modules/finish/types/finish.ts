@@ -4,10 +4,10 @@ export type FinishQuestion = {
   id: string;
   text: string;
   answer: string;
-  difficulty: 'easy' | 'medium' | 'hard'; // dễ:10, vừa:20, khó:30
+  difficulty: 'easy' | 'medium' | 'hard';
   points: number; // 10, 20, 30
-  isVideo: boolean; // true cho câu khó
-  youtubeUrl: string; // nếu isVideo
+  isVideo: boolean;
+  youtubeUrl: string;
 };
 
 export type FinishPackage = {
@@ -25,6 +25,13 @@ export type QuestionPhase =
   | 'intro'           // giới thiệu độ khó
   | 'star_decision'   // chọn dùng sao hay không
   | 'playing'         // hiển thị câu hỏi, timer đang chạy
-  | 'result'          // kết quả của đội chính (đúng/sai)
+  | 'result'          // kết quả của đội chính (đúng/sai) – có thể bỏ qua
   | 'steal'           // cơ hội cướp cho đội khác
   | 'resolved';       // đã kết thúc câu hỏi
+
+// Dùng để lưu kết quả trả lời
+export type AnswerResult = {
+  correct: boolean;
+  points: number;
+  teamId: TeamId | null; // đội đã trả lời (đội chính hoặc đội cướp)
+};
