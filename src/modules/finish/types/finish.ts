@@ -7,7 +7,7 @@ export type FinishQuestion = {
   difficulty: 'easy' | 'medium' | 'hard';
   points: number; // 10, 20, 30
   isVideo: boolean;
-  youtubeUrl: string;
+  youtubeUrl: string; // nếu isVideo = true
 };
 
 export type FinishPackage = {
@@ -25,6 +25,6 @@ export type QuestionPhase =
   | 'intro'           // giới thiệu độ khó
   | 'star_decision'   // chọn dùng sao hay không
   | 'playing'         // hiển thị câu hỏi, timer đang chạy
-  | 'result'          // kết quả của đội chính (đúng/sai)
+  | 'result'          // kết quả của đội chính (đúng/sai) – có thể hiển thị thông báo
   | 'steal'           // cơ hội cướp cho đội khác
   | 'resolved';       // đã kết thúc câu hỏi
