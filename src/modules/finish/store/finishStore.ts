@@ -47,64 +47,19 @@ type FinishStore = {
 
   status: FinishStatus;
 
-  /**
-   * Đội đang thi.
-   */
   currentTeamId: TeamId | null;
-
-  /**
-   * Gói đang được sử dụng.
-   */
   currentPackageId: string | null;
-
-  /**
-   * 0 → Câu 1
-   * 1 → Câu 2
-   * ...
-   * 4 → Câu 5
-   */
   currentQuestionIndex: number;
 
-  /**
-   * Trạng thái xử lý câu hỏi.
-   */
   resolution: FinishResolution;
 
-  /**
-   * Đội hiện tại đã sử dụng Ngôi sao.
-   */
   starActive: boolean;
-
-  /**
-   * Đang chờ đội quyết định có dùng Ngôi sao hay không.
-   */
   starDecisionPending: boolean;
 
-  /**
-   * Đội được chọn để cướp điểm.
-   */
   selectedStealTeamId: TeamId | null;
 
-  /**
-   * Thứ tự các đội được MC/Kỹ thuật
-   * ghép với gói câu hỏi.
-   *
-   * Không còn cố định team-1 → team-2 → team-3 → team-4.
-   */
   selectionOrder: TeamId[];
 
-  /**
-   * Đội đang được chọn để ghép gói
-   * trên màn hình lựa chọn.
-   */
-  selectionTeamId: TeamId | null;
-
-  /**
-   * Gán một đội vào một gói câu hỏi.
-   *
-   * Một đội chỉ được gán một gói.
-   * Một gói chỉ được gán một đội.
-   */
   selectPackage: (
     teamId: TeamId,
     packageId: string,
@@ -113,22 +68,21 @@ type FinishStore = {
   decideStar: (useStar: boolean) => void;
 
   markCorrect: () => void;
-
   markWrong: () => void;
 
   selectStealTeam: (teamId: TeamId) => void;
 
   markStealCorrect: () => void;
-
   markStealWrong: () => void;
 
   advanceQuestion: () => void;
-
   nextTeam: () => void;
 
   updatePackage: (
     packageId: string,
-    patch: Partial<Pick<FinishPackage, "label">>,
+    patch: Partial<
+      Pick<FinishPackage, "label">
+    >,
   ) => void;
 
   updateQuestion: (
@@ -140,7 +94,7 @@ type FinishStore = {
   resetRound: () => void;
 };
 
-const createInitialState = (): Pick<
+type InitialState = Pick<
   FinishStore,
   | "packages"
   | "status"
@@ -152,32 +106,25 @@ const createInitialState = (): Pick<
   | "starDecisionPending"
   | "selectedStealTeamId"
   | "selectionOrder"
-  | "selectionTeamId"
-> => ({
+>;
+
+const createInitialState = (): InitialState => ({
   packages: createPackages(),
 
   status: "selection",
 
   currentTeamId: null,
-
   currentPackageId: null,
-
   currentQuestionIndex: 0,
 
   resolution: "idle",
 
   starActive: false,
-
   starDecisionPending: false,
 
   selectedStealTeamId: null,
 
-  /**
-   * Ban đầu chưa có đội nào được ghép.
-   */
   selectionOrder: [],
-
-  selectionTeamId: null,
 });
 
 export const useFinishStore = create<FinishStore>()(
@@ -185,27 +132,28 @@ export const useFinishStore = create<FinishStore>()(
     (set, get) => ({
       ...createInitialState(),
 
-      /**
-       * Gán đội vào gói câu hỏi.
-       *
-       * Không ép thứ tự đội.
-       *
-       * Ví dụ:
-       * team-3 → GÓI 2
-       * team-1 → GÓI 4
-       * team-4 → GÓI 1
-       * team-2 → GÓI 3
-       */
-      selectPackage: (teamId, packageId) => {
+      /* =====================================================
+         CHỌN ĐỘI + GÓI CÂU HỎI
+         ===================================================== */
+
+      selectPackage: (
+        teamId,
+        packageId,
+      ) => {
         const state = get();
 
         if (state.status !== "selection") {
           return false;
         }
 
+        if (!TEAM_IDS.includes(teamId)) {
+          return false;
+        }
+
         const teamAlreadyAssigned =
           state.packages.some(
-            (pkg) => pkg.selectedBy === teamId,
+            (pkg) =>
+              pkg.selectedBy === teamId,
           );
 
         if (teamAlreadyAssigned) {
@@ -214,14 +162,18 @@ export const useFinishStore = create<FinishStore>()(
 
         const selectedPackage =
           state.packages.find(
-            (pkg) => pkg.id === packageId,
+            (pkg) =>
+              pkg.id === packageId,
           );
 
         if (!selectedPackage) {
           return false;
         }
 
-        if (selectedPackage.selectedBy !== null) {
+        if (
+          selectedPackage.selectedBy !==
+          null
+        ) {
           return false;
         }
 
@@ -231,52 +183,49 @@ export const useFinishStore = create<FinishStore>()(
         ];
 
         set({
-          packages: state.packages.map((pkg) =>
-            pkg.id === packageId
-              ? {
-                  ...pkg,
-                  selectedBy: teamId,
-                }
-              : pkg,
+          packages: state.packages.map(
+            (pkg) =>
+              pkg.id === packageId
+                ? {
+                    ...pkg,
+                    selectedBy: teamId,
+                  }
+                : pkg,
           ),
 
-          /**
-           * Đội vừa được ghép sẽ bắt đầu
-           * gói câu hỏi của mình ngay.
-           */
           status: "playing",
 
           currentTeamId: teamId,
-
           currentPackageId: packageId,
-
           currentQuestionIndex: 0,
 
-          resolution: "awaiting-main-result",
+          resolution:
+            "awaiting-main-result",
 
           starActive: false,
-
           starDecisionPending: false,
 
           selectedStealTeamId: null,
 
-          selectionOrder: nextSelectionOrder,
-
-          selectionTeamId: null,
+          selectionOrder:
+            nextSelectionOrder,
         });
 
         return true;
       },
 
-      /**
-       * Đội quyết định có dùng Ngôi sao hay không.
-       *
-       * Chỉ được quyết định trước Câu 4 hoặc Câu 5.
-       *
-       * Không xác định trước câu nào là Ngôi sao.
-       */
+      /* =====================================================
+         NGÔI SAO HY VỌNG
+         ===================================================== */
+
       decideStar: (useStar) => {
         const state = get();
+
+        if (
+          !state.starDecisionPending
+        ) {
+          return;
+        }
 
         const currentPackage =
           state.packages.find(
@@ -292,6 +241,7 @@ export const useFinishStore = create<FinishStore>()(
         const questionIndex =
           state.currentQuestionIndex;
 
+        // Chỉ được quyết định ở Câu 4 hoặc Câu 5
         if (
           questionIndex !== 3 &&
           questionIndex !== 4
@@ -299,10 +249,7 @@ export const useFinishStore = create<FinishStore>()(
           return;
         }
 
-        if (!state.starDecisionPending) {
-          return;
-        }
-
+        // Mỗi gói chỉ có một lần Ngôi sao
         if (currentPackage.starUsed) {
           return;
         }
@@ -327,24 +274,26 @@ export const useFinishStore = create<FinishStore>()(
             resolution:
               "awaiting-main-result",
           });
-        } else {
-          set({
-            starActive: false,
 
-            starDecisionPending: false,
-
-            resolution:
-              "awaiting-main-result",
-          });
+          return;
         }
+
+        // Không sử dụng sao.
+        // Nếu đang ở Câu 4 thì Câu 5 vẫn có thể dùng.
+        set({
+          starActive: false,
+
+          starDecisionPending: false,
+
+          resolution:
+            "awaiting-main-result",
+        });
       },
 
-      /**
-       * Chấm đội chính ĐÚNG.
-       *
-       * Điểm sẽ được xử lý tại FinishPage
-       * thông qua gameStore.
-       */
+      /* =====================================================
+         CHẤM ĐIỂM ĐỘI ĐANG THI
+         ===================================================== */
+
       markCorrect: () => {
         const state = get();
 
@@ -360,15 +309,6 @@ export const useFinishStore = create<FinishStore>()(
         });
       },
 
-      /**
-       * Chấm đội chính SAI.
-       *
-       * Nếu đang dùng Ngôi sao:
-       * → mở quyền cướp điểm.
-       *
-       * Nếu không:
-       * → kết thúc câu hỏi.
-       */
       markWrong: () => {
         const state = get();
 
@@ -379,6 +319,8 @@ export const useFinishStore = create<FinishStore>()(
           return;
         }
 
+        // Nếu đang dùng Ngôi sao:
+        // sai -> mở quyền cướp cho đội khác.
         if (state.starActive) {
           set({
             resolution:
@@ -390,15 +332,19 @@ export const useFinishStore = create<FinishStore>()(
           return;
         }
 
+        // Sai câu thường -> kết thúc câu.
         set({
           resolution: "resolved",
         });
       },
 
-      /**
-       * MC/Kỹ thuật chọn đội cướp.
-       */
-      selectStealTeam: (teamId) => {
+      /* =====================================================
+         CƯỚP ĐIỂM
+         ===================================================== */
+
+      selectStealTeam: (
+        teamId,
+      ) => {
         const state = get();
 
         if (
@@ -412,7 +358,15 @@ export const useFinishStore = create<FinishStore>()(
           return;
         }
 
-        if (teamId === state.currentTeamId) {
+        // Không được chọn chính đội đang thi
+        if (
+          teamId === state.currentTeamId
+        ) {
+          return;
+        }
+
+        // Chỉ cho phép 4 đội hợp lệ
+        if (!TEAM_IDS.includes(teamId)) {
           return;
         }
 
@@ -424,14 +378,6 @@ export const useFinishStore = create<FinishStore>()(
         });
       },
 
-      /**
-       * Đội cướp ĐÚNG.
-       *
-       * Điểm được xử lý tại FinishPage:
-       *
-       * Đội cướp +20
-       * Đội Ngôi sao -10
-       */
       markStealCorrect: () => {
         const state = get();
 
@@ -447,11 +393,6 @@ export const useFinishStore = create<FinishStore>()(
         });
       },
 
-      /**
-       * Đội cướp SAI.
-       *
-       * Không đội nào thay đổi điểm.
-       */
       markStealWrong: () => {
         const state = get();
 
@@ -467,14 +408,16 @@ export const useFinishStore = create<FinishStore>()(
         });
       },
 
-      /**
-       * Sang câu tiếp theo trong cùng gói.
-       */
+      /* =====================================================
+         CÂU TIẾP THEO
+         ===================================================== */
+
       advanceQuestion: () => {
         const state = get();
 
         if (
-          state.resolution !== "resolved"
+          state.resolution !==
+          "resolved"
         ) {
           return;
         }
@@ -495,13 +438,20 @@ export const useFinishStore = create<FinishStore>()(
               state.currentPackageId,
           );
 
-        /**
-         * Chỉ tại Câu 4 hoặc Câu 5 mới
-         * đưa ra quyết định Ngôi sao.
+        if (!currentPackage) {
+          return;
+        }
+
+        /*
+         * Ngôi sao chỉ được đưa ra quyết định
+         * ngay trước Câu 4 hoặc Câu 5.
+         *
+         * Quan trọng:
+         * Không tiết lộ trước trong question bank
+         * câu nào là "câu sao".
          */
+
         const shouldAskStar =
-          currentPackage !== null &&
-          currentPackage !== undefined &&
           !currentPackage.starUsed &&
           (nextQuestionIndex === 3 ||
             nextQuestionIndex === 4);
@@ -523,22 +473,14 @@ export const useFinishStore = create<FinishStore>()(
         });
       },
 
-      /**
-       * Hoàn thành Câu 5.
-       *
-       * Nếu còn đội đã được ghép:
-       * → chuyển sang đội tiếp theo
-       * theo đúng thứ tự MC/Kỹ thuật đã ghép.
-       *
-       * Nếu chưa có đội tiếp theo:
-       * → quay lại màn hình lựa chọn.
-       *
-       * Nếu cả 4 đội đã hoàn thành:
-       * → kết thúc Vòng 4.
-       */
+      /* =====================================================
+         CHUYỂN SANG ĐỘI TIẾP THEO
+         ===================================================== */
+
       nextTeam: () => {
         const state = get();
 
+        // Chỉ được chuyển đội sau khi hoàn thành Câu 5
         if (
           state.currentQuestionIndex !== 4
         ) {
@@ -546,35 +488,36 @@ export const useFinishStore = create<FinishStore>()(
         }
 
         if (
-          state.resolution !== "resolved"
+          state.resolution !==
+          "resolved"
         ) {
           return;
         }
 
-        const currentIndex =
+        const currentTeamIndex =
           state.currentTeamId
             ? state.selectionOrder.indexOf(
                 state.currentTeamId,
               )
             : -1;
 
-        const nextAssignedTeamId =
-          currentIndex >= 0
+        const nextTeamId =
+          currentTeamIndex >= 0
             ? state.selectionOrder[
-                currentIndex + 1
+                currentTeamIndex + 1
               ] ?? null
             : null;
 
-        /**
-         * Nếu có đội tiếp theo đã được ghép,
-         * bắt đầu gói của đội đó.
+        /*
+         * Nếu đội tiếp theo đã được chọn gói từ
+         * trước đó thì đưa thẳng vào phần thi.
          */
-        if (nextAssignedTeamId) {
+        if (nextTeamId) {
           const nextPackage =
             state.packages.find(
               (pkg) =>
                 pkg.selectedBy ===
-                nextAssignedTeamId,
+                nextTeamId,
             );
 
           if (nextPackage) {
@@ -582,7 +525,7 @@ export const useFinishStore = create<FinishStore>()(
               status: "playing",
 
               currentTeamId:
-                nextAssignedTeamId,
+                nextTeamId,
 
               currentPackageId:
                 nextPackage.id,
@@ -597,17 +540,15 @@ export const useFinishStore = create<FinishStore>()(
               starDecisionPending: false,
 
               selectedStealTeamId: null,
-
-              selectionTeamId: null,
             });
 
             return;
           }
         }
 
-        /**
-         * Nếu chưa đủ 4 đội được ghép,
-         * quay về màn hình lựa chọn.
+        /*
+         * Vẫn còn đội chưa được gán.
+         * Quay lại màn hình chọn đội + gói.
          */
         if (
           state.selectionOrder.length <
@@ -617,9 +558,7 @@ export const useFinishStore = create<FinishStore>()(
             status: "selection",
 
             currentTeamId: null,
-
             currentPackageId: null,
-
             currentQuestionIndex: 0,
 
             resolution: "idle",
@@ -629,23 +568,19 @@ export const useFinishStore = create<FinishStore>()(
             starDecisionPending: false,
 
             selectedStealTeamId: null,
-
-            selectionTeamId: null,
           });
 
           return;
         }
 
-        /**
-         * Cả 4 đội đã hoàn thành.
+        /*
+         * Đã hoàn thành cả 4 đội.
          */
         set({
           status: "finished",
 
           currentTeamId: null,
-
           currentPackageId: null,
-
           currentQuestionIndex: 0,
 
           resolution: "idle",
@@ -655,42 +590,49 @@ export const useFinishStore = create<FinishStore>()(
           starDecisionPending: false,
 
           selectedStealTeamId: null,
-
-          selectionTeamId: null,
         });
       },
 
-      /**
-       * Đổi tên gói.
-       */
+      /* =====================================================
+         ADMIN — TÊN GÓI
+         ===================================================== */
+
       updatePackage: (
         packageId,
         patch,
       ) => {
         set((state) => ({
-          packages:
-            state.packages.map((pkg) =>
+          packages: state.packages.map(
+            (pkg) =>
               pkg.id === packageId
                 ? {
                     ...pkg,
                     ...patch,
                   }
                 : pkg,
-            ),
+          ),
         }));
       },
 
-      /**
-       * Chỉnh sửa câu hỏi.
-       */
+      /* =====================================================
+         ADMIN — NỘI DUNG CÂU HỎI
+         ===================================================== */
+
       updateQuestion: (
         packageId,
         questionIndex,
         patch,
       ) => {
+        if (
+          questionIndex < 0 ||
+          questionIndex > 4
+        ) {
+          return;
+        }
+
         set((state) => ({
-          packages:
-            state.packages.map((pkg) =>
+          packages: state.packages.map(
+            (pkg) =>
               pkg.id !== packageId
                 ? pkg
                 : {
@@ -711,21 +653,19 @@ export const useFinishStore = create<FinishStore>()(
                             : question,
                       ),
                   },
-            ),
+          ),
         }));
       },
 
-      /**
-       * Reset riêng Vòng 4.
-       *
-       * Không đụng đến gameStore,
-       * vì điểm tổng của các vòng
-       * nằm ở store chung.
-       */
+      /* =====================================================
+         RESET VÒNG 4
+         ===================================================== */
+
       resetRound: () => {
         set(createInitialState());
       },
     }),
+
     {
       name: "olympia-finish-game",
     },
