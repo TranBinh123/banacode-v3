@@ -1718,3 +1718,377 @@ body:has(.acceleration-game) .ghost-button {
     right: 2%;
   }
 }
+/* =========================================================
+   VÒNG 4 • VỀ ĐÍCH
+   Gold / Amber / Sunset Theme
+   ========================================================= */
+
+/* Nền hoa Hướng Dương mờ làm background */
+.finish-page {
+  position: relative;
+  isolation: isolate;
+  color: #4E2E00;
+}
+
+/* Hoa Hướng Dương khổ lớn mờ ở hai bên */
+.finish-page::before,
+.finish-page::after {
+  position: fixed;
+  z-index: -1;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 300px;
+  line-height: 1;
+  opacity: 0.15;
+  pointer-events: none;
+  content: "🌻";
+  color: #FFD700;
+}
+
+.finish-page::before {
+  left: -40px;
+  transform: translateY(-50%) rotate(-15deg) scale(1.2);
+}
+
+.finish-page::after {
+  right: -40px;
+  transform: translateY(-50%) rotate(15deg) scale(1.2);
+}
+
+/* Thêm một vài bông nhỏ hơn rải rác */
+.finish-page .sunflower-extra {
+  position: fixed;
+  z-index: -1;
+  opacity: 0.12;
+  pointer-events: none;
+  font-size: 120px;
+  color: #FF8C00;
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+body:has(.finish-page) {
+  background:
+    radial-gradient(circle at 70% 30%, rgba(255, 215, 0, 0.08), transparent 40%),
+    radial-gradient(circle at 30% 70%, rgba(255, 127, 0, 0.06), transparent 35%),
+    linear-gradient(180deg, #FFF5CC 0%, #FFF8E7 40%, #FFFAF0 100%);
+  background-attachment: fixed;
+}
+
+/* =========================================================
+   NAV (override)
+   ========================================================= */
+
+body:has(.finish-page) .top-nav {
+  color: #4E2E00;
+  background: rgba(255, 245, 204, 0.92);
+  border-bottom-color: rgba(78, 46, 0, 0.10);
+  box-shadow: 0 8px 30px rgba(78, 46, 0, 0.06);
+}
+
+body:has(.finish-page) .top-nav strong {
+  color: #4E2E00;
+}
+
+body:has(.finish-page) .nav-subtitle {
+  color: #B87A2E;
+}
+
+body:has(.finish-page) .nav-module {
+  color: #B87A2E;
+}
+
+body:has(.finish-page) .nav-module:hover {
+  color: #4E2E00;
+  background: rgba(255, 215, 0, 0.12);
+}
+
+body:has(.finish-page) .nav-module.active {
+  color: #4E2E00;
+  background: rgba(255, 215, 0, 0.20);
+  border-color: rgba(255, 215, 0, 0.40);
+}
+
+body:has(.finish-page) .ghost-button {
+  color: #4E2E00;
+  background: rgba(255, 255, 255, 0.80);
+  border-color: rgba(78, 46, 0, 0.14);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.finish-page .finish-round-label {
+  color: #B87A2E;
+}
+
+.finish-page h1 {
+  color: #4E2E00;
+}
+
+.finish-page .finish-hero-line {
+  background: linear-gradient(90deg, #FFD700, #FF7F00, #FFD700);
+}
+
+/* =========================================================
+   PANELS / CARDS
+   ========================================================= */
+
+.finish-page .scoreboard,
+.finish-page .finish-assignment-section,
+.finish-page .finish-mapping-card,
+.finish-page .finish-assigned-summary,
+.finish-page .finish-game-header,
+.finish-page .finish-question-display,
+.finish-page .finish-live-control-panel,
+.finish-page .finish-public-star-decision,
+.finish-page .finish-judgement-panel,
+.finish-page .finish-steal-panel,
+.finish-page .finish-next-panel,
+.finish-page .finish-finale,
+.finish-page .finish-empty {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 245, 204, 0.92));
+  border-color: rgba(78, 46, 0, 0.12);
+  box-shadow: 0 18px 50px rgba(78, 46, 0, 0.08);
+  color: #4E2E00;
+}
+
+/* =========================================================
+   SCOREBOARD (trong finish)
+   ========================================================= */
+
+.finish-page .finish-scoreboard {
+  background: transparent;
+  border-color: rgba(78, 46, 0, 0.08);
+}
+
+.finish-page .finish-score-team {
+  color: #4E2E00;
+  background: rgba(255, 255, 255, 0.60);
+  border-color: rgba(78, 46, 0, 0.06);
+}
+
+.finish-page .finish-score-team.active {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: #FFD700;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.20);
+}
+
+.finish-page .finish-score-team strong {
+  color: #4E2E00;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.finish-page .finish-primary-button {
+  background: linear-gradient(135deg, #FFD700, #FF8C00);
+  border-color: rgba(255, 215, 0, 0.50);
+  color: #4E2E00;
+  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.30);
+}
+
+.finish-page .finish-primary-button:hover:not(:disabled) {
+  box-shadow: 0 11px 28px rgba(255, 215, 0, 0.45);
+  transform: translateY(-1px);
+}
+
+.finish-page .finish-primary-button:disabled {
+  opacity: 0.5;
+}
+
+.finish-page .finish-star-yes {
+  background: linear-gradient(135deg, #FFD700, #FF8C00);
+  border-color: #FFD700;
+  color: #4E2E00;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.30);
+}
+
+.finish-page .finish-star-yes:hover:not(:disabled) {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.45);
+}
+
+.finish-page .finish-star-no {
+  background: rgba(78, 46, 0, 0.08);
+  border-color: rgba(78, 46, 0, 0.20);
+  color: #4E2E00;
+}
+
+.finish-page .finish-correct-button {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.50);
+  color: #4E2E00;
+}
+
+.finish-page .finish-correct-button:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.25);
+}
+
+.finish-page .finish-wrong-button {
+  background: rgba(200, 50, 50, 0.08);
+  border-color: rgba(200, 50, 50, 0.25);
+  color: #6A1B1B;
+}
+
+.finish-page .finish-wrong-button:hover:not(:disabled) {
+  background: rgba(200, 50, 50, 0.16);
+}
+
+/* =========================================================
+   SELECTION CARDS
+   ========================================================= */
+
+.finish-page .finish-team-select-card,
+.finish-page .finish-package-select-card {
+  background: rgba(255, 255, 255, 0.60);
+  border-color: rgba(78, 46, 0, 0.12);
+  color: #4E2E00;
+}
+
+.finish-page .finish-team-select-card.selected,
+.finish-page .finish-package-select-card.selected {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.10);
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.15);
+}
+
+.finish-page .finish-team-select-score strong {
+  color: #4E2E00;
+}
+
+/* =========================================================
+   MAPPING CARD
+   ========================================================= */
+
+.finish-page .finish-mapping-value.active {
+  color: #4E2E00;
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.06);
+}
+
+.finish-page .finish-mapping-label {
+  color: #B87A2E;
+}
+
+.finish-page .finish-mapping-arrow {
+  color: #FF8C00;
+}
+
+/* =========================================================
+   STAR DECISION
+   ========================================================= */
+
+.finish-page .finish-star-glow {
+  color: #FFD700;
+  text-shadow: 0 0 40px rgba(255, 215, 0, 0.40);
+}
+
+.finish-page .finish-star-caption {
+  color: #B87A2E;
+}
+
+.finish-page .finish-star-question {
+  color: #4E2E00;
+  background: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.20);
+}
+
+/* =========================================================
+   STEAL TEAM
+   ========================================================= */
+
+.finish-page .finish-steal-team {
+  background: rgba(255, 255, 255, 0.60);
+  border-color: rgba(78, 46, 0, 0.12);
+  color: #4E2E00;
+}
+
+.finish-page .finish-steal-team:hover {
+  background: rgba(255, 215, 0, 0.10);
+  border-color: #FFD700;
+}
+
+/* =========================================================
+   FINALE
+   ========================================================= */
+
+.finish-page .finish-finale-badge {
+  color: #B87A2E;
+}
+
+.finish-page .finish-finale-star {
+  color: #FFD700;
+  text-shadow: 0 0 60px rgba(255, 215, 0, 0.30);
+}
+
+.finish-page .finish-final-score-row {
+  background: rgba(255, 255, 255, 0.60);
+  border-color: rgba(78, 46, 0, 0.06);
+}
+
+.finish-page .finish-final-rank {
+  color: #FF8C00;
+}
+
+.finish-page .finish-finale-message {
+  color: #4E2E00;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.finish-page .finish-footer-brand {
+  color: #B87A2E;
+}
+
+.finish-page .finish-footer-brand strong {
+  color: #4E2E00;
+}
+
+/* =========================================================
+   VIDEO / EMPTY
+   ========================================================= */
+
+.finish-page .finish-public-video-empty {
+  color: #B87A2E;
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(78, 46, 0, 0.08);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .finish-page::before,
+  .finish-page::after {
+    font-size: 180px;
+    opacity: 0.10;
+  }
+  .finish-page::before {
+    left: -20px;
+  }
+  .finish-page::after {
+    right: -20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .finish-page::before,
+  .finish-page::after {
+    font-size: 120px;
+    opacity: 0.08;
+  }
+  .finish-page::before {
+    left: -10px;
+  }
+  .finish-page::after {
+    right: -10px;
+  }
+}
