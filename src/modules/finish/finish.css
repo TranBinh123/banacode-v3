@@ -1083,3 +1083,120 @@ export function FinishPage() {
     </section>
   );
 }
+/* =========================================================
+   LIVE GAME — MC / KỸ THUẬT CONTROL
+   ========================================================= */
+
+.finish-live-control-panel {
+  width: min(1100px, 100%);
+  margin: 22px auto 0;
+  padding: 20px;
+  border: 1px solid rgba(55, 65, 90, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 40px rgba(38, 47, 69, 0.08);
+}
+
+.finish-live-control-header {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.finish-live-control-header > div {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 15px;
+  background: #f5f7fa;
+}
+
+.finish-live-control-header span,
+.finish-live-answer span {
+  display: block;
+  margin-bottom: 5px;
+  color: #8a94a6;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.finish-live-control-header strong {
+  display: block;
+  overflow: hidden;
+  color: #ff6900;
+  font-size: 15px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finish-live-answer strong {
+  display: block;
+  overflow: hidden;
+  color: #39445a;
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+}
+
+.finish-steal-selected-team {
+  display: block;
+  margin: 10px 0;
+  color: #ff6900;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+/* =========================
+   STAR DECISION — PUBLIC
+   ========================= */
+
+.finish-public-star-decision .finish-star-yes,
+.finish-public-star-decision .finish-star-no {
+  width: min(300px, 100%);
+}
+
+.finish-public-star-decision .finish-star-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: min(620px, 100%);
+  margin-top: 25px;
+}
+
+/* =========================
+   LIVE RESULT STATES
+   ========================= */
+
+.finish-judgement-panel {
+  margin-top: 0;
+}
+
+.finish-steal-panel {
+  margin-top: 0;
+}
+
+.finish-next-panel {
+  margin-top: 0;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 720px) {
+  .finish-live-control-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .finish-live-control-header {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-public-star-decision .finish-star-actions {
+    grid-template-columns: 1fr;
+  }
+}
