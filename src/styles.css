@@ -2725,3 +2725,167 @@ body:has(.finish-page) .ghost-button {
     grid-template-columns: 1fr 1fr;
   }
 }
+/* =========================================================
+   VÒNG 4 • NGÔI SAO HY VỌNG – Cải tiến giao diện
+   ========================================================= */
+
+/* Container chính: căn giữa, nền trắng sáng, bóng đổ nhẹ */
+.finish-public-star-decision {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 32px 32px;
+  background: linear-gradient(145deg, #ffffff, #FFFDF5);
+  border-radius: 32px;
+  border: 2px solid rgba(255, 215, 0, 0.40);
+  box-shadow: 0 20px 60px rgba(255, 215, 0, 0.12), 0 8px 24px rgba(78, 46, 0, 0.08);
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Biểu tượng ngôi sao lớn, lung linh */
+.finish-star-glow {
+  font-size: 72px;
+  line-height: 1;
+  color: #FFD700;
+  text-shadow: 0 0 40px rgba(255, 215, 0, 0.35), 0 0 80px rgba(255, 215, 0, 0.15);
+  margin-bottom: 8px;
+}
+
+/* Chữ "NGÔI SAO HY VỌNG" */
+.finish-star-caption {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  color: #B87A2E;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Tên đội */
+.finish-public-star-decision h2 {
+  font-size: 32px;
+  font-weight: 950;
+  color: #4E2E00;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+/* Đoạn văn hỏi có dùng ngôi sao */
+.finish-public-star-decision p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4E2E00;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.finish-public-star-decision p strong {
+  color: #FF8C00;
+  font-weight: 900;
+}
+
+/* Dòng trạng thái chờ quyết định */
+.finish-star-question {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4E2E00;
+  background: rgba(255, 215, 0, 0.08);
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.20);
+  margin-bottom: 28px;
+  width: 100%;
+  max-width: 400px;
+  letter-spacing: 0.04em;
+}
+
+/* Hàng chứa 2 button – luôn căn giữa */
+.finish-star-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 480px;
+}
+
+/* Button chung */
+.finish-star-actions button {
+  flex: 1;
+  min-height: 56px;
+  border-radius: 16px;
+  font-weight: 950;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Button "DÙNG NGÔI SAO" – vàng kim nổi bật */
+.finish-star-yes {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFD700 !important;
+  color: #4E2E00;
+  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.35);
+}
+
+.finish-star-yes:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(255, 215, 0, 0.50);
+}
+
+.finish-star-yes:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Button "KHÔNG DÙNG" – nhẹ nhàng, trung tính */
+.finish-star-no {
+  background: rgba(78, 46, 0, 0.06);
+  border-color: rgba(78, 46, 0, 0.15) !important;
+  color: #4E2E00;
+}
+
+.finish-star-no:hover:not(:disabled) {
+  background: rgba(78, 46, 0, 0.10);
+  transform: translateY(-2px);
+}
+
+.finish-star-no:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Responsive cho màn hình nhỏ */
+@media (max-width: 560px) {
+  .finish-public-star-decision {
+    padding: 28px 16px 24px;
+    border-radius: 24px;
+  }
+  .finish-star-glow {
+    font-size: 52px;
+  }
+  .finish-public-star-decision h2 {
+    font-size: 26px;
+  }
+  .finish-public-star-decision p {
+    font-size: 16px;
+  }
+  .finish-star-actions {
+    flex-direction: column;
+    gap: 12px;
+    max-width: 100%;
+  }
+  .finish-star-actions button {
+    width: 100%;
+    min-height: 50px;
+    font-size: 15px;
+  }
+}
