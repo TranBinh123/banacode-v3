@@ -9,7 +9,6 @@ import type {
   ObstaclePhase,
   TeamAnswerMap,
 } from "../types/obstacle";
-import "./obstacle.css"; // <-- Import CSS riêng
 
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
