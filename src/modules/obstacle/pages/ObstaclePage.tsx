@@ -13,7 +13,7 @@ import type {
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
 const CELL_STEP_X = 40;
-const ROW_CELL_OFFSET_X = 0;
+const ROW_CELL_OFFSET_X = 33;
 const ROW_CELL_OFFSET_Y = 3;
 const ROW_STEP_Y = 64;
 const BOARD_LEFT = 72;
