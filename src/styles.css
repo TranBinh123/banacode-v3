@@ -3558,3 +3558,64 @@ body:has(.finish-page) .ghost-button {
   border-color: #FFD700;
   background: rgba(255, 215, 0, 0.15);
 }
+/* =========================================================
+   Finish – Style lại nút Đúng/Sai trong cướp điểm
+   ========================================================= */
+
+.finish-steal-panel .finish-correct-button,
+.finish-steal-panel .finish-wrong-button {
+  min-width: 140px;
+  min-height: 48px;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 16px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Nút ĐÚNG */
+.finish-steal-panel .finish-correct-button {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  border-color: #4CAF50;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.35);
+}
+
+.finish-steal-panel .finish-correct-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.50);
+  background: linear-gradient(135deg, #66BB6A, #388E3C);
+}
+
+/* Nút SAI */
+.finish-steal-panel .finish-wrong-button {
+  background: linear-gradient(135deg, #EF5350, #B71C1C);
+  border-color: #EF5350;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(239, 83, 80, 0.35);
+}
+
+.finish-steal-panel .finish-wrong-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 83, 80, 0.50);
+  background: linear-gradient(135deg, #F44336, #C62828);
+}
+
+.finish-steal-panel .finish-correct-button:disabled,
+.finish-steal-panel .finish-wrong-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Đảm bảo căn giữa nhóm nút */
+.finish-steal-panel > div:last-child {
+  display: flex !important;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
