@@ -47,12 +47,32 @@ export function FinishPage() {
     finish.selectPackage(pendingTeamId, pendingPackageId);
   };
 
-  // Cập nhật điểm lên Bảng điểm tổng (Truyền đúng 3 tham số: teamId, points, reason)
+// Cập nhật điểm lên Bảng điểm tổng (Truyền đúng type GamePhase: "finish")
   const handleMarkCorrect = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     const pts = finish.starActive ? currentQuestion.points * 2 : currentQuestion.points;
-    addScore(finish.currentTeamId, pts, "Trả lời đúng câu hỏi Về đích");
+    addScore(finish.currentTeamId, pts, "finish");
     finish.markCorrect();
+  };
+
+  const handleMarkWrong = () => {
+    if (!finish.currentTeamId || !currentQuestion) return;
+    if (finish.starActive) {
+      addScore(finish.currentTeamId, -currentQuestion.points, "finish");
+    }
+    finish.markWrong();
+  };
+
+  const handleStealCorrect = () => {
+    if (!finish.selectedStealTeamId || !currentQuestion) return;
+    addScore(finish.selectedStealTeamId, currentQuestion.points, "finish");
+    finish.markStealCorrect();
+  };
+
+  const handleStealWrong = () => {
+    if (!finish.selectedStealTeamId || !currentQuestion) return;
+    addScore(finish.selectedStealTeamId, -Math.floor(currentQuestion.points / 2), "finish");
+    finish.markStealWrong();
   };
 
   const handleMarkWrong = () => {
