@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useFinishStore } from "../store/finishStore";
 import { useGameStore } from "../../../core/store/gameStore";
 import { addScore } from "../../../core/scoring/scoring";
@@ -28,11 +28,9 @@ export function FinishPage() {
   const teams = useGameStore((state) => state.teams);
   const addScore = useGameStore((state) => state.addScore);
 
-  // State cho selection
   const [pendingTeamId, setPendingTeamId] = useState<TeamId | null>(null);
   const [pendingPackageId, setPendingPackageId] = useState<string | null>(null);
 
-  // Timer effect
   useEffect(() => {
     if (!finish.isTimerRunning) return;
     const interval = setInterval(() => {
@@ -46,11 +44,7 @@ export function FinishPage() {
   const currentTeam = finish.currentTeamId
     ? teams.find((t) => t.id === finish.currentTeamId) ?? null
     : null;
-  const selectedStealTeam = finish.selectedStealTeamId
-    ? teams.find((t) => t.id === finish.selectedStealTeamId) ?? null
-    : null;
 
-  // Xử lý điểm
   const handleMarkCorrect = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     const pts = finish.starActive ? currentQuestion.points * 2 : currentQuestion.points;
@@ -83,7 +77,6 @@ export function FinishPage() {
     finish.markStealWrong();
   };
 
-  // Màn hình FINISHED
   if (finish.status === "finished") {
     return (
       <section className="finish-page">
@@ -113,7 +106,6 @@ export function FinishPage() {
     );
   }
 
-  // Màn hình SELECTION (3 cột đẹp)
   if (finish.status === "selection") {
     const selectedTeam = pendingTeamId
       ? teams.find((t) => t.id === pendingTeamId) ?? null
@@ -147,7 +139,6 @@ export function FinishPage() {
           </header>
 
           <main className="finish-assignment-layout">
-            {/* Cột 1: Chọn đội */}
             <section className="finish-assignment-section finish-team-section">
               <div className="finish-assignment-section-header">
                 <div className="finish-assignment-index">01</div>
@@ -179,7 +170,6 @@ export function FinishPage() {
               </div>
             </section>
 
-            {/* Cột 2: Ghép */}
             <section className="finish-assignment-section finish-mapping-section">
               <div className="finish-assignment-section-header">
                 <div className="finish-assignment-index">02</div>
@@ -214,7 +204,6 @@ export function FinishPage() {
               </div>
             </section>
 
-            {/* Cột 3: Chọn gói */}
             <section className="finish-assignment-section finish-package-section">
               <div className="finish-assignment-section-header">
                 <div className="finish-assignment-index">03</div>
@@ -249,7 +238,6 @@ export function FinishPage() {
             </section>
           </main>
 
-          {/* Tiến độ gán */}
           {finish.selectionOrder.length > 0 && (
             <section className="finish-assigned-summary">
               <div className="finish-assigned-summary-header">
@@ -275,7 +263,6 @@ export function FinishPage() {
             </section>
           )}
 
-          {/* Footer bảng điểm */}
           <footer className="finish-public-footer">
             <div className="finish-scoreboard">
               {teams
@@ -297,10 +284,6 @@ export function FinishPage() {
       </section>
     );
   }
-
-  // =========================================================
-  // MÀN HÌNH PLAYING (đang thi)
-  // =========================================================
 
   if (!currentPkg || !currentQuestion) {
     return (
@@ -326,7 +309,6 @@ export function FinishPage() {
   return (
     <section className="finish-page">
       <div className="finish-page-inner">
-        {/* HEADER */}
         <header className="finish-game-header">
           <div className="finish-game-title">
             <div className="finish-round-label">VÒNG 4</div>
@@ -366,9 +348,7 @@ export function FinishPage() {
           </div>
         </header>
 
-        {/* KHU VỰC CÂU HỎI */}
         <main className="finish-question-area">
-          {/* STAR DECISION */}
           {isStarDecision && (
             <div className="finish-public-star-decision">
               <div className="finish-star-glow">★</div>
@@ -389,7 +369,6 @@ export function FinishPage() {
             </div>
           )}
 
-          {/* INTRO */}
           {isIntro && (
             <div className="finish-question-display" style={{ textAlign: "center", padding: "40px 20px" }}>
               <div style={{ fontSize: "14px", fontWeight: "700", color: "#B87A2E", marginBottom: "12px" }}>
@@ -424,7 +403,6 @@ export function FinishPage() {
             </div>
           )}
 
-          {/* PLAYING / STEAL / RESOLVED */}
           {(isPlaying || isSteal || isResolved) && (
             <>
               <div className="finish-question-topline">
@@ -454,7 +432,6 @@ export function FinishPage() {
                 )}
               </div>
 
-              {/* MC CONTROLS */}
               <div className="finish-live-control-panel">
                 {isPlaying && (
                   <div className="finish-judgement-panel">
@@ -545,7 +522,6 @@ export function FinishPage() {
           )}
         </main>
 
-        {/* SCOREBOARD */}
         <footer className="finish-public-footer">
           <div className="finish-scoreboard">
             {teams
