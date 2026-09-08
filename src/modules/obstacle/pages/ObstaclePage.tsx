@@ -59,6 +59,29 @@ export function ObstaclePage() {
     () => [...(puzzle?.clues ?? [])].sort((a, b) => a.order - b.order),
     [puzzle],
   );
+  /*
+ * Cột giao chung của toàn bộ bảng.
+ *
+ * Mọi hàng ngang đều được render sao cho:
+ *
+ *   x + verticalIndex = verticalColumn
+ *
+ * Vì vậy tất cả ô giao luôn nằm trên
+ * cùng một đường thẳng đứng.
+ */
+const verticalColumn = useMemo(() => {
+  if (!puzzle?.clues.length) return 6;
+
+  const total = puzzle.clues.reduce(
+    (sum, clue) =>
+      sum + clue.x + clue.verticalIndex,
+    0,
+  );
+
+  return Math.round(
+    total / puzzle.clues.length,
+  );
+}, [puzzle]);
 
   const verticalLetters = useMemo(() => {
     if (!puzzle) return [];
@@ -376,11 +399,9 @@ export function ObstaclePage() {
                 if (!clue) return null;
 
                 const crossingLeft =
-                  BOARD_LEFT +
-                  clue.x * CELL_STEP_X +
-                  ROW_CELL_OFFSET_X +
-                  clue.verticalIndex *
-                    CELL_STEP_X;
+  BOARD_LEFT +
+  verticalColumn * CELL_STEP_X +
+  ROW_CELL_OFFSET_X;
 
                 const crossingTop =
                   BOARD_TOP +
@@ -457,16 +478,28 @@ export function ObstaclePage() {
                     ? "active"
                     : ""
                 }`}
-                style={{
-                  left:
-                    clue.x *
-                      CELL_STEP_X +
-                    BOARD_LEFT,
-                  top:
-                    clue.y *
-                      ROW_STEP_Y +
-                    BOARD_TOP,
-                }}
+           style={{
+  /*
+   * Không dùng trực tiếp clue.x nữa.
+   *
+   * Hàng được đặt dựa trên cột giao chung:
+   *
+   *   left = verticalColumn - verticalIndex
+   *
+   * Nhờ đó ô giao của mọi hàng ngang
+   * luôn nằm chính xác trên cùng một trục.
+   */
+  left:
+    (verticalColumn -
+      clue.verticalIndex) *
+      CELL_STEP_X +
+    BOARD_LEFT,
+
+  top:
+    clue.y *
+      ROW_STEP_Y +
+    BOARD_TOP,
+}}
                 disabled={!canOpen}
                 onClick={() =>
                   openClue(clue.id)
