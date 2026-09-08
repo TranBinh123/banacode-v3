@@ -3104,3 +3104,423 @@ body:has(.finish-page) .ghost-button {
     box-shadow: 0 8px 30px rgba(255, 215, 0, 0.60), 0 0 0 2px rgba(255, 215, 0, 0.30) inset;
   }
 }
+/* =========================================================
+   VÒNG 4 • MÀN HÌNH THI (PLAYING)
+   ========================================================= */
+
+/* Header khi thi */
+.finish-game-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  border: 1px solid rgba(78, 46, 0, 0.10);
+  box-shadow: 0 8px 24px rgba(78, 46, 0, 0.06);
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.finish-game-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.finish-game-title .finish-round-label {
+  font-size: 11px;
+  font-weight: 900;
+  color: #B87A2E;
+  letter-spacing: 0.12em;
+}
+
+.finish-game-title h1 {
+  font-size: 28px;
+  margin: 0;
+  color: #4E2E00;
+  letter-spacing: -0.02em;
+}
+
+.finish-game-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.finish-game-meta > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.finish-game-meta span {
+  font-size: 8px;
+  font-weight: 900;
+  color: #B87A2E;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.finish-game-meta strong {
+  font-size: 20px;
+  font-weight: 950;
+  color: #4E2E00;
+}
+
+.finish-game-meta strong small {
+  font-size: 14px;
+  font-weight: 700;
+  color: #B87A2E;
+}
+
+.finish-current-team {
+  background: rgba(255, 215, 0, 0.10);
+  padding: 4px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.finish-current-team strong {
+  color: #4E2E00;
+}
+
+/* Khu vực câu hỏi */
+.finish-question-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.finish-question-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: rgba(255, 215, 0, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+}
+
+.finish-question-topline span {
+  font-size: 14px;
+  font-weight: 900;
+  color: #4E2E00;
+}
+
+.finish-question-topline strong {
+  color: #FFD700;
+  font-size: 14px;
+  background: rgba(255, 215, 0, 0.12);
+  padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.finish-question-display {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(78, 46, 0, 0.08);
+  border-radius: 18px;
+  padding: 28px 32px;
+  box-shadow: 0 8px 24px rgba(78, 46, 0, 0.04);
+}
+
+.finish-question-display h2 {
+  font-size: clamp(28px, 4vw, 48px);
+  margin: 0 0 16px;
+  color: #4E2E00;
+  line-height: 1.2;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* Video */
+.finish-public-video {
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  background: #1a1a1a;
+  margin-top: 12px;
+}
+
+.finish-public-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.finish-public-video-empty {
+  text-align: center;
+  padding: 30px;
+  color: #B87A2E;
+  background: rgba(255, 215, 0, 0.06);
+  border-radius: 12px;
+  border: 1px dashed rgba(78, 46, 0, 0.12);
+  font-weight: 700;
+}
+
+/* Panel điều khiển MC */
+.finish-live-control-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(78, 46, 0, 0.08);
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 24px rgba(78, 46, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Các panel chấm */
+.finish-judgement-panel,
+.finish-steal-panel,
+.finish-next-panel {
+  padding: 16px 20px;
+  background: rgba(255, 248, 235, 0.40);
+  border-radius: 14px;
+  border: 1px solid rgba(78, 46, 0, 0.06);
+}
+
+.finish-judgement-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #4E2E00;
+  margin-bottom: 6px;
+}
+
+.finish-judgement-panel p {
+  font-size: 13px;
+  color: #B87A2E;
+  margin: 4px 0 14px;
+}
+
+.finish-judgement-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.finish-judgement-actions button {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 14px;
+  border: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.finish-correct-button {
+  background: rgba(255, 215, 0, 0.15);
+  border-color: #FFD700 !important;
+  color: #4E2E00;
+}
+
+.finish-correct-button:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.25);
+}
+
+.finish-wrong-button {
+  background: rgba(200, 50, 50, 0.08);
+  border-color: #e74c3c !important;
+  color: #6A1B1B;
+}
+
+.finish-wrong-button:hover:not(:disabled) {
+  background: rgba(200, 50, 50, 0.16);
+}
+
+/* Cướp điểm */
+.finish-steal-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.finish-steal-team {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(78, 46, 0, 0.10);
+  background: rgba(255, 255, 255, 0.60);
+  color: #4E2E00;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.finish-steal-team:hover {
+  background: rgba(255, 215, 0, 0.08);
+  border-color: #FFD700;
+}
+
+.finish-steal-team.selected {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.15);
+}
+
+/* Star decision */
+.finish-public-star-decision {
+  text-align: center;
+  padding: 32px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.10);
+}
+
+.finish-star-glow {
+  font-size: 64px;
+  color: #FFD700;
+  text-shadow: 0 0 60px rgba(255, 215, 0, 0.30);
+}
+
+.finish-star-caption {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #B87A2E;
+  margin: 8px 0 12px;
+}
+
+.finish-public-star-decision h2 {
+  font-size: 28px;
+  color: #4E2E00;
+  margin: 0 0 8px;
+}
+
+.finish-public-star-decision p {
+  font-size: 16px;
+  color: #4E2E00;
+  margin: 0 0 16px;
+}
+
+.finish-public-star-decision p strong {
+  color: #FFD700;
+}
+
+.finish-star-question {
+  font-size: 14px;
+  font-weight: 700;
+  color: #4E2E00;
+  background: rgba(255, 215, 0, 0.08);
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  margin-bottom: 20px;
+}
+
+.finish-star-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.finish-star-actions button {
+  min-width: 200px;
+  min-height: 52px;
+  border-radius: 14px;
+  font-weight: 950;
+  font-size: 15px;
+  border: 2px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.finish-star-yes {
+  background: linear-gradient(135deg, #FFD700, #FF8C00);
+  border-color: #FFD700;
+  color: #4E2E00;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.30);
+}
+
+.finish-star-yes:hover:not(:disabled) {
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.45);
+}
+
+.finish-star-no {
+  background: rgba(78, 46, 0, 0.08);
+  border-color: rgba(78, 46, 0, 0.20);
+  color: #4E2E00;
+}
+
+/* Next panel */
+.finish-next-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.finish-result-message {
+  font-size: 15px;
+  font-weight: 700;
+  color: #4E2E00;
+}
+
+.finish-result-message .correct {
+  color: #4CAF50;
+}
+
+.finish-result-message .wrong {
+  color: #f44336;
+}
+
+.finish-next-panel .finish-primary-button {
+  min-width: 180px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .finish-game-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .finish-game-meta {
+    justify-content: space-around;
+  }
+  .finish-judgement-actions {
+    flex-direction: column;
+  }
+  .finish-next-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .finish-next-panel .finish-primary-button {
+    width: 100%;
+  }
+  .finish-star-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  .finish-star-actions button {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 560px) {
+  .finish-game-title h1 {
+    font-size: 24px;
+  }
+  .finish-game-meta {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .finish-game-meta > div {
+    min-width: 80px;
+  }
+  .finish-question-display {
+    padding: 16px;
+  }
+  .finish-question-display h2 {
+    font-size: 22px;
+  }
+  .finish-live-control-panel {
+    padding: 14px;
+  }
+  .finish-steal-team-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
