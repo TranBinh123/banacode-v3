@@ -5,14 +5,14 @@ import type { TeamId } from "../../../core/types/game";
 import { Scoreboard } from "../../../components/Scoreboard";
 import { useObstacleStore } from "../store/obstacleStore";
 import type {
-  ObstacleClue,
   ObstacleClueStatus,
   ObstaclePhase,
   TeamAnswerMap,
 } from "../types/obstacle";
 
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
-const CELL_STEP_X = 42;
+
+const CELL_STEP_X = 40;
 const ROW_CELL_OFFSET_X = 36;
 const ROW_STEP_Y = 64;
 const BOARD_LEFT = 72;
@@ -64,6 +64,7 @@ export function ObstaclePage() {
     if (!puzzle) return [];
 
     const letters = puzzle.verticalAnswer.replace(/\s/g, "").split("");
+
     const rows = [...puzzle.clues].sort(
       (a, b) => a.y - b.y || a.order - b.order,
     );
@@ -74,48 +75,6 @@ export function ObstaclePage() {
       index,
     }));
   }, [puzzle]);
-
-  /*
-   * X của hàng dọc là vị trí giao nhau của các hàng ngang.
-   *
-   * Nếu cấu hình cũ chưa có verticalColumn:
-   * - lấy trung vị của toàn bộ điểm giao;
-   * - tránh việc một hàng bị lệch làm kéo cả trục hàng dọc.
-   */
-  const verticalColumn = useMemo(() => {
-    if (!puzzle || !sortedClues.length) return 0;
-
-    if (typeof puzzle.verticalColumn === "number") {
-      return puzzle.verticalColumn;
-    }
-
-    const intersections = sortedClues
-      .map((clue) => clue.x + clue.verticalIndex)
-      .sort((a, b) => a - b);
-
-    const middle = Math.floor(intersections.length / 2);
-
-    return intersections.length % 2
-      ? intersections[middle]
-      : Math.round(
-          (intersections[middle - 1] + intersections[middle]) / 2,
-        );
-  }, [puzzle, sortedClues]);
-
-  /*
-   * Hàng ngang luôn được căn lại theo trục hàng dọc.
-   *
-   * Công thức:
-   *   vị trí hàng ngang = cột hàng dọc - vị trí ô giao
-   *
-   * Nhờ vậy ô verticalIndex của mọi hàng luôn nằm đúng
-   * trên cùng một cột và hàng dọc sẽ đè chính xác lên ô đó.
-   */
-  const getDisplayX = useCallback(
-    (clue: ObstacleClue) =>
-      Math.max(0, verticalColumn - clue.verticalIndex),
-    [verticalColumn],
-  );
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) return;
@@ -191,7 +150,7 @@ export function ObstaclePage() {
   );
 
   const awardHorizontal = useCallback(() => {
-    if (!selectedClue) return;
+    if (!selectedClue || !puzzle) return;
 
     TEAM_IDS.forEach((teamId) => {
       if (
@@ -200,7 +159,7 @@ export function ObstaclePage() {
       ) {
         addScore(
           teamId,
-          puzzle?.horizontalPoints ?? 0,
+          puzzle.horizontalPoints,
           "obstacle",
         );
       }
@@ -209,9 +168,9 @@ export function ObstaclePage() {
     finishQuestion("solve");
   }, [
     selectedClue,
+    puzzle,
     answers,
     phase,
-    puzzle?.horizontalPoints,
     finishQuestion,
   ]);
 
@@ -220,16 +179,6 @@ export function ObstaclePage() {
     [finishQuestion],
   );
 
-  /*
-   * Chuyển sang phần thi khán giả:
-   *
-   * - đóng câu hỏi/khung chấm hiện tại;
-   * - dừng timer;
-   * - bỏ trạng thái "active" dang dở về "available";
-   * - không thay đổi các câu đã giải hoặc đã làm mờ.
-   *
-   * Vì vậy các ô chưa giải vẫn có thể được khán giả chọn.
-   */
   const enterAudience = useCallback(() => {
     setPhase("audience");
     setQuestionOpen(false);
@@ -309,10 +258,6 @@ export function ObstaclePage() {
     ? statusMap[selectedClue.id] === "audience-active"
     : false;
 
-  const minRowY = sortedClues.length
-    ? Math.min(...sortedClues.map((clue) => clue.y))
-    : 0;
-
   return (
     <main className="game-page obstacle-game">
       <header className="game-header obstacle-header">
@@ -320,6 +265,7 @@ export function ObstaclePage() {
           <div className="eyebrow">
             GAME SHOW • VÒNG 2
           </div>
+
           <h1>VƯỢT CHƯỚNG NGẠI VẬT</h1>
         </div>
 
@@ -413,79 +359,81 @@ export function ObstaclePage() {
         </div>
 
         <div className="puzzle-board">
-          <div
-            className="vertical-answer"
-            style={{
-              /*
-               * ROW_CELL_OFFSET_X = phần khoảng cách từ
-               * mép button hàng ngang tới mép ô đầu tiên:
-               *
-               * padding 3px + số thứ tự 28px + gap 5px = 36px
-               *
-               * Vì vậy hàng dọc được đặt đúng vào mép
-               * thực tế của các ô ngang.
-               */
-              left:
-                BOARD_LEFT +
-                verticalColumn * CELL_STEP_X +
-                ROW_CELL_OFFSET_X,
-              top:
-                BOARD_TOP +
-                minRowY * ROW_STEP_Y,
-            }}
-          >
+          {/*
+            HÀNG DỌC ĐƯỢC ĐẶT TRỰC TIẾP TRÊN Ô GIAO.
+
+            Không tính một "verticalColumn" độc lập nữa.
+            Mỗi chữ lấy chính clue.x + clue.verticalIndex
+            của hàng ngang tương ứng.
+
+            Công thức này dùng cùng CELL_STEP_X và
+            ROW_CELL_OFFSET_X với hàng ngang nên hai ô
+            có cùng tọa độ tuyệt đối.
+          */}
+          <div className="vertical-answer">
             {verticalLetters.map(
-              ({ char, clue, index }) => (
-                <span
-                  key={`${char}-${index}`}
-                  className={
-                    verticalSolved
-                      ? "revealed"
-                      : "hidden-letter"
-                  }
-                  style={{
-                    top: `${
-                      clue
-                        ? (clue.y - minRowY) *
-                          ROW_STEP_Y
-                        : index * ROW_STEP_Y
-                    }px`,
-                  }}
-                >
-                  {verticalSolved ? char : ""}
-                </span>
-              ),
+              ({ char, clue, index }) => {
+                if (!clue) return null;
+
+                const crossingLeft =
+                  BOARD_LEFT +
+                  clue.x * CELL_STEP_X +
+                  ROW_CELL_OFFSET_X +
+                  clue.verticalIndex *
+                    CELL_STEP_X;
+
+                const crossingTop =
+                  BOARD_TOP +
+                  clue.y * ROW_STEP_Y;
+
+                return (
+                  <span
+                    key={`${clue.id}-${index}`}
+                    className={
+                      verticalSolved
+                        ? "revealed"
+                        : "hidden-letter"
+                    }
+                    style={{
+                      left: `${crossingLeft}px`,
+                      top: `${crossingTop}px`,
+                    }}
+                  >
+                    {verticalSolved
+                      ? char
+                      : ""}
+                  </span>
+                );
+              },
             )}
           </div>
 
           {sortedClues.map((clue) => {
             const status =
-              statusMap[clue.id] ?? "available";
+              statusMap[clue.id] ??
+              "available";
 
             const isVisible =
               status === "solved" ||
-              status === "audience-solved";
+              status ===
+                "audience-solved";
 
             const isDim =
               status === "missed" ||
-              status === "audience-missed";
+              status ===
+                "audience-missed";
 
-            /*
-             * Ở phần khán giả:
-             * - available: được chọn;
-             * - active: vẫn cho phép mở lại nếu còn sót
-             *   trạng thái từ phần đội;
-             * - missed / audience-missed: được chọn lại;
-             * - solved: khóa.
-             */
             const canOpen =
               phase === "teams"
                 ? status === "available"
-                : status === "available" ||
-                  status === "active" ||
-                  status === "missed" ||
-                  status ===
-                    "audience-missed";
+                : status ===
+                      "available" ||
+                    status ===
+                      "active" ||
+                    status ===
+                      "missed" ||
+                    status ===
+                      "audience-missed";
 
             const letters = clue.answer
               .replace(/\s/g, "")
@@ -495,9 +443,13 @@ export function ObstaclePage() {
               <button
                 key={clue.id}
                 className={`puzzle-row ${
-                  isVisible ? "solved" : ""
+                  isVisible
+                    ? "solved"
+                    : ""
                 } ${
-                  isDim ? "dimmed" : ""
+                  isDim
+                    ? "dimmed"
+                    : ""
                 } ${
                   status === "active" ||
                   status ===
@@ -506,18 +458,13 @@ export function ObstaclePage() {
                     : ""
                 }`}
                 style={{
-                  /*
-                   * Không dùng clue.x trực tiếp.
-                   * Hệ thống tự căn hàng ngang theo
-                   * verticalColumn để ô verticalIndex
-                   * trùng tuyệt đối với hàng dọc.
-                   */
                   left:
-                    getDisplayX(clue) *
+                    clue.x *
                       CELL_STEP_X +
                     BOARD_LEFT,
                   top:
-                    clue.y * ROW_STEP_Y +
+                    clue.y *
+                      ROW_STEP_Y +
                     BOARD_TOP,
                 }}
                 disabled={!canOpen}
@@ -527,15 +474,17 @@ export function ObstaclePage() {
                 title={`Hàng ngang ${clue.order}`}
               >
                 <b>
-                  {String(clue.order).padStart(
-                    2,
-                    "0",
-                  )}
+                  {String(
+                    clue.order,
+                  ).padStart(2, "0")}
                 </b>
 
                 <span className="cells">
                   {letters.map(
-                    (letter, index) => (
+                    (
+                      letter,
+                      index,
+                    ) => (
                       <i
                         key={index}
                         className="cell"
@@ -554,6 +503,7 @@ export function ObstaclePage() {
           {phase === "finished" && (
             <div className="finished-overlay">
               <div>🏁</div>
+
               <strong>
                 HOÀN THÀNH Ô CHỮ
               </strong>
@@ -569,59 +519,63 @@ export function ObstaclePage() {
         </div>
       </section>
 
-      {questionOpen && selectedClue && (
-        <div className="stage-modal">
-          <section className="question-stage-card">
-            <div className="eyebrow">
-              HÀNG NGANG{" "}
-              {String(
-                selectedClue.order,
-              ).padStart(2, "0")}
-              {isAudienceActive
-                ? " • KHÁN GIẢ"
-                : ""}
-            </div>
+      {questionOpen &&
+        selectedClue && (
+          <div className="stage-modal">
+            <section className="question-stage-card">
+              <div className="eyebrow">
+                HÀNG NGANG{" "}
+                {String(
+                  selectedClue.order,
+                ).padStart(2, "0")}
+                {isAudienceActive
+                  ? " • KHÁN GIẢ"
+                  : ""}
+              </div>
 
-            <div className="big-timer">
-              {timerText}
-            </div>
+              <div className="big-timer">
+                {timerText}
+              </div>
 
-            <h2>
-              {selectedClue.question ||
-                "Chưa nhập câu hỏi"}
-            </h2>
+              <h2>
+                {selectedClue.question ||
+                  "Chưa nhập câu hỏi"}
+              </h2>
 
-            <button
-              className="primary-button"
-              onClick={() =>
-                setTimerRunning(
-                  (value) => !value,
-                )
-              }
-            >
-              {timerRunning
-                ? "Ⅱ TẠM DỪNG"
-                : "▶ TIẾP TỤC"}
-            </button>
+              <button
+                className="primary-button"
+                onClick={() =>
+                  setTimerRunning(
+                    (value) => !value,
+                  )
+                }
+              >
+                {timerRunning
+                  ? "Ⅱ TẠM DỪNG"
+                  : "▶ TIẾP TỤC"}
+              </button>
 
-            <button
-              className="ghost-button modal-close"
-              onClick={() => {
-                setTimerRunning(false);
-                setQuestionOpen(false);
-              }}
-            >
-              QUAY LẠI BẢNG Ô CHỮ
-            </button>
-          </section>
-        </div>
-      )}
+              <button
+                className="ghost-button modal-close"
+                onClick={() => {
+                  setTimerRunning(false);
+                  setQuestionOpen(false);
+                }}
+              >
+                QUAY LẠI BẢNG Ô CHỮ
+              </button>
+            </section>
+          </div>
+        )}
 
       {!questionOpen &&
         selectedClue &&
-        (statusMap[selectedClue.id] ===
-          "active" ||
-          statusMap[selectedClue.id] ===
+        (statusMap[
+          selectedClue.id
+        ] === "active" ||
+          statusMap[
+            selectedClue.id
+          ] ===
             "audience-active") && (
           <section className="grading-panel">
             <div className="grading-head">
@@ -652,8 +606,9 @@ export function ObstaclePage() {
                   <button
                     key={team.id}
                     className={`team-grade ${
-                      answers[team.id] ===
-                      "correct"
+                      answers[
+                        team.id
+                      ] === "correct"
                         ? "correct"
                         : ""
                     }`}
@@ -662,7 +617,9 @@ export function ObstaclePage() {
                         (map) => ({
                           ...map,
                           [team.id]:
-                            map[team.id] ===
+                            map[
+                              team.id
+                            ] ===
                             "correct"
                               ? "unanswered"
                               : "correct",
@@ -756,7 +713,8 @@ export function ObstaclePage() {
               {puzzle.verticalAnswer
                 .replace(/\s/g, "")
                 .split("")
-                .map(() => "_ ")}
+                .map(() => "_ ")
+                .join("")}
             </h2>
 
             <div className="team-grade-grid">
