@@ -47,31 +47,31 @@ export function FinishPage() {
     finish.selectPackage(pendingTeamId, pendingPackageId);
   };
 
-  // Cập nhật điểm lên Bảng điểm tổng khi có kết quả
+  // Cập nhật điểm lên Bảng điểm tổng (Truyền đúng 3 tham số: teamId, points, reason)
   const handleMarkCorrect = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     const pts = finish.starActive ? currentQuestion.points * 2 : currentQuestion.points;
-    addScore(finish.currentTeamId, pts);
+    addScore(finish.currentTeamId, pts, "Trả lời đúng câu hỏi Về đích");
     finish.markCorrect();
   };
 
   const handleMarkWrong = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     if (finish.starActive) {
-      addScore(finish.currentTeamId, -currentQuestion.points);
+      addScore(finish.currentTeamId, -currentQuestion.points, "Trừ điểm Ngôi sao hy vọng");
     }
     finish.markWrong();
   };
 
   const handleStealCorrect = () => {
     if (!finish.selectedStealTeamId || !currentQuestion) return;
-    addScore(finish.selectedStealTeamId, currentQuestion.points);
+    addScore(finish.selectedStealTeamId, currentQuestion.points, "Cướp điểm thành công");
     finish.markStealCorrect();
   };
 
   const handleStealWrong = () => {
     if (!finish.selectedStealTeamId || !currentQuestion) return;
-    addScore(finish.selectedStealTeamId, -Math.floor(currentQuestion.points / 2));
+    addScore(finish.selectedStealTeamId, -Math.floor(currentQuestion.points / 2), "Trừ điểm cướp sai");
     finish.markStealWrong();
   };
 
@@ -136,7 +136,6 @@ export function FinishPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto text-white">
-      {/* Tiêu đề & Trạng thái đội */}
       <div className="flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg">
         <div>
           <span className="text-gray-400">Đội đang thi: </span>
@@ -152,7 +151,6 @@ export function FinishPage() {
         </div>
       </div>
 
-      {/* Màn hình từng Phase */}
       {finish.questionPhase === "intro" && (
         <div className="text-center bg-slate-800 p-8 rounded-lg">
           <h2 className="text-2xl font-bold mb-4">
@@ -190,7 +188,6 @@ export function FinishPage() {
 
       {(finish.questionPhase === "playing" || finish.questionPhase === "steal" || finish.questionPhase === "resolved") && (
         <div className="bg-slate-800 p-6 rounded-lg space-y-6">
-          {/* Header Câu hỏi */}
           <div className="flex justify-between items-center border-b border-slate-700 pb-4">
             <div className="text-lg font-semibold">
               Điểm: <span className="text-yellow-400">{currentQuestion?.points}</span> 
@@ -201,12 +198,10 @@ export function FinishPage() {
             </div>
           </div>
 
-          {/* Nội dung câu hỏi */}
           <div className="text-xl font-medium min-h-[100px] bg-slate-900 p-4 rounded">
             {currentQuestion?.text || "Chưa có nội dung câu hỏi"}
           </div>
 
-          {/* Video nếu có */}
           {currentQuestion?.isVideo && currentQuestion.youtubeUrl && (
             <div className="aspect-video w-full max-w-2xl mx-auto rounded overflow-hidden">
               <iframe 
@@ -218,7 +213,6 @@ export function FinishPage() {
             </div>
           )}
 
-          {/* Controls theo Phase */}
           {finish.questionPhase === "playing" && (
             <div className="flex flex-wrap gap-4 justify-center pt-4">
               {!finish.isTimerRunning && (
@@ -244,7 +238,6 @@ export function FinishPage() {
             </div>
           )}
 
-          {/* Phase Giành quyền trả lời (Steal) */}
           {finish.questionPhase === "steal" && (
             <div className="border-t border-slate-700 pt-4 space-y-4 text-center">
               <h3 className="text-lg font-bold text-orange-400">CƠ HỘI CƯỚP ĐIỂM CHO CÁC ĐỘI KHÁC</h3>
@@ -271,7 +264,6 @@ export function FinishPage() {
             </div>
           )}
 
-          {/* Phase Hoàn thành câu hỏi */}
           {finish.questionPhase === "resolved" && (
             <div className="text-center pt-4 border-t border-slate-700">
               <p className="text-slate-300 mb-2">Đáp án: <span className="text-green-400 font-bold">{currentQuestion?.answer}</span></p>
