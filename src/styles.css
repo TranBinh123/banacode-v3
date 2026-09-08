@@ -2961,3 +2961,43 @@ body:has(.finish-page) .ghost-button {
 .finish-assignment-section {
   padding: 24px 20px !important;
 }
+/* =========================================================
+   Finish – Căn giữa cột "Ghép đang chọn"
+   ========================================================= */
+
+/* Căn giữa toàn bộ card */
+.finish-mapping-card {
+  text-align: center;
+  align-items: center;
+}
+
+/* Căn giữa label và giá trị */
+.finish-mapping-label {
+  text-align: center;
+  width: 100%;
+}
+
+.finish-mapping-value {
+  display: flex !important;
+  justify-content: center !important;
+  text-align: center;
+}
+
+/* Căn giữa mũi tên */
+.finish-mapping-arrow {
+  text-align: center;
+}
+
+/* Căn giữa nút "Gán đội vào gói" */
+.finish-assignment-submit {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Tăng thêm chút padding cho đẹp */
+.finish-mapping-card {
+  padding: 20px 16px;
+}
