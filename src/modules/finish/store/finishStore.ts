@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { TeamId } from "../../../types/game";
+import type { TeamId } from "../../../core/types/game";
 import type {
   FinishPackage,
   FinishQuestion,
