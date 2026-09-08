@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useFinishStore } from "../store/finishStore";
 import { useGameStore } from "../../../core/store/gameStore";
+import { addScore } from "../../../core/scoring/scoring";
 import type { TeamId } from "../../../core/types/game";
 
 const youtubeEmbedUrl = (url: string) => {
@@ -27,9 +28,11 @@ export function FinishPage() {
   const teams = useGameStore((state) => state.teams);
   const addScore = useGameStore((state) => state.addScore);
 
-  const [pendingTeamId, setPendingTeamId] = useState<TeamId>("team-1");
-  const [pendingPackageId, setPendingPackageId] = useState<string>("package-1");
+  // State cho selection
+  const [pendingTeamId, setPendingTeamId] = useState<TeamId | null>(null);
+  const [pendingPackageId, setPendingPackageId] = useState<string | null>(null);
 
+  // Timer effect
   useEffect(() => {
     if (!finish.isTimerRunning) return;
     const interval = setInterval(() => {
@@ -39,12 +42,15 @@ export function FinishPage() {
   }, [finish.isTimerRunning, finish.tickTimer]);
 
   const currentPkg = finish.packages.find((p) => p.id === finish.currentPackageId);
-  const currentQuestion = currentPkg?.questions[finish.currentQuestionIndex];
+  const currentQuestion = currentPkg?.questions[finish.currentQuestionIndex] ?? null;
+  const currentTeam = finish.currentTeamId
+    ? teams.find((t) => t.id === finish.currentTeamId) ?? null
+    : null;
+  const selectedStealTeam = finish.selectedStealTeamId
+    ? teams.find((t) => t.id === finish.selectedStealTeamId) ?? null
+    : null;
 
-  const handleSelectPackage = () => {
-    finish.selectPackage(pendingTeamId, pendingPackageId);
-  };
-
+  // Xử lý điểm
   const handleMarkCorrect = () => {
     if (!finish.currentTeamId || !currentQuestion) return;
     const pts = finish.starActive ? currentQuestion.points * 2 : currentQuestion.points;
@@ -63,7 +69,6 @@ export function FinishPage() {
   const handleStealCorrect = () => {
     if (!finish.selectedStealTeamId || !currentQuestion) return;
     addScore(finish.selectedStealTeamId, currentQuestion.points, "finish");
-    // Đội chính bị trừ (nếu có sao) hoặc trừ thường? Theo luật: cướp đúng -> đội chính bị trừ điểm câu hỏi.
     if (finish.currentTeamId) {
       addScore(finish.currentTeamId, -currentQuestion.points, "finish");
     }
@@ -72,227 +77,496 @@ export function FinishPage() {
 
   const handleStealWrong = () => {
     if (!finish.selectedStealTeamId || !currentQuestion) return;
-    // Nếu có sao, đội cướp bị trừ điểm
     if (finish.starActive) {
       addScore(finish.selectedStealTeamId, -currentQuestion.points, "finish");
     }
     finish.markStealWrong();
   };
 
-  // Màn hình selection
-  if (finish.status === "selection") {
-    return (
-      <div className="p-6 max-w-4xl mx-auto text-white">
-        <h1 className="text-3xl font-bold mb-6 text-center text-yellow-400">VỀ ĐÍCH - CHỌN GÓI CÂU HỎI</h1>
-        
-        <div className="bg-slate-800 p-6 rounded-lg mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div>
-            <label className="block text-sm font-medium mb-1">Chọn Đội Thi:</label>
-            <select 
-              value={pendingTeamId} 
-              onChange={(e) => setPendingTeamId(e.target.value as TeamId)}
-              className="bg-slate-700 p-2 rounded text-white border border-slate-600"
-            >
-              {teams.map((t) => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Chọn Gói Câu Hỏi:</label>
-            <select 
-              value={pendingPackageId} 
-              onChange={(e) => setPendingPackageId(e.target.value)}
-              className="bg-slate-700 p-2 rounded text-white border border-slate-600"
-            >
-              {finish.packages.map((pkg) => (
-                <option key={pkg.id} value={pkg.id} disabled={pkg.selectedBy !== null}>
-                  {pkg.label} {pkg.selectedBy ? `(Đã chọn)` : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button 
-            onClick={handleSelectPackage}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-500 font-bold rounded shadow transition"
-          >
-            Xác Nhận Chọn
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+  // Màn hình FINISHED
   if (finish.status === "finished") {
     return (
-      <div className="p-6 text-center text-white">
-        <h1 className="text-4xl font-bold text-green-400 mb-4">PHẦN THI VỀ ĐÍCH ĐÃ HOÀN THÀNH!</h1>
-        <button 
-          onClick={finish.resetRound} 
-          className="px-6 py-2 bg-red-600 hover:bg-red-500 rounded font-bold"
-        >
-          Reset Vòng Thi
-        </button>
-      </div>
+      <section className="finish-page">
+        <div className="finish-finale">
+          <div className="finish-finale-badge">VÒNG 4</div>
+          <div className="finish-finale-star">★</div>
+          <h1>VỀ ĐÍCH</h1>
+          <p>PHẦN THI ĐÃ HOÀN THÀNH</p>
+          <div className="finish-final-scoreboard">
+            {teams
+              .slice()
+              .sort((a, b) => b.totalScore - a.totalScore)
+              .map((team, index) => (
+                <div key={team.id} className="finish-final-score-row">
+                  <span className="finish-final-rank">{index + 1}</span>
+                  <strong>{team.name}</strong>
+                  <b>{team.totalScore}</b>
+                </div>
+              ))}
+          </div>
+          <div className="finish-finale-message">CHÚC MỪNG CÁC ĐỘI THI!</div>
+          <button className="finish-primary-button" onClick={finish.resetRound}>
+            CHƠI LẠI VÒNG 4
+          </button>
+        </div>
+      </section>
     );
   }
 
-  // Đang chơi
-  return (
-    <div className="p-6 max-w-5xl mx-auto text-white">
-      <div className="flex justify-between items-center mb-6 bg-slate-800 p-4 rounded-lg">
-        <div>
-          <span className="text-gray-400">Đội đang thi: </span>
-          <span className="text-xl font-bold text-yellow-300">
-            {teams.find(t => t.id === finish.currentTeamId)?.name}
-          </span>
-        </div>
-        <div>
-          <span className="text-gray-400">Câu hỏi: </span>
-          <span className="text-xl font-bold">
-            {(finish.currentQuestionIndex || 0) + 1} / {currentPkg?.questions.length || 5}
-          </span>
-        </div>
-      </div>
+  // Màn hình SELECTION (3 cột đẹp)
+  if (finish.status === "selection") {
+    const selectedTeam = pendingTeamId
+      ? teams.find((t) => t.id === pendingTeamId) ?? null
+      : null;
+    const selectedPackage = pendingPackageId
+      ? finish.packages.find((p) => p.id === pendingPackageId) ?? null
+      : null;
 
-      {/* Ưu tiên hiển thị star_decision trước */}
-      {finish.questionPhase === "star_decision" && (
-        <div className="text-center bg-slate-800 p-8 rounded-lg">
-          <h2 className="text-2xl font-bold mb-6 text-yellow-400">BẠN CÓ MUỐN CHỌN NGÔI SAO HY VỌNG?</h2>
-          <div className="flex justify-center gap-4">
-            <button 
-              onClick={() => finish.decideStar(true)}
-              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded"
-            >
-              CÓ (Dùng Ngôi Sao Hy Vọng)
-            </button>
-            <button 
-              onClick={() => finish.decideStar(false)}
-              className="px-6 py-3 bg-gray-600 hover:bg-gray-500 font-bold rounded"
-            >
-              KHÔNG
-            </button>
-          </div>
-        </div>
-      )}
+    const availableTeams = teams.filter(
+      (team) => !finish.packages.some((pkg) => pkg.selectedBy === team.id)
+    );
+    const availablePackages = finish.packages.filter((pkg) => pkg.selectedBy === null);
 
-      {finish.questionPhase === "intro" && (
-        <div className="text-center bg-slate-800 p-8 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4">
-            Câu hỏi {finish.currentQuestionIndex + 1}: Mức độ{" "}
-            <span className="uppercase text-yellow-400">{currentQuestion?.difficulty}</span> ({currentQuestion?.points} điểm)
-          </h2>
-          <button 
-            onClick={finish.startQuestion}
-            className="px-6 py-3 bg-green-600 hover:bg-green-500 text-lg font-bold rounded"
-          >
-            Bắt Đầu Câu Hỏi
-          </button>
-        </div>
-      )}
+    const handleAssignPackage = () => {
+      if (!pendingTeamId || !pendingPackageId) return;
+      const success = finish.selectPackage(pendingTeamId, pendingPackageId);
+      if (success) {
+        setPendingTeamId(null);
+        setPendingPackageId(null);
+      }
+    };
 
-      {(finish.questionPhase === "playing" || finish.questionPhase === "steal" || finish.questionPhase === "resolved") && (
-        <div className="bg-slate-800 p-6 rounded-lg space-y-6">
-          <div className="flex justify-between items-center border-b border-slate-700 pb-4">
-            <div className="text-lg font-semibold">
-              Điểm: <span className="text-yellow-400">{currentQuestion?.points}</span> 
-              {finish.starActive && <span className="ml-2 text-yellow-300 font-bold">🌟 [Ngôi Sao Hy Vọng]</span>}
-            </div>
-            <div className={`text-3xl font-mono font-bold ${finish.timerSeconds <= 5 ? "text-red-500" : "text-green-400"}`}>
-              ⏱️ {finish.timerSeconds}s
-            </div>
-          </div>
+    return (
+      <section className="finish-page finish-selection-page">
+        <div className="finish-page-inner">
+          <header className="finish-hero finish-selection-hero">
+            <div className="finish-round-label">VÒNG 4</div>
+            <h1>VỀ ĐÍCH</h1>
+            <div className="finish-hero-line" />
+            <p>GHÉP ĐỘI THI VỚI GÓI CÂU HỎI</p>
+          </header>
 
-          <div className="text-xl font-medium min-h-[100px] bg-slate-900 p-4 rounded">
-            {currentQuestion?.text || "Chưa có nội dung câu hỏi"}
-          </div>
+          <main className="finish-assignment-layout">
+            {/* Cột 1: Chọn đội */}
+            <section className="finish-assignment-section finish-team-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">01</div>
+                <div>
+                  <span>CHỌN ĐỘI THI</span>
+                  <small>Chọn đội đang chuẩn bị thi</small>
+                </div>
+              </div>
+              <div className="finish-assignment-team-list">
+                {availableTeams.length === 0 ? (
+                  <div className="finish-assignment-empty">TẤT CẢ ĐỘI ĐÃ ĐƯỢC GÁN</div>
+                ) : (
+                  availableTeams.map((team) => (
+                    <button
+                      key={team.id}
+                      type="button"
+                      className={`finish-team-select-card ${pendingTeamId === team.id ? "selected" : ""}`}
+                      onClick={() => setPendingTeamId(team.id)}
+                    >
+                      <span className="finish-team-select-check">{pendingTeamId === team.id ? "✓" : ""}</span>
+                      <div className="finish-team-select-name">{team.name}</div>
+                      <div className="finish-team-select-score">
+                        <small>ĐIỂM</small>
+                        <strong>{team.totalScore}</strong>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </section>
 
-          {currentQuestion?.isVideo && currentQuestion.youtubeUrl && (
-            <div className="aspect-video w-full max-w-2xl mx-auto rounded overflow-hidden">
-              <iframe 
-                className="w-full h-full" 
-                src={youtubeEmbedUrl(currentQuestion.youtubeUrl)} 
-                title="Youtube video"
-                allowFullScreen
-              />
-            </div>
-          )}
-
-          {finish.questionPhase === "playing" && (
-            <div className="flex flex-wrap gap-4 justify-center pt-4">
-              {!finish.isTimerRunning && (
-                <button 
-                  onClick={finish.startTimer} 
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 font-bold rounded"
+            {/* Cột 2: Ghép */}
+            <section className="finish-assignment-section finish-mapping-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">02</div>
+                <div>
+                  <span>GHÉP ĐANG CHỌN</span>
+                  <small>Xác nhận đội và gói câu hỏi</small>
+                </div>
+              </div>
+              <div className="finish-mapping-card">
+                <div className="finish-mapping-label">ĐỘI THI</div>
+                <div className={`finish-mapping-value ${selectedTeam ? "active" : ""}`}>
+                  {selectedTeam?.name ?? <span>Chưa chọn đội</span>}
+                </div>
+                <div className="finish-mapping-arrow">↓</div>
+                <div className="finish-mapping-label">GÓI CÂU HỎI</div>
+                <div className={`finish-mapping-value ${selectedPackage ? "active" : ""}`}>
+                  {selectedPackage?.label ?? <span>Chưa chọn gói</span>}
+                </div>
+                <button
+                  type="button"
+                  className="finish-primary-button finish-assignment-submit"
+                  disabled={!pendingTeamId || !pendingPackageId}
+                  onClick={handleAssignPackage}
                 >
-                  Bắt đầu đếm giờ
+                  GÁN ĐỘI VÀO GÓI <span>→</span>
                 </button>
-              )}
-              <button 
-                onClick={handleMarkCorrect} 
-                className="px-6 py-2 bg-green-600 hover:bg-green-500 font-bold rounded"
+              </div>
+              <div className="finish-assignment-hint">
+                {!selectedTeam && "① Chọn một đội thi bên trái"}
+                {selectedTeam && !selectedPackage && "② Chọn một gói câu hỏi bên phải"}
+                {selectedTeam && selectedPackage && "③ Kiểm tra và xác nhận ghép đội"}
+              </div>
+            </section>
+
+            {/* Cột 3: Chọn gói */}
+            <section className="finish-assignment-section finish-package-section">
+              <div className="finish-assignment-section-header">
+                <div className="finish-assignment-index">03</div>
+                <div>
+                  <span>CHỌN GÓI CÂU HỎI</span>
+                  <small>Mỗi gói chỉ được chọn một lần</small>
+                </div>
+              </div>
+              <div className="finish-assignment-package-list">
+                {availablePackages.length === 0 ? (
+                  <div className="finish-assignment-empty">TẤT CẢ GÓI ĐÃ ĐƯỢC CHỌN</div>
+                ) : (
+                  availablePackages.map((pkg, index) => (
+                    <button
+                      key={pkg.id}
+                      type="button"
+                      className={`finish-package-select-card ${pendingPackageId === pkg.id ? "selected" : ""}`}
+                      onClick={() => setPendingPackageId(pkg.id)}
+                    >
+                      <div className="finish-package-select-number">{String(index + 1).padStart(2, "0")}</div>
+                      <div className="finish-package-select-info">
+                        <strong>{pkg.label}</strong>
+                        <span>5 CÂU HỎI</span>
+                      </div>
+                      <div className="finish-package-select-arrow">
+                        {pendingPackageId === pkg.id ? "✓" : "→"}
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </section>
+          </main>
+
+          {/* Tiến độ gán */}
+          {finish.selectionOrder.length > 0 && (
+            <section className="finish-assigned-summary">
+              <div className="finish-assigned-summary-header">
+                <span>TIẾN ĐỘ GÁN GÓI</span>
+                <strong>{finish.selectionOrder.length} / 4</strong>
+              </div>
+              <div className="finish-assigned-summary-list">
+                {finish.selectionOrder.map((teamId, index) => {
+                  const team = teams.find((t) => t.id === teamId);
+                  const pkg = finish.packages.find((p) => p.selectedBy === teamId);
+                  if (!team || !pkg) return null;
+                  return (
+                    <div key={teamId} className="finish-assigned-summary-item">
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <strong>{team.name}</strong>
+                      <b>→</b>
+                      <em>{pkg.label}</em>
+                      <small>ĐÃ GÁN</small>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Footer bảng điểm */}
+          <footer className="finish-public-footer">
+            <div className="finish-scoreboard">
+              {teams
+                .slice()
+                .sort((a, b) => b.totalScore - a.totalScore)
+                .map((team) => (
+                  <div key={team.id} className="finish-score-team">
+                    <span>{team.name}</span>
+                    <strong>{team.totalScore}</strong>
+                  </div>
+                ))}
+            </div>
+            <div className="finish-footer-brand">
+              <span>THE BANACODE</span>
+              <strong>HÀNH TRÌNH 19 NĂM</strong>
+            </div>
+          </footer>
+        </div>
+      </section>
+    );
+  }
+
+  // =========================================================
+  // MÀN HÌNH PLAYING (đang thi)
+  // =========================================================
+
+  if (!currentPkg || !currentQuestion) {
+    return (
+      <section className="finish-page">
+        <div className="finish-empty">
+          <div className="finish-round-label">VÒNG 4</div>
+          <h1>VỀ ĐÍCH</h1>
+          <p>Chưa có câu hỏi đang diễn ra.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const embedUrl = currentQuestion.isVideo ? youtubeEmbedUrl(currentQuestion.youtubeUrl) : "";
+  const isStarDecision = finish.questionPhase === "star_decision";
+  const isIntro = finish.questionPhase === "intro";
+  const isPlaying = finish.questionPhase === "playing";
+  const isSteal = finish.questionPhase === "steal";
+  const isResolved = finish.questionPhase === "resolved";
+
+  const timerText = `${String(Math.floor(finish.timerSeconds / 60)).padStart(2, "0")}:${String(finish.timerSeconds % 60).padStart(2, "0")}`;
+
+  return (
+    <section className="finish-page">
+      <div className="finish-page-inner">
+        {/* HEADER */}
+        <header className="finish-game-header">
+          <div className="finish-game-title">
+            <div className="finish-round-label">VÒNG 4</div>
+            <h1>VỀ ĐÍCH</h1>
+          </div>
+          <div className="finish-game-meta">
+            <div>
+              <span>GÓI</span>
+              <strong>{currentPkg.label}</strong>
+            </div>
+            <div>
+              <span>CÂU</span>
+              <strong>
+                {finish.currentQuestionIndex + 1}
+                <small>/{currentPkg.questions.length}</small>
+              </strong>
+            </div>
+            <div>
+              <span>ĐỘ KHÓ</span>
+              <strong
+                style={{
+                  color:
+                    currentQuestion.difficulty === "easy"
+                      ? "#4CAF50"
+                      : currentQuestion.difficulty === "medium"
+                      ? "#FF9800"
+                      : "#f44336",
+                }}
               >
-                Trả Lời Đúng
-              </button>
-              <button 
-                onClick={handleMarkWrong} 
-                className="px-6 py-2 bg-red-600 hover:bg-red-500 font-bold rounded"
+                {currentQuestion.difficulty.toUpperCase()}
+              </strong>
+            </div>
+            <div className="finish-current-team">
+              <span>ĐANG THI</span>
+              <strong>{currentTeam?.name ?? "ĐỘI THI"}</strong>
+            </div>
+          </div>
+        </header>
+
+        {/* KHU VỰC CÂU HỎI */}
+        <main className="finish-question-area">
+          {/* STAR DECISION */}
+          {isStarDecision && (
+            <div className="finish-public-star-decision">
+              <div className="finish-star-glow">★</div>
+              <div className="finish-star-caption">NGÔI SAO HY VỌNG</div>
+              <h2>{currentTeam?.name}</h2>
+              <p>
+                Có muốn sử dụng <strong>NGÔI SAO HY VỌNG</strong> cho câu hỏi này?
+              </p>
+              <div className="finish-star-question">MC/KỸ THUẬT ĐANG CHỜ QUYẾT ĐỊNH</div>
+              <div className="finish-star-actions">
+                <button className="finish-star-yes" onClick={() => finish.decideStar(true)}>
+                  ★ DÙNG NGÔI SAO
+                </button>
+                <button className="finish-star-no" onClick={() => finish.decideStar(false)}>
+                  KHÔNG DÙNG
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* INTRO */}
+          {isIntro && (
+            <div className="finish-question-display" style={{ textAlign: "center", padding: "40px 20px" }}>
+              <div style={{ fontSize: "14px", fontWeight: "700", color: "#B87A2E", marginBottom: "12px" }}>
+                CÂU HỎI {finish.currentQuestionIndex + 1}
+              </div>
+              <h2 style={{ fontSize: "clamp(28px, 4vw, 48px)", margin: "0 0 12px" }}>
+                Mức độ{" "}
+                <span
+                  style={{
+                    color:
+                      currentQuestion.difficulty === "easy"
+                        ? "#4CAF50"
+                        : currentQuestion.difficulty === "medium"
+                        ? "#FF9800"
+                        : "#f44336",
+                  }}
+                >
+                  {currentQuestion.difficulty.toUpperCase()}
+                </span>
+              </h2>
+              <p style={{ fontSize: "18px", color: "#4E2E00", fontWeight: "600" }}>
+                {currentQuestion.points} điểm
+                {finish.starActive && " (đã chọn Ngôi sao hy vọng)"}
+              </p>
+              <button
+                className="finish-primary-button"
+                onClick={finish.startQuestion}
+                style={{ marginTop: "20px", minWidth: "200px" }}
               >
-                Trả Lời Sai
+                BẮT ĐẦU CÂU HỎI
               </button>
             </div>
           )}
 
-          {finish.questionPhase === "steal" && (
-            <div className="border-t border-slate-700 pt-4 space-y-4 text-center">
-              <h3 className="text-lg font-bold text-orange-400">CƠ HỘI CƯỚP ĐIỂM CHO CÁC ĐỘI KHÁC</h3>
-              <div className="flex justify-center gap-2 flex-wrap">
-                {teams.filter(t => t.id !== finish.currentTeamId).map(team => (
-                  <button
-                    key={team.id}
-                    onClick={() => finish.selectStealTeam(team.id)}
-                    className={`px-4 py-2 rounded font-semibold ${
-                      finish.selectedStealTeamId === team.id ? "bg-orange-500 text-white" : "bg-slate-700 text-gray-300"
-                    }`}
-                  >
-                    {team.name}
-                  </button>
-                ))}
+          {/* PLAYING / STEAL / RESOLVED */}
+          {(isPlaying || isSteal || isResolved) && (
+            <>
+              <div className="finish-question-topline">
+                <span>CÂU {finish.currentQuestionIndex + 1}</span>
+                {finish.starActive && <strong>★ NGÔI SAO HY VỌNG</strong>}
+                {isPlaying && (
+                  <span style={{ fontFamily: "monospace", fontSize: "20px", fontWeight: "bold" }}>
+                    ⏱ {timerText}
+                  </span>
+                )}
               </div>
 
-              {finish.selectedStealTeamId && (
-                <div className="flex justify-center gap-4 pt-2">
-                  <button onClick={handleStealCorrect} className="px-4 py-2 bg-green-600 rounded font-bold">Cướp Đúng (+Điểm)</button>
-                  <button onClick={handleStealWrong} className="px-4 py-2 bg-red-600 rounded font-bold">Cướp Sai (-Điểm)</button>
-                </div>
-              )}
-            </div>
-          )}
+              <div className="finish-question-display">
+                <h2>{currentQuestion.text || "CÂU HỎI ĐANG ĐƯỢC CHUẨN BỊ"}</h2>
+                {currentQuestion.isVideo && embedUrl && (
+                  <div className="finish-public-video">
+                    <iframe
+                      src={embedUrl}
+                      title={`Video câu hỏi ${finish.currentQuestionIndex + 1}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+                {currentQuestion.isVideo && !embedUrl && (
+                  <div className="finish-public-video-empty">VIDEO CÂU HỎI CHƯA CÓ URL</div>
+                )}
+              </div>
 
-          {finish.questionPhase === "resolved" && (
-            <div className="text-center pt-4 border-t border-slate-700">
-              <p className="text-slate-300 mb-2">Đáp án: <span className="text-green-400 font-bold">{currentQuestion?.answer}</span></p>
-              {currentPkg && finish.currentQuestionIndex + 1 < currentPkg.questions.length ? (
-                <button 
-                  onClick={finish.advanceQuestion} 
-                  className="px-6 py-2 bg-blue-600 hover:bg-blue-500 font-bold rounded"
-                >
-                  Câu Hỏi Tiếp Theo ➡️
-                </button>
-              ) : (
-                <button 
-                  onClick={finish.nextTeam} 
-                  className="px-6 py-2 bg-purple-600 hover:bg-purple-500 font-bold rounded"
-                >
-                  Hoàn Thành Gói Câu Hỏi 🏁
-                </button>
-              )}
-            </div>
+              {/* MC CONTROLS */}
+              <div className="finish-live-control-panel">
+                {isPlaying && (
+                  <div className="finish-judgement-panel">
+                    <div className="finish-judgement-title">
+                      {finish.starActive ? "★ NGÔI SAO HY VỌNG" : "KẾT QUẢ CÂU HỎI"}
+                    </div>
+                    <p>
+                      {finish.starActive
+                        ? "Đúng +" + currentQuestion.points * 2 + " điểm · Sai → các đội còn lại được quyền cướp"
+                        : "Đúng +" + currentQuestion.points + " điểm · Sai 0 điểm"}
+                    </p>
+                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+                      {!finish.isTimerRunning && (
+                        <button
+                          className="finish-primary-button"
+                          onClick={finish.startTimer}
+                          style={{ minWidth: "140px" }}
+                        >
+                          ▶ BẮT ĐẦU TÍNH GIỜ
+                        </button>
+                      )}
+                      <button className="finish-correct-button" onClick={handleMarkCorrect}>
+                        ✓ ĐÚNG
+                      </button>
+                      <button className="finish-wrong-button" onClick={handleMarkWrong}>
+                        ✕ SAI
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {isSteal && (
+                  <div className="finish-steal-panel">
+                    <div className="finish-judgement-title">CƠ HỘI CƯỚP ĐIỂM</div>
+                    <p>Chọn một trong các đội còn lại để trả lời.</p>
+                    <div className="finish-steal-team-grid">
+                      {teams
+                        .filter((team) => team.id !== finish.currentTeamId)
+                        .map((team) => (
+                          <button
+                            key={team.id}
+                            className={`finish-steal-team ${
+                              finish.selectedStealTeamId === team.id ? "selected" : ""
+                            }`}
+                            onClick={() => finish.selectStealTeam(team.id)}
+                            style={
+                              finish.selectedStealTeamId === team.id
+                                ? { borderColor: "#FFD700", background: "rgba(255,215,0,0.15)" }
+                                : {}
+                            }
+                          >
+                            {team.name}
+                          </button>
+                        ))}
+                    </div>
+                    {finish.selectedStealTeamId && (
+                      <div style={{ display: "flex", gap: "12px", justifyContent: "center", marginTop: "12px" }}>
+                        <button className="finish-correct-button" onClick={handleStealCorrect}>
+                          ✓ ĐÚNG
+                        </button>
+                        <button className="finish-wrong-button" onClick={handleStealWrong}>
+                          ✕ SAI
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {isResolved && (
+                  <div className="finish-next-panel">
+                    <div className="finish-result-message">
+                      Câu hỏi đã được chấm.
+                      {finish.starActive && <span style={{ marginLeft: "12px" }}>★ Ngôi sao đã sử dụng</span>}
+                    </div>
+                    {finish.currentQuestionIndex + 1 < currentPkg.questions.length ? (
+                      <button className="finish-primary-button" onClick={finish.advanceQuestion}>
+                        CÂU TIẾP THEO →
+                      </button>
+                    ) : (
+                      <button className="finish-primary-button" onClick={finish.nextTeam}>
+                        HOÀN THÀNH GÓI →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </>
           )}
-        </div>
-      )}
-    </div>
+        </main>
+
+        {/* SCOREBOARD */}
+        <footer className="finish-public-footer">
+          <div className="finish-scoreboard">
+            {teams
+              .slice()
+              .sort((a, b) => b.totalScore - a.totalScore)
+              .map((team) => (
+                <div
+                  key={team.id}
+                  className={`finish-score-team ${team.id === finish.currentTeamId ? "active" : ""}`}
+                >
+                  <span>{team.name}</span>
+                  <strong>{team.totalScore}</strong>
+                </div>
+              ))}
+          </div>
+          <div className="finish-footer-brand">
+            <span>THE BANACODE</span>
+            <strong>HÀNH TRÌNH 19 NĂM</strong>
+          </div>
+        </footer>
+      </div>
+    </section>
   );
 }
