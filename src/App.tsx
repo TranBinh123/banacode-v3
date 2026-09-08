@@ -5,37 +5,150 @@ import { ObstaclePage } from "./modules/obstacle/pages/ObstaclePage";
 import { ObstacleAdmin } from "./admin/obstacle/ObstacleAdmin";
 import { AccelerationPage } from "./modules/acceleration/pages/AccelerationPage";
 import { AccelerationAdmin } from "./admin/acceleration/AccelerationAdmin";
+import { FinishPage } from "./modules/finish/pages/FinishPage";
+import { FinishAdmin } from "./admin/finish/FinishAdmin";
 import { useGameStore } from "./core/store/gameStore";
 
-type Module = "warmup" | "obstacle" | "acceleration";
+type Module =
+  | "warmup"
+  | "obstacle"
+  | "acceleration"
+  | "finish";
 
 export default function App() {
-  const [module, setModule] = useState<Module>("warmup");
+  const [module, setModule] =
+    useState<Module>("warmup");
+
   const [admin, setAdmin] = useState(false);
-  const teams = useGameStore((s) => s.teams);
-  const isObstacle = module === "obstacle";
-  const isAcceleration = module === "acceleration";
+
+  const teams = useGameStore(
+    (state) => state.teams,
+  );
+
+  const isObstacle =
+    module === "obstacle";
+
+  const isAcceleration =
+    module === "acceleration";
+
+  const isFinish =
+    module === "finish";
+
+  const handleModuleChange = (
+    nextModule: Module,
+  ) => {
+    setModule(nextModule);
+    setAdmin(false);
+  };
+
+  const adminLabel = isFinish
+    ? "Về đích"
+    : isAcceleration
+      ? "Tăng tốc"
+      : isObstacle
+        ? "Vượt chướng ngại vật"
+        : "Khởi động";
 
   return (
     <div className="app-shell">
       <nav className="top-nav">
         <div>
-          <strong>ĐƯỜNG LÊN ĐỈNH OLYMPIA</strong>
-          <span className="nav-subtitle">THE BANACODE • HÀNH TRÌNH 19 NĂM</span>
+          <strong>
+            ĐƯỜNG LÊN ĐỈNH OLYMPIA
+          </strong>
+
+          <span className="nav-subtitle">
+            THE BANACODE • HÀNH TRÌNH 19 NĂM
+          </span>
         </div>
+
         <div className="nav-module-tabs">
-          <button className={module === "warmup" ? "nav-module active" : "nav-module"} onClick={() => { setModule("warmup"); setAdmin(false); }}>VÒNG 1</button>
-          <button className={module === "obstacle" ? "nav-module active" : "nav-module"} onClick={() => { setModule("obstacle"); setAdmin(false); }}>VÒNG 2</button>
-          <button className={module === "acceleration" ? "nav-module active" : "nav-module"} onClick={() => { setModule("acceleration"); setAdmin(false); }}>VÒNG 3</button>
-          <button className="ghost-button" onClick={() => setAdmin((v) => !v)}>
-            {admin ? "← Màn hình chơi" : `⚙ Quản trị ${isObstacle ? "Vượt chướng ngại vật" : isAcceleration ? "Tăng tốc" : "Khởi động"}`}
+          <button
+            className={
+              module === "warmup"
+                ? "nav-module active"
+                : "nav-module"
+            }
+            onClick={() =>
+              handleModuleChange("warmup")
+            }
+          >
+            VÒNG 1
+          </button>
+
+          <button
+            className={
+              module === "obstacle"
+                ? "nav-module active"
+                : "nav-module"
+            }
+            onClick={() =>
+              handleModuleChange("obstacle")
+            }
+          >
+            VÒNG 2
+          </button>
+
+          <button
+            className={
+              module === "acceleration"
+                ? "nav-module active"
+                : "nav-module"
+            }
+            onClick={() =>
+              handleModuleChange(
+                "acceleration",
+              )
+            }
+          >
+            VÒNG 3
+          </button>
+
+          <button
+            className={
+              module === "finish"
+                ? "nav-module active"
+                : "nav-module"
+            }
+            onClick={() =>
+              handleModuleChange("finish")
+            }
+          >
+            VÒNG 4
+          </button>
+
+          <button
+            className="ghost-button"
+            onClick={() =>
+              setAdmin((value) => !value)
+            }
+          >
+            {admin
+              ? "← Màn hình chơi"
+              : `⚙ Quản trị ${adminLabel}`}
           </button>
         </div>
       </nav>
 
-      {admin
-        ? (isObstacle ? <ObstacleAdmin /> : isAcceleration ? <AccelerationAdmin /> : <WarmupAdmin />)
-        : (isObstacle ? <ObstaclePage /> : isAcceleration ? <AccelerationPage /> : <WarmupPage teams={teams} />)}
+      {admin ? (
+        isFinish ? (
+          <FinishAdmin />
+        ) : isAcceleration ? (
+          <AccelerationAdmin />
+        ) : isObstacle ? (
+          <ObstacleAdmin />
+        ) : (
+          <WarmupAdmin />
+        )
+      ) : isFinish ? (
+        <FinishPage />
+      ) : isAcceleration ? (
+        <AccelerationPage />
+      ) : isObstacle ? (
+        <ObstaclePage />
+      ) : (
+        <WarmupPage teams={teams} />
+      )}
     </div>
   );
 }
