@@ -10,7 +10,11 @@ const youtubeEmbedUrl = (url: string) => {
     const parsed = new URL(url);
 
     if (parsed.hostname.includes("youtu.be")) {
-      return `https://www.youtube.com/embed/${parsed.pathname.replace("/", "")}`;
+      const videoId = parsed.pathname.replace("/", "");
+
+      return videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : "";
     }
 
     if (parsed.hostname.includes("youtube.com")) {
@@ -47,35 +51,60 @@ export function FinishAdmin() {
   const currentQuestion =
     currentPackage?.questions[finish.currentQuestionIndex] ?? null;
 
-  const currentTeam = currentPackage?.selectedBy
-    ? teams.find((team) => team.id === currentPackage.selectedBy)
+  const currentTeam = finish.currentTeamId
+    ? teams.find((team) => team.id === finish.currentTeamId) ?? null
+    : null;
+
+  const selectionTeamId =
+    finish.selectionOrder[finish.selectionIndex] ?? null;
+
+  const selectionTeam = selectionTeamId
+    ? teams.find((team) => team.id === selectionTeamId) ?? null
     : null;
 
   const remainingTeams = teams.filter(
     (team) =>
-      team.id !== currentPackage?.selectedBy &&
-      team.id !== finish.stealTeamId,
+      team.id !== finish.currentTeamId &&
+      team.id !== finish.selectedStealTeamId,
   );
-
-  const selectTeamForSteal = (teamId: TeamId) => {
-    finish.selectStealTeam(teamId);
-  };
 
   const handleCorrect = () => {
     if (!currentPackage || !currentQuestion) return;
 
-    if (finish.resolution === "awaiting-main-result") {
-      addScore(currentPackage.selectedBy!, 10, "finish");
+    if (
+      finish.resolution === "awaiting-main-result" &&
+      finish.currentTeamId
+    ) {
+      const points = finish.starActive ? 20 : 10;
+
+      addScore(
+        finish.currentTeamId,
+        points,
+        "finish",
+      );
+
       finish.markCorrect();
+
       return;
     }
 
     if (
       finish.resolution === "awaiting-steal-result" &&
-      finish.stealTeamId
+      finish.selectedStealTeamId &&
+      finish.currentTeamId
     ) {
-      addScore(finish.stealTeamId, 20, "finish");
-      addScore(currentPackage.selectedBy!, -10, "finish");
+      addScore(
+        finish.selectedStealTeamId,
+        20,
+        "finish",
+      );
+
+      addScore(
+        finish.currentTeamId,
+        -10,
+        "finish",
+      );
+
       finish.markStealCorrect();
     }
   };
@@ -84,11 +113,7 @@ export function FinishAdmin() {
     if (!currentPackage || !currentQuestion) return;
 
     if (finish.resolution === "awaiting-main-result") {
-      if (finish.starActive) {
-        finish.markWrong();
-      } else {
-        finish.markWrong();
-      }
+      finish.markWrong();
       return;
     }
 
@@ -97,17 +122,32 @@ export function FinishAdmin() {
     }
   };
 
+  const handleSelectPackage = (packageId: string) => {
+    if (!selectionTeamId) return;
+
+    finish.selectPackage(
+      selectionTeamId,
+      packageId,
+    );
+  };
+
   if (finish.status === "finished") {
     return (
       <section className="finish-admin">
         <div className="finish-admin-card">
-          <div className="finish-kicker">VÒNG 4</div>
+          <div className="finish-kicker">
+            VÒNG 4
+          </div>
+
           <h1>VỀ ĐÍCH</h1>
-          <p>Phần thi đã hoàn thành.</p>
+
+          <p>
+            Phần thi Vòng 4 đã hoàn thành.
+          </p>
 
           <button
             className="finish-primary-button"
-            onClick={finish.resetGame}
+            onClick={finish.resetRound}
           >
             Chơi lại Vòng 4
           </button>
@@ -116,52 +156,74 @@ export function FinishAdmin() {
     );
   }
 
+  /*
+   * =========================
+   * CHỌN GÓI CÂU HỎI
+   * =========================
+   */
   if (finish.status === "selection") {
-    const currentSelectionTeam = teams.find(
-      (team) => team.id === finish.selectionTeamId,
-    );
-
     return (
       <section className="finish-admin">
         <div className="finish-admin-header">
           <div>
-            <div className="finish-kicker">QUẢN TRỊ VÒNG 4</div>
+            <div className="finish-kicker">
+              QUẢN TRỊ VÒNG 4
+            </div>
+
             <h1>VỀ ĐÍCH</h1>
+
             <p>
-              Chọn gói câu hỏi lần lượt cho từng đội. Mỗi gói chỉ được
-              chọn một lần.
+              Các đội lần lượt chọn gói câu hỏi.
+              Mỗi gói chỉ được chọn một lần.
             </p>
           </div>
         </div>
 
         <div className="finish-selection-team">
-          <span>ĐỘI ĐANG CHỌN</span>
+          <span>ĐỘI ĐANG CHỌN GÓI</span>
+
           <strong>
-            {currentSelectionTeam?.name ?? "Chưa xác định"}
+            {selectionTeam?.name ?? "Chưa xác định"}
           </strong>
+
+          <small>
+            Lượt chọn {finish.selectionIndex + 1}/
+            {finish.selectionOrder.length}
+          </small>
         </div>
 
         <div className="finish-package-grid">
           {finish.packages.map((pkg) => {
             const selectedTeam = pkg.selectedBy
-              ? teams.find((team) => team.id === pkg.selectedBy)
+              ? teams.find(
+                  (team) =>
+                    team.id === pkg.selectedBy,
+                )
               : null;
 
             return (
               <button
                 key={pkg.id}
                 className={`finish-package-card ${
-                  pkg.selectedBy ? "taken" : ""
+                  pkg.selectedBy
+                    ? "taken"
+                    : ""
                 }`}
                 disabled={Boolean(pkg.selectedBy)}
-                onClick={() => finish.selectPackage(pkg.id)}
+                onClick={() =>
+                  handleSelectPackage(pkg.id)
+                }
               >
                 <span>{pkg.label}</span>
 
                 {selectedTeam ? (
-                  <small>Đã chọn: {selectedTeam.name}</small>
+                  <small>
+                    Đã chọn: {selectedTeam.name}
+                  </small>
                 ) : (
-                  <small>Chưa chọn</small>
+                  <small>
+                    Nhấn để chọn
+                  </small>
                 )}
               </button>
             );
@@ -171,85 +233,136 @@ export function FinishAdmin() {
     );
   }
 
+  /*
+   * =========================
+   * CHƯA CÓ CÂU HỎI
+   * =========================
+   */
   if (!currentPackage || !currentQuestion) {
     return (
       <section className="finish-admin">
         <div className="finish-admin-card">
-          <h2>Chưa có câu hỏi đang diễn ra</h2>
+          <h2>
+            Chưa có câu hỏi đang diễn ra
+          </h2>
         </div>
       </section>
     );
   }
 
+  /*
+   * =========================
+   * NGÔI SAO HY VỌNG
+   * =========================
+   *
+   * Quan trọng:
+   * Không hiển thị nội dung câu hỏi
+   * trước khi đội quyết định.
+   */
   const isStarDecision =
     finish.starDecisionPending &&
     (finish.currentQuestionIndex === 3 ||
       finish.currentQuestionIndex === 4);
 
+  /*
+   * =========================
+   * TRẠNG THÁI CHẤM
+   * =========================
+   */
   const isMainResult =
-    finish.resolution === "awaiting-main-result";
+    finish.resolution ===
+    "awaiting-main-result";
 
   const isStealSelection =
-    finish.resolution === "selecting-steal-team";
+    finish.resolution ===
+    "selecting-steal-team";
 
   const isStealResult =
-    finish.resolution === "awaiting-steal-result";
+    finish.resolution ===
+    "awaiting-steal-result";
 
-  const embedUrl = currentQuestion.isVideo
-    ? youtubeEmbedUrl(currentQuestion.youtubeUrl)
-    : "";
+  const embedUrl =
+    currentQuestion.isVideo
+      ? youtubeEmbedUrl(
+          currentQuestion.youtubeUrl,
+        )
+      : "";
 
   return (
     <section className="finish-admin">
       <div className="finish-admin-header">
         <div>
-          <div className="finish-kicker">QUẢN TRỊ VÒNG 4</div>
+          <div className="finish-kicker">
+            QUẢN TRỊ VÒNG 4
+          </div>
+
           <h1>VỀ ĐÍCH</h1>
 
           <div className="finish-admin-meta">
-            <span>{currentPackage.label}</span>
             <span>
-              CÂU {finish.currentQuestionIndex + 1}/
-              {currentPackage.questions.length}
+              {currentPackage.label}
             </span>
-            <strong>{currentTeam?.name}</strong>
+
+            <span>
+              CÂU{" "}
+              {finish.currentQuestionIndex + 1}
+              /{currentPackage.questions.length}
+            </span>
+
+            <strong>
+              {currentTeam?.name ??
+                "Đội thi"}
+            </strong>
           </div>
         </div>
       </div>
 
       <div className="finish-admin-main">
-        {/* Không hiển thị nội dung Q4/Q5 trước khi đội quyết định
-            có dùng Ngôi sao hy vọng hay không. */}
+        {/*
+         * ==================================================
+         * TRƯỚC Q4/Q5:
+         * CHỈ HIỆN QUYẾT ĐỊNH NGÔI SAO
+         * KHÔNG HIỆN NỘI DUNG CÂU HỎI
+         * ==================================================
+         */}
         {isStarDecision ? (
           <div className="finish-star-decision">
-            <div className="finish-star-icon">★</div>
+            <div className="finish-star-icon">
+              ★
+            </div>
 
             <div className="finish-star-label">
               NGÔI SAO HY VỌNG
             </div>
 
             <h2>
-              Đội {currentTeam?.name} có muốn sử dụng
+              {currentTeam?.name}
               <br />
-              Ngôi sao hy vọng cho câu này không?
+              có muốn sử dụng
+              <br />
+              Ngôi sao hy vọng không?
             </h2>
 
             <p>
-              Đây là cơ hội Ngôi sao duy nhất của đội trong toàn bộ
-              gói câu hỏi.
+              Đây là cơ hội Ngôi sao duy nhất
+              của đội trong gói câu hỏi này.
             </p>
 
             <div className="finish-star-actions">
               <button
                 className="finish-star-yes"
-                onClick={finish.useStar}
+                onClick={() =>
+                  finish.decideStar(true)
+                }
               >
                 ★ DÙNG NGÔI SAO
               </button>
 
               <button
                 className="finish-star-no"
-                onClick={finish.skipStar}
+                onClick={() =>
+                  finish.decideStar(false)
+                }
               >
                 KHÔNG DÙNG
               </button>
@@ -257,49 +370,79 @@ export function FinishAdmin() {
           </div>
         ) : (
           <>
+            {/*
+             * =========================
+             * NỘI DUNG CÂU HỎI
+             * =========================
+             */}
             <div className="finish-question-card">
               <div className="finish-question-number">
-                CÂU {finish.currentQuestionIndex + 1}
+                CÂU{" "}
+                {finish.currentQuestionIndex +
+                  1}
               </div>
 
-              <h2>{currentQuestion.text}</h2>
-
-              {currentQuestion.isVideo && embedUrl && (
-                <div className="finish-video-wrapper">
-                  <iframe
-                    src={embedUrl}
-                    title={`Video câu hỏi ${
-                      finish.currentQuestionIndex + 1
-                    }`}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+              {finish.starActive && (
+                <div className="finish-active-star">
+                  ★ NGÔI SAO HY VỌNG
                 </div>
               )}
 
-              {currentQuestion.isVideo && !embedUrl && (
-                <div className="finish-video-placeholder">
-                  Chưa có URL YouTube hợp lệ.
-                </div>
-              )}
+              <h2>
+                {currentQuestion.text ||
+                  "Chưa nhập nội dung câu hỏi."}
+              </h2>
+
+              {currentQuestion.isVideo &&
+                embedUrl && (
+                  <div className="finish-video-wrapper">
+                    <iframe
+                      src={embedUrl}
+                      title={`Video câu hỏi ${
+                        finish.currentQuestionIndex +
+                        1
+                      }`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+
+              {currentQuestion.isVideo &&
+                !embedUrl && (
+                  <div className="finish-video-placeholder">
+                    Chưa có URL YouTube hợp lệ.
+                  </div>
+                )}
 
               <div className="finish-answer-box">
-                <span>ĐÁP ÁN THAM KHẢO</span>
-                <strong>{currentQuestion.answer}</strong>
+                <span>
+                  ĐÁP ÁN THAM KHẢO
+                </span>
+
+                <strong>
+                  {currentQuestion.answer ||
+                    "Chưa nhập đáp án."}
+                </strong>
               </div>
             </div>
 
+            {/*
+             * =========================
+             * CHẤM ĐỘI CHÍNH
+             * =========================
+             */}
             {isMainResult && (
               <div className="finish-judgement-panel">
                 <div className="finish-judgement-title">
                   {finish.starActive
-                    ? "NGÔI SAO HY VỌNG"
+                    ? "★ NGÔI SAO HY VỌNG"
                     : "KẾT QUẢ CÂU HỎI"}
                 </div>
 
                 <p>
                   {finish.starActive
-                    ? "Đội trả lời đúng được +20 điểm. Nếu sai, các đội còn lại được quyền cướp."
+                    ? "Đúng +20 điểm · Sai: các đội còn lại được quyền cướp."
                     : "Đúng +10 điểm · Sai 0 điểm"}
                 </p>
 
@@ -321,6 +464,11 @@ export function FinishAdmin() {
               </div>
             )}
 
+            {/*
+             * =========================
+             * CHỌN ĐỘI CƯỚP
+             * =========================
+             */}
             {isStealSelection && (
               <div className="finish-steal-panel">
                 <div className="finish-judgement-title">
@@ -328,33 +476,49 @@ export function FinishAdmin() {
                 </div>
 
                 <p>
-                  Chọn một trong các đội còn lại để trả lời.
+                  Chọn một trong các đội còn
+                  lại để trả lời.
                 </p>
 
                 <div className="finish-steal-team-grid">
-                  {remainingTeams.map((team) => (
-                    <button
-                      key={team.id}
-                      className="finish-steal-team"
-                      onClick={() => selectTeamForSteal(team.id)}
-                    >
-                      {team.name}
-                    </button>
-                  ))}
+                  {remainingTeams.map(
+                    (team) => (
+                      <button
+                        key={team.id}
+                        className="finish-steal-team"
+                        onClick={() =>
+                          finish.selectStealTeam(
+                            team.id,
+                          )
+                        }
+                      >
+                        {team.name}
+                      </button>
+                    ),
+                  )}
                 </div>
               </div>
             )}
 
+            {/*
+             * =========================
+             * CHẤM ĐỘI CƯỚP
+             * =========================
+             */}
             {isStealResult && (
               <div className="finish-judgement-panel">
                 <div className="finish-judgement-title">
                   {teams.find(
-                    (team) => team.id === finish.stealTeamId,
-                  )?.name ?? "ĐỘI CƯỚP ĐIỂM"}
+                    (team) =>
+                      team.id ===
+                      finish.selectedStealTeamId,
+                  )?.name ??
+                    "ĐỘI CƯỚP ĐIỂM"}
                 </div>
 
                 <p>
-                  Đúng +20 điểm · Đội sử dụng Ngôi sao −10 điểm
+                  Đúng +20 điểm · Đội Ngôi sao
+                  −10 điểm
                 </p>
 
                 <div className="finish-judgement-actions">
@@ -375,20 +539,36 @@ export function FinishAdmin() {
               </div>
             )}
 
-            {finish.resolution === "resolved" && (
+            {/*
+             * =========================
+             * CÂU ĐÃ ĐƯỢC CHẤM
+             * =========================
+             */}
+            {finish.resolution ===
+              "resolved" && (
               <div className="finish-next-panel">
                 <div className="finish-result-message">
                   Câu hỏi đã được chấm.
                 </div>
 
-                <button
-                  className="finish-primary-button"
-                  onClick={finish.advanceQuestion}
-                >
-                  {finish.currentQuestionIndex === 4
-                    ? "Kết thúc phần thi"
-                    : "Câu tiếp theo →"}
-                </button>
+                {finish.currentQuestionIndex ===
+                4 ? (
+                  <button
+                    className="finish-primary-button"
+                    onClick={finish.nextTeam}
+                  >
+                    Sang đội tiếp theo →
+                  </button>
+                ) : (
+                  <button
+                    className="finish-primary-button"
+                    onClick={
+                      finish.advanceQuestion
+                    }
+                  >
+                    Câu tiếp theo →
+                  </button>
+                )}
               </div>
             )}
           </>
@@ -399,12 +579,18 @@ export function FinishAdmin() {
         <span>
           Ngôi sao:{" "}
           <strong>
-            {currentPackage.starUsed ? "ĐÃ DÙNG" : "CHƯA DÙNG"}
+            {currentPackage.starUsed
+              ? "ĐÃ DÙNG"
+              : "CHƯA DÙNG"}
           </strong>
         </span>
 
         <span>
-          Đội thi: <strong>{currentTeam?.name}</strong>
+          Đội thi:{" "}
+          <strong>
+            {currentTeam?.name ??
+              "—"}
+          </strong>
         </span>
       </div>
     </section>
