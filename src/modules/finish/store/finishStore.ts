@@ -9,9 +9,9 @@ const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 const createQuestion = (
   packageIndex: number,
   questionIndex: number,
-  difficulty: 'easy' | 'medium' | 'hard',
+  difficulty: "easy" | "medium" | "hard",
   points: number,
-  isVideo: boolean = false,
+  isVideo: boolean = false
 ): FinishQuestion => ({
   id: `finish-${packageIndex + 1}-${questionIndex + 1}`,
   text: "",
@@ -29,11 +29,11 @@ const createPackages = (): FinishPackage[] =>
     selectedBy: null,
     starUsed: false,
     questions: [
-      createQuestion(packageIndex, 0, 'easy', 10),
-      createQuestion(packageIndex, 1, 'easy', 10),
-      createQuestion(packageIndex, 2, 'medium', 20),
-      createQuestion(packageIndex, 3, 'medium', 20),
-      createQuestion(packageIndex, 4, 'hard', 30, true),
+      createQuestion(packageIndex, 0, "easy", 10),
+      createQuestion(packageIndex, 1, "easy", 10),
+      createQuestion(packageIndex, 2, "medium", 20),
+      createQuestion(packageIndex, 3, "medium", 20),
+      createQuestion(packageIndex, 4, "hard", 30, true),
     ],
   }));
 
@@ -58,6 +58,7 @@ type FinishStore = {
   starDecisionPending: boolean;
   selectedStealTeamId: TeamId | null;
   selectionOrder: TeamId[]; // Lưu thứ tự các đội đã chọn gói
+  completedTeams: TeamId[]; // Thêm mảng theo dõi các đội ĐÃ HOÀN THÀNH lượt thi
   timerSeconds: number;
   isTimerRunning: boolean;
 
@@ -107,6 +108,7 @@ const createInitialState = (): Omit<
   starDecisionPending: false,
   selectedStealTeamId: null,
   selectionOrder: [],
+  completedTeams: [],
   timerSeconds: 30,
   isTimerRunning: false,
 });
@@ -227,10 +229,8 @@ export const useFinishStore = create<FinishStore>()(
       markWrong: () => {
         const state = get();
         if (state.questionPhase !== "playing") return;
-        // Kiểm tra còn đội khác để cướp không
-        const remainingTeams = TEAM_IDS.filter(id => id !== state.currentTeamId);
-        // Nhưng cần kiểm tra các đội còn lại đã chọn gói chưa? Luật cho phép tất cả đội còn lại cướp.
-        // Nếu còn ít nhất 1 đội khác, mở cướp.
+        const remainingTeams = TEAM_IDS.filter((id) => id !== state.currentTeamId);
+
         if (remainingTeams.length > 0) {
           set({
             questionPhase: "steal",
@@ -268,11 +268,13 @@ export const useFinishStore = create<FinishStore>()(
         const pkg = state.packages.find((p) => p.id === state.currentPackageId);
         if (!pkg) return;
         const nextIndex = state.currentQuestionIndex + 1;
+
         if (nextIndex >= pkg.questions.length) {
           // Hết câu hỏi trong gói -> chuyển sang đội tiếp theo
           get().nextTeam();
           return;
         }
+
         const starUsed = pkg.starUsed;
         set({
           currentQuestionIndex: nextIndex,
@@ -287,19 +289,19 @@ export const useFinishStore = create<FinishStore>()(
 
       nextTeam: () => {
         const state = get();
+        const currentTeam = state.currentTeamId;
 
-        // Tìm các đội đã được gán gói
-        const assignedTeams = state.packages
-          .map(p => p.selectedBy)
-          .filter(id => id !== null) as TeamId[];
+        // Thêm đội vừa hoàn thành vào danh sách completedTeams
+        const newCompletedTeams =
+          currentTeam && !state.completedTeams.includes(currentTeam)
+            ? [...state.completedTeams, currentTeam]
+            : state.completedTeams;
 
-        // Tìm đội tiếp theo chưa được gán
-        const remainingTeams = TEAM_IDS.filter(id => !assignedTeams.includes(id));
-
-        if (remainingTeams.length > 0) {
-          // Vẫn còn đội chưa thi -> quay lại màn hình selection
+        // Kiểm tra nếu tất cả các đội (hoặc 4 lượt) đã hoàn thành
+        if (newCompletedTeams.length >= TEAM_IDS.length) {
           set({
-            status: "selection",
+            status: "finished",
+            completedTeams: newCompletedTeams,
             currentTeamId: null,
             currentPackageId: null,
             currentQuestionIndex: 0,
@@ -313,9 +315,10 @@ export const useFinishStore = create<FinishStore>()(
           return;
         }
 
-        // Tất cả đội đã thi xong
+        // Nếu vẫn còn đội chưa hoàn thành lượt thi -> Quay lại màn hình selection
         set({
-          status: "finished",
+          status: "selection",
+          completedTeams: newCompletedTeams,
           currentTeamId: null,
           currentPackageId: null,
           currentQuestionIndex: 0,
@@ -346,7 +349,7 @@ export const useFinishStore = create<FinishStore>()(
                   questions: pkg.questions.map((q, idx) =>
                     idx === questionIndex ? { ...q, ...patch } : q
                   ),
-                }
+                },
           ),
         }));
       },
