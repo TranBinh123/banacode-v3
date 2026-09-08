@@ -25,68 +25,16 @@
 }
 
 .warmup-page::before {
-  left: -20px;
+  left: -10px;
 
-  background-image:
-    radial-gradient(
-      ellipse at 50% 78%,
-      rgba(74, 145, 93, 0.58) 0 4%,
-      transparent 4.5%
-    ),
-    radial-gradient(
-      ellipse at 37% 48%,
-      rgba(255, 190, 205, 0.72) 0 12%,
-      transparent 12.8%
-    ),
-    radial-gradient(
-      ellipse at 61% 42%,
-      rgba(255, 255, 255, 0.92) 0 13%,
-      transparent 13.8%
-    ),
-    radial-gradient(
-      ellipse at 27% 58%,
-      rgba(255, 255, 255, 0.82) 0 9%,
-      transparent 9.8%
-    ),
-    linear-gradient(
-      72deg,
-      transparent 0 49%,
-      rgba(58, 130, 78, 0.48) 50% 52%,
-      transparent 53%
-    );
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 260'><path d='M40 260 C40 180 40 140 55 90' stroke='%234a915d' stroke-width='6' fill='none'/><path d='M118 260 C118 190 118 150 126 82' stroke='%233a824e' stroke-width='7' fill='none'/><path d='M172 260 C172 202 166 162 152 104' stroke='%234a915d' stroke-width='6' fill='none'/><path d='M40 192 C16 200 10 220 4 236' stroke='%234a915d' stroke-width='5' fill='none'/><path d='M124 172 C152 178 166 192 176 206' stroke='%233a824e' stroke-width='6' fill='none'/><g transform='translate(55,90)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffffff'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffd3e0'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffd3e0'/></g><g transform='translate(126,82) scale(1.18)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffc2d1'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffffff'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffffff'/></g><g transform='translate(152,104) scale(0.85)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffffff'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffb6cf'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffb6cf'/></g></svg>");
 }
 
 .warmup-page::after {
-  right: -20px;
+  right: -10px;
   transform: scaleX(-1);
 
-  background-image:
-    radial-gradient(
-      ellipse at 50% 78%,
-      rgba(74, 145, 93, 0.58) 0 4%,
-      transparent 4.5%
-    ),
-    radial-gradient(
-      ellipse at 37% 48%,
-      rgba(255, 190, 205, 0.72) 0 12%,
-      transparent 12.8%
-    ),
-    radial-gradient(
-      ellipse at 61% 42%,
-      rgba(255, 255, 255, 0.92) 0 13%,
-      transparent 13.8%
-    ),
-    radial-gradient(
-      ellipse at 27% 58%,
-      rgba(255, 255, 255, 0.82) 0 9%,
-      transparent 9.8%
-    ),
-    linear-gradient(
-      72deg,
-      transparent 0 49%,
-      rgba(58, 130, 78, 0.48) 50% 52%,
-      transparent 53%
-    );
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 260'><path d='M40 260 C40 180 40 140 55 90' stroke='%234a915d' stroke-width='6' fill='none'/><path d='M118 260 C118 190 118 150 126 82' stroke='%233a824e' stroke-width='7' fill='none'/><path d='M172 260 C172 202 166 162 152 104' stroke='%234a915d' stroke-width='6' fill='none'/><path d='M40 192 C16 200 10 220 4 236' stroke='%234a915d' stroke-width='5' fill='none'/><path d='M124 172 C152 178 166 192 176 206' stroke='%233a824e' stroke-width='6' fill='none'/><g transform='translate(55,90)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffffff'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffd3e0'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffd3e0'/></g><g transform='translate(126,82) scale(1.18)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffc2d1'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffffff'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffffff'/></g><g transform='translate(152,104) scale(0.85)'><path d='M0 40 C-20 10 -12 -25 0 -40 C12 -25 20 10 0 40 Z' fill='%23ffffff'/><path d='M-14 32 C-26 8 -20 -18 -10 -32 C-14 -6 -18 14 -14 32 Z' fill='%23ffb6cf'/><path d='M14 32 C26 8 20 -18 10 -32 C14 -6 18 14 14 32 Z' fill='%23ffb6cf'/></g></svg>");
 }
 
 /* =========================================================
@@ -97,26 +45,31 @@ body:has(.warmup-page),
 body:has(.warmup-admin-page) {
   background:
     radial-gradient(
-      360px 140px at 12% 8%,
-      rgba(255, 255, 255, 0.92),
-      transparent 72%
+      380px 150px at 10% 6%,
+      rgba(255, 255, 255, 0.98),
+      transparent 68%
     ),
     radial-gradient(
-      420px 150px at 82% 12%,
-      rgba(255, 255, 255, 0.88),
-      transparent 72%
+      440px 160px at 84% 10%,
+      rgba(255, 255, 255, 0.95),
+      transparent 68%
     ),
     radial-gradient(
-      280px 100px at 48% 2%,
-      rgba(255, 255, 255, 0.68),
+      300px 110px at 46% 0%,
+      rgba(255, 255, 255, 0.85),
+      transparent 68%
+    ),
+    radial-gradient(
+      260px 100px at 65% 22%,
+      rgba(255, 255, 255, 0.55),
       transparent 70%
     ),
     linear-gradient(
       180deg,
-      #aee8e4 0%,
-      #d5f3ee 38%,
-      #eefaf5 72%,
-      #f9fffc 100%
+      #7fdcd4 0%,
+      #b8ecdf 32%,
+      #e8f5e9 66%,
+      #ffffff 100%
     );
 }
 
@@ -166,6 +119,93 @@ body:has(.warmup-admin-page) .ghost-button {
   color: #004d66;
   background: rgba(255, 255, 255, 0.78);
   border-color: rgba(0, 77, 102, 0.14);
+}
+
+/* Nút Tạm dừng / Tiếp tục — trước đây thừa hưởng theme tối mặc định
+   (chữ trắng trên nền gần như trong suốt) khiến nút gần như vô hình. */
+.warmup-page .pause-button {
+  color: #004d66;
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 77, 102, 0.18);
+  box-shadow: 0 8px 22px rgba(0, 77, 102, 0.08);
+}
+
+.warmup-page .pause-button:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: rgba(0, 180, 216, 0.5);
+}
+
+.warmup-page .pause-button kbd {
+  color: #005d73;
+  background: #e8f5e9;
+  border-color: rgba(0, 77, 102, 0.14);
+}
+
+/* Nút chính (VD: "Chọn đội tiếp theo") — đổi từ xanh dương đậm
+   mặc định sang xanh Mint để đồng bộ theme sáng. */
+.warmup-page .primary-button {
+  color: #ffffff;
+  background: linear-gradient(135deg, #009fbe, #00b4d8);
+  border-color: rgba(0, 77, 102, 0.16);
+  box-shadow: 0 8px 24px rgba(0, 180, 216, 0.24);
+}
+
+.warmup-page .primary-button:hover:not(:disabled) {
+  box-shadow: 0 11px 28px rgba(0, 180, 216, 0.32);
+}
+
+/* Lưới chọn bộ câu hỏi — trước đây không có CSS nên trình duyệt
+   hiển thị nút mặc định (xám/không đồng bộ theme). */
+.warmup-page .set-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.warmup-page .set-selection-button {
+  min-height: 100px;
+
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 7px;
+
+  padding: 16px 18px;
+
+  text-align: left;
+  color: #004d66;
+
+  background: linear-gradient(145deg, #ffffff, #e8f5e9);
+
+  border: 1px solid rgba(0, 180, 216, 0.24);
+  border-radius: 14px;
+
+  box-shadow: 0 8px 22px rgba(0, 77, 102, 0.06);
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.warmup-page .set-selection-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: #00b4d8;
+  box-shadow: 0 14px 30px rgba(0, 180, 216, 0.16);
+}
+
+.warmup-page .set-selection-button strong {
+  color: #004d66;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.warmup-page .set-selection-button span {
+  color: #527888;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 /* =========================================================
@@ -559,6 +599,41 @@ body:has(.warmup-admin-page) .ghost-button {
   color: #775500;
   background: rgba(251, 191, 36, 0.10);
   border-color: rgba(176, 128, 0, 0.25);
+}
+
+/* =========================================================
+   ANSWER BUTTONS — tăng độ tương phản trên nền sáng
+   ========================================================= */
+
+.warmup-page .answer-button.correct {
+  background: rgba(34, 197, 94, 0.16);
+  border-color: rgba(22, 163, 74, 0.45);
+}
+
+.warmup-page .answer-button.correct:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.24);
+}
+
+.warmup-page .answer-button.wrong {
+  background: rgba(244, 63, 94, 0.14);
+  border-color: rgba(190, 40, 60, 0.4);
+}
+
+.warmup-page .answer-button.wrong:hover:not(:disabled) {
+  background: rgba(244, 63, 94, 0.22);
+}
+
+.warmup-page .answer-button.skip {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(180, 128, 0, 0.4);
+}
+
+.warmup-page .answer-button.skip:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.28);
+}
+
+.warmup-page .answer-button span {
+  opacity: 0.85;
 }
 
 /* =========================================================
