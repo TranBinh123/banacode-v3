@@ -5,7 +5,7 @@ import type { FinishPackage, FinishQuestion, FinishStatus, QuestionPhase } from 
 
 const TEAM_IDS: TeamId[] = ["team-1", "team-2", "team-3", "team-4"];
 
-// Hàm tạo câu hỏi mẫu
+// Tạo câu hỏi mẫu
 const createQuestion = (
   packageIndex: number,
   questionIndex: number,
@@ -22,7 +22,7 @@ const createQuestion = (
   youtubeUrl: isVideo ? "https://www.youtube.com/watch?v=..." : "",
 });
 
-// Tạo 4 gói, mỗi gói 5 câu: 2 dễ (10), 2 vừa (20), 1 khó (30, video)
+// Tạo 4 gói, mỗi gói 5 câu: 2 dễ, 2 vừa, 1 khó
 const createPackages = (): FinishPackage[] =>
   Array.from({ length: 4 }, (_, packageIndex) => ({
     id: `package-${packageIndex + 1}`,
@@ -38,8 +38,8 @@ const createPackages = (): FinishPackage[] =>
     ],
   }));
 
-// Shuffle (Fisher–Yates)
-function shuffle<T>(array: T[]): T[] {
+// Hàm xáo trộn mảng
+function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -49,38 +49,41 @@ function shuffle<T>(array: T[]): T[] {
 }
 
 type FinishStore = {
+  // State
   packages: FinishPackage[];
   status: FinishStatus;
   currentTeamId: TeamId | null;
   currentPackageId: string | null;
   currentQuestionIndex: number;
   questionPhase: QuestionPhase;
-  starActive: boolean;          // có sử dụng sao cho câu hiện tại?
-  starDecisionPending: boolean; // đang chờ quyết định sao?
+  starActive: boolean;
+  starDecisionPending: boolean;
   selectedStealTeamId: TeamId | null;
   selectionOrder: TeamId[];
   timerSeconds: number;
   isTimerRunning: boolean;
-  // Kết quả tạm để hiển thị
+
+  // Kết quả để hiển thị
   lastResult: { correct: boolean; points: number; teamId: TeamId | null } | null;
+  stealResult: { correct: boolean; points: number; teamId: TeamId | null } | null;
 
   // Actions
   selectPackage: (teamId: TeamId, packageId: string) => boolean;
-  startQuestion: () => void;            // từ intro sang star_decision hoặc playing
+  startQuestion: () => void;
   decideStar: (useStar: boolean) => void;
-  startTimer: () => void;               // bắt đầu đếm giờ
-  markCorrect: () => void;              // đội chính trả lời đúng
-  markWrong: () => void;                // đội chính trả lời sai
+  startTimer: () => void;
+  markCorrect: () => void;
+  markWrong: () => void;
   selectStealTeam: (teamId: TeamId) => void;
   markStealCorrect: () => void;
   markStealWrong: () => void;
   advanceQuestion: () => void;
   nextTeam: () => void;
+
+  // Admin actions
   updatePackage: (packageId: string, patch: Partial<Pick<FinishPackage, "label">>) => void;
   updateQuestion: (packageId: string, questionIndex: number, patch: Partial<FinishQuestion>) => void;
   resetRound: () => void;
-  // Hàm giảm timer (gọi từ useEffect bên ngoài)
-  tickTimer: () => void;
 };
 
 // State khởi tạo
@@ -100,7 +103,6 @@ const getInitialState = (): Omit<
   | "updatePackage"
   | "updateQuestion"
   | "resetRound"
-  | "tickTimer"
 > => ({
   packages: createPackages(),
   status: "selection",
@@ -115,6 +117,7 @@ const getInitialState = (): Omit<
   timerSeconds: 30,
   isTimerRunning: false,
   lastResult: null,
+  stealResult: null,
 });
 
 export const useFinishStore = create<FinishStore>()(
@@ -132,12 +135,12 @@ export const useFinishStore = create<FinishStore>()(
         if (!pkg || pkg.selectedBy !== null) return false;
 
         // Xáo trộn câu hỏi trong gói
-        const shuffled = shuffle(pkg.questions);
+        const shuffledQuestions = shuffleArray(pkg.questions);
 
         set({
           packages: state.packages.map((p) =>
             p.id === packageId
-              ? { ...p, selectedBy: teamId, questions: shuffled }
+              ? { ...p, selectedBy: teamId, questions: shuffledQuestions }
               : p
           ),
           status: "playing",
@@ -152,6 +155,7 @@ export const useFinishStore = create<FinishStore>()(
           timerSeconds: 30,
           isTimerRunning: false,
           lastResult: null,
+          stealResult: null,
         });
         return true;
       },
@@ -162,10 +166,11 @@ export const useFinishStore = create<FinishStore>()(
 
         const pkg = state.packages.find((p) => p.id === state.currentPackageId);
         if (!pkg) return;
+
         const question = pkg.questions[state.currentQuestionIndex];
         if (!question) return;
 
-        // Nếu gói chưa dùng sao, cho quyết định
+        // Nếu gói chưa dùng sao, hỏi quyết định
         if (!pkg.starUsed) {
           set({
             questionPhase: "star_decision",
@@ -179,7 +184,6 @@ export const useFinishStore = create<FinishStore>()(
             starDecisionPending: false,
             timerSeconds: 30,
             isTimerRunning: false,
-            lastResult: null,
           });
         }
       },
@@ -201,7 +205,6 @@ export const useFinishStore = create<FinishStore>()(
             questionPhase: "playing",
             timerSeconds: 30,
             isTimerRunning: false,
-            lastResult: null,
           });
         } else {
           set({
@@ -210,30 +213,15 @@ export const useFinishStore = create<FinishStore>()(
             questionPhase: "playing",
             timerSeconds: 30,
             isTimerRunning: false,
-            lastResult: null,
           });
         }
       },
 
       startTimer: () => {
-        const state = get();
-        if (state.questionPhase !== "playing") return;
         set({ isTimerRunning: true });
       },
 
-      // Timer tick (gọi từ useEffect)
-      tickTimer: () => {
-        const state = get();
-        if (!state.isTimerRunning || state.questionPhase !== "playing") return;
-        if (state.timerSeconds <= 0) {
-          set({ isTimerRunning: false });
-          // Hết giờ coi như sai (markWrong)
-          // Nhưng để tránh gọi đệ quy, ta sẽ gọi markWrong từ page khi timer về 0
-          return;
-        }
-        set({ timerSeconds: state.timerSeconds - 1 });
-      },
-
+      // Đội chính trả lời đúng
       markCorrect: () => {
         const state = get();
         if (state.questionPhase !== "playing") return;
@@ -246,14 +234,18 @@ export const useFinishStore = create<FinishStore>()(
 
         const points = state.starActive ? question.points * 2 : question.points;
 
-        // Lưu kết quả để page xử lý
         set({
-          lastResult: { correct: true, points, teamId: state.currentTeamId },
           questionPhase: "resolved",
+          lastResult: {
+            correct: true,
+            points,
+            teamId: state.currentTeamId,
+          },
           isTimerRunning: false,
         });
       },
 
+      // Đội chính trả lời sai
       markWrong: () => {
         const state = get();
         if (state.questionPhase !== "playing") return;
@@ -264,31 +256,20 @@ export const useFinishStore = create<FinishStore>()(
         const question = pkg.questions[state.currentQuestionIndex];
         if (!question) return;
 
-        // Sai: nếu có sao, đội chính bị trừ điểm; nếu không có sao, chỉ mở cướp
-        // Tùy vào có sao hay không, xử lý khác nhau
-        // Ta sẽ để page xử lý việc cộng/trừ, còn store chỉ chuyển trạng thái
-        // Nếu có sao, đội chính bị trừ điểm (x1)
-        // Nếu không có sao, không trừ điểm
-        // Sau đó chuyển sang steal
-        const withStar = state.starActive;
-        if (withStar) {
-          // Đội chính bị trừ điểm
-          // Store lưu kết quả sai để page trừ điểm
-          set({
-            lastResult: { correct: false, points: question.points, teamId: state.currentTeamId },
-            questionPhase: "steal",
-            isTimerRunning: false,
-            selectedStealTeamId: null,
-          });
-        } else {
-          // Không có sao: không trừ điểm, mở cướp
-          set({
-            lastResult: null,
-            questionPhase: "steal",
-            isTimerRunning: false,
-            selectedStealTeamId: null,
-          });
-        }
+        const points = question.points; // điểm của câu hỏi
+
+        // Lưu kết quả sai
+        set({
+          questionPhase: "steal", // mở cơ hội cướp
+          lastResult: {
+            correct: false,
+            points,
+            teamId: state.currentTeamId,
+          },
+          isTimerRunning: false,
+          selectedStealTeamId: null,
+          stealResult: null,
+        });
       },
 
       selectStealTeam: (teamId) => {
@@ -301,6 +282,7 @@ export const useFinishStore = create<FinishStore>()(
         set({ selectedStealTeamId: teamId });
       },
 
+      // Đội cướp trả lời đúng
       markStealCorrect: () => {
         const state = get();
         if (state.questionPhase !== "steal") return;
@@ -311,18 +293,20 @@ export const useFinishStore = create<FinishStore>()(
         const question = pkg.questions[state.currentQuestionIndex];
         if (!question) return;
 
-        // Đội cướp được + điểm
-        // Đội chính đã bị trừ nếu có sao (đã lưu ở lastResult)
-        // Nếu không có sao, đội chính không bị trừ, nhưng đội cướp được + điểm
-        // Lưu kết quả
+        const points = question.points; // cướp đúng được điểm câu hỏi
+
         set({
-          lastResult: { correct: true, points: question.points, teamId: state.selectedStealTeamId },
           questionPhase: "resolved",
-          isTimerRunning: false,
+          stealResult: {
+            correct: true,
+            points,
+            teamId: state.selectedStealTeamId,
+          },
           selectedStealTeamId: null,
         });
       },
 
+      // Đội cướp trả lời sai
       markStealWrong: () => {
         const state = get();
         if (state.questionPhase !== "steal") return;
@@ -333,20 +317,18 @@ export const useFinishStore = create<FinishStore>()(
         const question = pkg.questions[state.currentQuestionIndex];
         if (!question) return;
 
-        // Nếu có sao: đội cướp bị trừ điểm
-        // Nếu không có sao: không ai bị trừ
-        const withStar = state.starActive;
-        let points = 0;
-        let teamId = null;
-        if (withStar) {
-          points = question.points;
-          teamId = state.selectedStealTeamId;
-        }
+        const points = question.points;
+
+        // Nếu có sao thì đội cướp bị trừ điểm, nếu không thì bình yên
+        const isStar = state.starActive;
 
         set({
-          lastResult: withStar ? { correct: false, points, teamId } : null,
           questionPhase: "resolved",
-          isTimerRunning: false,
+          stealResult: {
+            correct: false,
+            points: isStar ? points : 0, // nếu có sao thì trừ điểm, nếu không thì 0 (không trừ)
+            teamId: state.selectedStealTeamId,
+          },
           selectedStealTeamId: null,
         });
       },
@@ -357,40 +339,79 @@ export const useFinishStore = create<FinishStore>()(
 
         const pkg = state.packages.find((p) => p.id === state.currentPackageId);
         if (!pkg) return;
-        const nextIndex = state.currentQuestionIndex + 1;
 
-        if (nextIndex < pkg.questions.length) {
-          // Chuyển sang câu tiếp theo
+        const nextIndex = state.currentQuestionIndex + 1;
+        if (nextIndex >= pkg.questions.length) {
+          // Hết câu hỏi trong gói, chuyển sang đội tiếp theo
+          // Không tự động nextTeam, để MC bấm nút "Hoàn thành gói"
+          // Nhưng store không có nút đó, ta sẽ để page gọi nextTeam
+          // Để tạm thời ta chỉ set currentQuestionIndex = nextIndex nhưng sẽ báo hết
+          // Thực tế nên có nút "Hoàn thành gói" để gọi nextTeam
+          // Tôi sẽ để page kiểm tra và gọi nextTeam
           set({
             currentQuestionIndex: nextIndex,
             questionPhase: "intro",
             starActive: false,
             starDecisionPending: false,
-            selectedStealTeamId: null,
             timerSeconds: 30,
             isTimerRunning: false,
             lastResult: null,
+            stealResult: null,
           });
+          // Page sẽ phát hiện nếu nextIndex >= length và hiển thị nút "Hoàn thành gói"
         } else {
-          // Đã hết câu trong gói
-          set({ status: "finished" });
+          set({
+            currentQuestionIndex: nextIndex,
+            questionPhase: "intro",
+            starActive: false,
+            starDecisionPending: false,
+            timerSeconds: 30,
+            isTimerRunning: false,
+            lastResult: null,
+            stealResult: null,
+          });
         }
       },
 
       nextTeam: () => {
         const state = get();
-        if (state.status !== "finished") return;
+        // Chỉ cho phép gọi khi đã hoàn thành tất cả câu trong gói hiện tại
+        const pkg = state.packages.find((p) => p.id === state.currentPackageId);
+        if (!pkg) return;
+        if (state.currentQuestionIndex < pkg.questions.length) return;
 
-        // Kiểm tra xem còn đội nào chưa thi không
-        const assignedTeams = state.packages
-          .filter((p) => p.selectedBy !== null)
-          .map((p) => p.selectedBy) as TeamId[];
+        const currentTeamIndex = state.currentTeamId
+          ? state.selectionOrder.indexOf(state.currentTeamId)
+          : -1;
+        const nextTeamId = currentTeamIndex >= 0
+          ? state.selectionOrder[currentTeamIndex + 1] ?? null
+          : null;
 
-        const remaining = TEAM_IDS.filter((id) => !assignedTeams.includes(id));
+        if (nextTeamId) {
+          const nextPackage = state.packages.find((p) => p.selectedBy === nextTeamId);
+          if (nextPackage) {
+            set({
+              status: "playing",
+              currentTeamId: nextTeamId,
+              currentPackageId: nextPackage.id,
+              currentQuestionIndex: 0,
+              questionPhase: "intro",
+              starActive: false,
+              starDecisionPending: false,
+              selectedStealTeamId: null,
+              timerSeconds: 30,
+              isTimerRunning: false,
+              lastResult: null,
+              stealResult: null,
+            });
+            return;
+          }
+        }
 
-        if (remaining.length > 0) {
+        // Nếu không còn đội nào, chuyển sang finished
+        if (state.selectionOrder.length >= TEAM_IDS.length) {
           set({
-            status: "selection",
+            status: "finished",
             currentTeamId: null,
             currentPackageId: null,
             currentQuestionIndex: 0,
@@ -401,15 +422,29 @@ export const useFinishStore = create<FinishStore>()(
             timerSeconds: 30,
             isTimerRunning: false,
             lastResult: null,
+            stealResult: null,
           });
-        } else {
-          // Tất cả đội đã thi xong
-          set({
-            status: "finished",
-          });
+          return;
         }
+
+        // Quay lại selection nếu vẫn còn đội chưa chọn
+        set({
+          status: "selection",
+          currentTeamId: null,
+          currentPackageId: null,
+          currentQuestionIndex: 0,
+          questionPhase: "intro",
+          starActive: false,
+          starDecisionPending: false,
+          selectedStealTeamId: null,
+          timerSeconds: 30,
+          isTimerRunning: false,
+          lastResult: null,
+          stealResult: null,
+        });
       },
 
+      // Admin actions
       updatePackage: (packageId, patch) => {
         set((state) => ({
           packages: state.packages.map((pkg) =>
@@ -437,6 +472,6 @@ export const useFinishStore = create<FinishStore>()(
         set(getInitialState());
       },
     }),
-    { name: "olympia-finish-game-v2" }
+    { name: "olympia-finish-game" }
   )
 );
