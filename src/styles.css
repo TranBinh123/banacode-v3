@@ -3524,3 +3524,37 @@ body:has(.finish-page) .ghost-button {
     grid-template-columns: 1fr 1fr;
   }
 }
+/* =========================================================
+   Finish – Canh giữa panel cướp điểm
+   ========================================================= */
+
+.finish-steal-panel {
+  text-align: center;
+}
+
+.finish-steal-panel .finish-judgement-title {
+  text-align: center;
+}
+
+.finish-steal-panel p {
+  text-align: center;
+}
+
+.finish-steal-team-grid {
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.finish-steal-team {
+  text-align: center;
+  flex: 0 1 auto;
+  min-width: 140px;
+  padding: 12px 20px;
+}
+
+.finish-steal-team.selected {
+  border-color: #FFD700;
+  background: rgba(255, 215, 0, 0.15);
+}
