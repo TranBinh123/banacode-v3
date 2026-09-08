@@ -1314,7 +1314,7 @@ body:has(.obstacle-game) .ghost-button {
 }
 /* =========================================================
    VÒNG 3 • TĂNG TỐC
-   Lilac / Cobalt Theme
+   Lilac / Cobalt Theme (gộp vào styles.css)
    ========================================================= */
 
 .acceleration-game {
@@ -1676,11 +1676,11 @@ body:has(.acceleration-game) .ghost-button {
 }
 
 /* =========================================================
-   ANSWER REVEAL
+   ANSWER REVEAL - đã giảm opacity background
    ========================================================= */
 
 .acceleration-game .answer-reveal {
-  background: rgba(58, 12, 163, 0.85);
+  background: rgba(58, 12, 163, 0.70); /* giảm từ 0.85 xuống 0.70 để mờ hơn */
   border-color: rgba(123, 44, 191, 0.60);
   box-shadow: 0 10px 35px rgba(0,0,0,0.30), 0 0 28px rgba(123, 44, 191, 0.15);
 }
