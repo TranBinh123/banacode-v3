@@ -13,6 +13,29 @@ export function FinishAdmin() {
     (state) => state.updateQuestion,
   );
 
+  // Hàm chuyển đổi độ khó thành điểm
+  const getPointsByDifficulty = (difficulty: 'easy' | 'medium' | 'hard') => {
+    switch (difficulty) {
+      case 'easy': return 10;
+      case 'medium': return 20;
+      case 'hard': return 30;
+      default: return 10;
+    }
+  };
+
+  // Hàm xử lý khi đổi độ khó
+  const handleDifficultyChange = (
+    pkgId: string,
+    qIndex: number,
+    newDifficulty: 'easy' | 'medium' | 'hard'
+  ) => {
+    const newPoints = getPointsByDifficulty(newDifficulty);
+    updateQuestion(pkgId, qIndex, {
+      difficulty: newDifficulty,
+      points: newPoints,
+    });
+  };
+
   return (
     <section className="finish-admin">
       <div className="finish-admin-header">
@@ -71,8 +94,9 @@ export function FinishAdmin() {
             <div className="finish-admin-question-list">
               {pkg.questions.map(
                 (question, questionIndex) => {
-                  const isVideo =
-                    question.isVideo;
+                  const isVideo = question.isVideo;
+                  const difficulty = question.difficulty || 'easy';
+                  const points = question.points || 10;
 
                   return (
                     <div
@@ -82,6 +106,29 @@ export function FinishAdmin() {
                       <div className="finish-admin-question-header">
                         <div className="finish-admin-question-number">
                           CÂU {questionIndex + 1}
+                        </div>
+
+                        {/* Dropdown chọn độ khó */}
+                        <div className="finish-difficulty-selector">
+                          <label>ĐỘ KHÓ</label>
+                          <select
+                            value={difficulty}
+                            onChange={(e) =>
+                              handleDifficultyChange(
+                                pkg.id,
+                                questionIndex,
+                                e.target.value as 'easy' | 'medium' | 'hard'
+                              )
+                            }
+                            className={`difficulty-select difficulty-${difficulty}`}
+                          >
+                            <option value="easy">Dễ (10 điểm)</option>
+                            <option value="medium">Vừa (20 điểm)</option>
+                            <option value="hard">Khó (30 điểm)</option>
+                          </select>
+                          <span className="points-badge">
+                            {points} điểm
+                          </span>
                         </div>
 
                         {questionIndex === 4 && (
@@ -124,8 +171,7 @@ export function FinishAdmin() {
                               pkg.id,
                               questionIndex,
                               {
-                                answer:
-                                  event.target.value,
+                                answer: event.target.value,
                               },
                             )
                           }
@@ -144,8 +190,7 @@ export function FinishAdmin() {
                                 pkg.id,
                                 questionIndex,
                                 {
-                                  isVideo:
-                                    event.target.checked,
+                                  isVideo: event.target.checked,
                                 },
                               )
                             }
@@ -174,16 +219,13 @@ export function FinishAdmin() {
 
                           <input
                             type="url"
-                            value={
-                              question.youtubeUrl
-                            }
+                            value={question.youtubeUrl}
                             onChange={(event) =>
                               updateQuestion(
                                 pkg.id,
                                 questionIndex,
                                 {
-                                  youtubeUrl:
-                                    event.target.value,
+                                  youtubeUrl: event.target.value,
                                 },
                               )
                             }
