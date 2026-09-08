@@ -1,5 +1,6 @@
 /* =========================================================
-   WARMUP — MINT / SPRING THEME
+   VÒNG 1 • KHỞI ĐỘNG
+   MINT / SPRING THEME
    ========================================================= */
 
 .warmup-page {
@@ -12,9 +13,9 @@
 .warmup-page::after {
   position: fixed;
   z-index: -1;
-  bottom: -18px;
-  width: 230px;
-  height: 230px;
+  bottom: -15px;
+  width: 260px;
+  height: 260px;
   content: "";
   pointer-events: none;
   opacity: 0.24;
@@ -24,491 +25,112 @@
 }
 
 .warmup-page::before {
-  left: -18px;
+  left: -20px;
+
   background-image:
     radial-gradient(
-      circle at 45% 62%,
-      rgba(255,255,255,.96) 0 12%,
-      transparent 13%
+      ellipse at 50% 78%,
+      rgba(74, 145, 93, 0.58) 0 4%,
+      transparent 4.5%
     ),
     radial-gradient(
-      circle at 62% 45%,
-      rgba(255,192,203,.78) 0 16%,
-      transparent 17%
+      ellipse at 37% 48%,
+      rgba(255, 190, 205, 0.72) 0 12%,
+      transparent 12.8%
     ),
     radial-gradient(
-      circle at 29% 42%,
-      rgba(255,255,255,.94) 0 15%,
-      transparent 16%
+      ellipse at 61% 42%,
+      rgba(255, 255, 255, 0.92) 0 13%,
+      transparent 13.8%
+    ),
+    radial-gradient(
+      ellipse at 27% 58%,
+      rgba(255, 255, 255, 0.82) 0 9%,
+      transparent 9.8%
     ),
     linear-gradient(
-      74deg,
-      transparent 0 42%,
-      rgba(74,150,100,.62) 43% 46%,
-      transparent 47%
+      72deg,
+      transparent 0 49%,
+      rgba(58, 130, 78, 0.48) 50% 52%,
+      transparent 53%
     );
 }
 
 .warmup-page::after {
-  right: -18px;
+  right: -20px;
   transform: scaleX(-1);
+
   background-image:
     radial-gradient(
-      circle at 45% 62%,
-      rgba(255,255,255,.96) 0 12%,
-      transparent 13%
+      ellipse at 50% 78%,
+      rgba(74, 145, 93, 0.58) 0 4%,
+      transparent 4.5%
     ),
     radial-gradient(
-      circle at 62% 45%,
-      rgba(255,192,203,.78) 0 16%,
-      transparent 17%
+      ellipse at 37% 48%,
+      rgba(255, 190, 205, 0.72) 0 12%,
+      transparent 12.8%
     ),
     radial-gradient(
-      circle at 29% 42%,
-      rgba(255,255,255,.94) 0 15%,
-      transparent 16%
+      ellipse at 61% 42%,
+      rgba(255, 255, 255, 0.92) 0 13%,
+      transparent 13.8%
+    ),
+    radial-gradient(
+      ellipse at 27% 58%,
+      rgba(255, 255, 255, 0.82) 0 9%,
+      transparent 9.8%
     ),
     linear-gradient(
-      74deg,
-      transparent 0 42%,
-      rgba(74,150,100,.62) 43% 46%,
-      transparent 47%
+      72deg,
+      transparent 0 49%,
+      rgba(58, 130, 78, 0.48) 50% 52%,
+      transparent 53%
     );
-}
-
-.warmup-page .game-header h1 {
-  color: #004d66;
-}
-
-.warmup-page .eyebrow,
-.warmup-page .section-label {
-  color: #006b80;
-}
-
-.warmup-page .timer {
-  color: #004d66;
-}
-
-.warmup-page .timer.danger {
-  color: #a83232;
-}
-
-.warmup-page .scoreboard-toggle {
-  color: #004d66;
-  border-color: rgba(0,77,102,.18);
-  background: rgba(255,255,255,.78);
-}
-
-.warmup-page .scoreboard-toggle:hover:not(:disabled) {
-  color: #003746;
-  background: #fff;
-  border-color: rgba(0,180,216,.42);
-}
-
-.warmup-page .scoreboard,
-.warmup-page .question-panel,
-.warmup-page .ready-panel,
-.warmup-page .result-panel,
-.warmup-page .warmup-set-selection {
-  border-color: rgba(0,77,102,.12);
-  background: rgba(255,255,255,.90);
-  box-shadow: 0 18px 50px rgba(0,77,102,.10);
-}
-
-.warmup-page .score-card {
-  color: #004d66;
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,.98),
-      rgba(232,245,233,.94)
-    );
-  border-color: rgba(0,77,102,.10);
-  box-shadow: 0 10px 28px rgba(0,77,102,.08);
-}
-
-.warmup-page .score-team,
-.warmup-page .score-phase {
-  color: #356778;
-}
-
-.warmup-page .score-value {
-  color: #004d66;
-}
-
-.warmup-page .manual-score-controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 7px;
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0,77,102,.10);
-}
-
-.warmup-page .manual-score-controls span {
-  grid-column: 1 / -1;
-  color: #527888;
-  font-size: 8px;
-  font-weight: 950;
-  letter-spacing: .13em;
-}
-
-.warmup-page .manual-score-button {
-  min-height: 36px;
-  border: 1px solid rgba(0,77,102,.15);
-  border-radius: 9px;
-  font-size: 11px;
-  font-weight: 950;
-  transition: .15s ease;
-}
-
-.warmup-page .manual-score-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.warmup-page .manual-score-button.minus {
-  color: #8c3030;
-  background: rgba(239,68,68,.08);
-}
-
-.warmup-page .manual-score-button.plus {
-  color: #005c6e;
-  background: rgba(0,180,216,.12);
-}
-
-.warmup-page .team-select {
-  color: #004d66;
-  border-color: rgba(0,77,102,.12);
-  background: rgba(255,255,255,.82);
-}
-
-.warmup-page .team-select:hover:not(:disabled) {
-  background: #fff;
-  border-color: rgba(0,180,216,.48);
-  box-shadow: 0 10px 24px rgba(0,180,216,.10);
-}
-
-.warmup-page .team-select > span {
-  color: #005d73;
-  background: #e8f5e9;
-}
-
-.warmup-page .team-select small {
-  color: #5c7e8b;
-}
-
-.warmup-page .team-select.selected {
-  background: rgba(0,180,216,.10);
-  border-color: #00b4d8;
-  box-shadow:
-    0 0 0 2px rgba(0,180,216,.10),
-    0 12px 28px rgba(0,180,216,.12);
-}
-
-.warmup-page .team-select.played {
-  background: rgba(232,245,233,.82);
-  border-color: rgba(52,105,72,.14);
-}
-
-.warmup-page .assignment-note {
-  color: #356778;
-  border-color: rgba(0,180,216,.18);
-  background: rgba(0,180,216,.07);
-}
-
-.warmup-set-selection {
-  margin-top: 20px;
-  padding: clamp(20px, 3vw, 30px);
-  border: 1px solid;
-  border-radius: 18px;
-}
-
-.warmup-selection-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin: 12px 0 16px;
-}
-
-.warmup-selection-heading > div {
-  display: grid;
-  gap: 5px;
-}
-
-.warmup-selection-heading strong {
-  color: #004d66;
-  font-size: 16px;
-  font-weight: 950;
-}
-
-.warmup-selection-heading span {
-  color: #527888;
-  font-size: 11px;
-}
-
-.warmup-selection-heading .ghost-button {
-  color: #004d66;
-  border-color: rgba(0,77,102,.15);
-  background: rgba(232,245,233,.75);
-}
-
-.warmup-set-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.warmup-set-card {
-  min-height: 125px;
-  display: grid;
-  align-content: center;
-  gap: 7px;
-  padding: 18px;
-  text-align: left;
-  color: #004d66;
-  border: 1px solid rgba(0,180,216,.22);
-  border-radius: 15px;
-  background:
-    linear-gradient(
-      145deg,
-      #fff,
-      #e8f5e9
-    );
-  box-shadow: 0 8px 22px rgba(0,77,102,.06);
-  transition: .16s ease;
-}
-
-.warmup-set-card:hover:not(:disabled) {
-  transform: translateY(-2px);
-  border-color: #00b4d8;
-  box-shadow: 0 14px 30px rgba(0,180,216,.13);
-}
-
-.warmup-set-card.selected {
-  border-color: #00b4d8;
-  box-shadow: 0 0 0 2px rgba(0,180,216,.12);
-}
-
-.warmup-set-card:disabled {
-  opacity: .55;
-}
-
-.warmup-set-card span {
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.warmup-set-card strong {
-  color: #00758d;
-  font-size: 21px;
-  font-weight: 950;
-}
-
-.warmup-set-card small {
-  color: #527888;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: .10em;
-}
-
-.warmup-page .question-panel {
-  overflow: hidden;
-}
-
-.warmup-page .live-meta {
-  color: #527888;
-}
-
-.warmup-page .live-meta b {
-  color: #805900;
-  background: rgba(251,191,36,.14);
-}
-
-.warmup-page .question-text {
-  color: #003f52;
-}
-
-.warmup-page .status-cell {
-  color: #62818d;
-  border-color: rgba(0,77,102,.10);
-  background: rgba(232,245,233,.60);
-}
-
-.warmup-page .status-cell.active {
-  color: #005b70;
-  border-color: rgba(0,180,216,.65);
-  background: rgba(0,180,216,.12);
-}
-
-.warmup-page .answer-button.correct {
-  color: #075f45;
-  border-color: rgba(16,120,84,.28);
-  background: rgba(34,197,94,.11);
-}
-
-.warmup-page .answer-button.wrong {
-  color: #8c3030;
-  border-color: rgba(180,55,55,.25);
-  background: rgba(244,63,94,.08);
-}
-
-.warmup-page .answer-button.skip {
-  color: #775500;
-  border-color: rgba(176,128,0,.25);
-  background: rgba(251,191,36,.10);
-}
-
-.warmup-page .pause-button {
-  color: #004d66;
-  border-color: rgba(0,77,102,.15);
-  background: rgba(232,245,233,.82);
-}
-
-.warmup-page .ready-icon {
-  color: #006b80;
-  background: rgba(0,180,216,.10);
-  border-color: rgba(0,180,216,.24);
-}
-
-.warmup-page .ready-panel h2,
-.warmup-page .result-panel h2 {
-  color: #004d66;
-}
-
-.warmup-page .ready-panel p,
-.warmup-page .result-panel p,
-.warmup-page .shortcut-hint {
-  color: #527888;
-}
-
-.warmup-page kbd {
-  color: #005d73;
-  border-color: rgba(0,77,102,.14);
-  background: #e8f5e9;
 }
 
 /* =========================================================
-   WARMUP ADMIN
-   ========================================================= */
-
-.warmup-admin-page {
-  color: #004d66;
-}
-
-.warmup-admin-page .admin-card {
-  border-color: rgba(0,77,102,.12);
-  background: rgba(255,255,255,.92);
-  box-shadow: 0 18px 50px rgba(0,77,102,.08);
-}
-
-.warmup-admin-page .admin-header h1 {
-  color: #004d66;
-}
-
-.warmup-admin-page .admin-header p,
-.warmup-admin-page .admin-help {
-  color: #527888;
-}
-
-.warmup-admin-page .set-tab {
-  color: #356778;
-  border-color: rgba(0,77,102,.10);
-  background: #f4fbf5;
-}
-
-.warmup-admin-page .set-tab span {
-  color: #63838f;
-}
-
-.warmup-admin-page .set-tab:hover {
-  color: #004d66;
-  background: #fff;
-}
-
-.warmup-admin-page .set-tab.active {
-  color: #004d66;
-  border-color: #00b4d8;
-  background: rgba(0,180,216,.10);
-}
-
-.warmup-admin-page input,
-.warmup-admin-page textarea {
-  color: #004d66;
-  background: #f8fcf9;
-  border-color: rgba(0,77,102,.13);
-}
-
-.warmup-admin-page input:focus,
-.warmup-admin-page textarea:focus {
-  border-color: rgba(0,180,216,.60);
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(0,180,216,.08);
-}
-
-.warmup-admin-note-card {
-  overflow: hidden;
-}
-
-.warmup-admin-flow {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.warmup-admin-flow > div {
-  display: grid;
-  gap: 7px;
-  padding: 14px;
-  border: 1px solid rgba(0,180,216,.14);
-  border-radius: 12px;
-  background: #f4fbf5;
-}
-
-.warmup-admin-flow b {
-  color: #00b4d8;
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-
-.warmup-admin-flow span {
-  color: #004d66;
-  font-size: 11px;
-  font-weight: 850;
-  line-height: 1.35;
-}
-
-/* =========================================================
-   WARMUP BACKGROUND
+   BACKGROUND
    ========================================================= */
 
 body:has(.warmup-page),
 body:has(.warmup-admin-page) {
   background:
     radial-gradient(
-      650px 240px at 15% 0%,
-      rgba(255,255,255,.92),
+      360px 140px at 12% 8%,
+      rgba(255, 255, 255, 0.92),
       transparent 72%
     ),
     radial-gradient(
-      720px 280px at 88% 8%,
-      rgba(255,255,255,.88),
+      420px 150px at 82% 12%,
+      rgba(255, 255, 255, 0.88),
+      transparent 72%
+    ),
+    radial-gradient(
+      280px 100px at 48% 2%,
+      rgba(255, 255, 255, 0.68),
       transparent 70%
     ),
     linear-gradient(
       180deg,
-      #b9eee9 0%,
-      #dff7f0 34%,
-      #f7fffb 100%
+      #aee8e4 0%,
+      #d5f3ee 38%,
+      #eefaf5 72%,
+      #f9fffc 100%
     );
 }
+
+/* =========================================================
+   NAV
+   ========================================================= */
 
 body:has(.warmup-page) .top-nav,
 body:has(.warmup-admin-page) .top-nav {
   color: #004d66;
-  border-bottom-color: rgba(0,77,102,.10);
-  background: rgba(255,255,255,.82);
-  box-shadow: 0 8px 30px rgba(0,77,102,.08);
+  background: rgba(255, 255, 255, 0.84);
+  border-bottom-color: rgba(0, 77, 102, 0.10);
+  box-shadow:
+    0 8px 30px rgba(0, 77, 102, 0.08);
 }
 
 body:has(.warmup-page) .top-nav strong,
@@ -529,33 +151,615 @@ body:has(.warmup-admin-page) .nav-module {
 body:has(.warmup-page) .nav-module:hover,
 body:has(.warmup-admin-page) .nav-module:hover {
   color: #004d66;
-  background: rgba(0,180,216,.08);
+  background: rgba(0, 180, 216, 0.08);
 }
 
 body:has(.warmup-page) .nav-module.active,
 body:has(.warmup-admin-page) .nav-module.active {
   color: #004d66;
-  background: rgba(0,180,216,.14);
-  border-color: rgba(0,180,216,.34);
+  background: rgba(0, 180, 216, 0.14);
+  border-color: rgba(0, 180, 216, 0.34);
 }
 
 body:has(.warmup-page) .ghost-button,
 body:has(.warmup-admin-page) .ghost-button {
   color: #004d66;
-  border-color: rgba(0,77,102,.14);
-  background: rgba(255,255,255,.72);
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 77, 102, 0.14);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.warmup-page .game-header h1 {
+  color: #004d66;
+}
+
+.warmup-page .eyebrow,
+.warmup-page .section-label {
+  color: #006b80;
+}
+
+.warmup-subtitle {
+  margin: 8px 0 0;
+  color: #527888;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+.warmup-page .timer {
+  color: #004d66;
+}
+
+.warmup-page .timer.danger {
+  color: #9b3434;
+}
+
+/* =========================================================
+   PANELS
+   ========================================================= */
+
+.warmup-page .scoreboard,
+.warmup-page .question-panel,
+.warmup-page .ready-panel,
+.warmup-page .result-panel,
+.warmup-page .warmup-set-selection {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(244, 252, 248, 0.94)
+    );
+
+  border-color: rgba(0, 77, 102, 0.12);
+
+  box-shadow:
+    0 18px 50px rgba(0, 77, 102, 0.10);
+}
+
+/* =========================================================
+   SCOREBOARD
+   ========================================================= */
+
+.warmup-page .score-card {
+  color: #004d66;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #e8f5e9
+    );
+
+  border-color: rgba(0, 77, 102, 0.10);
+
+  box-shadow:
+    0 10px 28px rgba(0, 77, 102, 0.08);
+}
+
+.warmup-page .score-team {
+  color: #356778;
+}
+
+.warmup-page .score-value {
+  color: #004d66;
+}
+
+.warmup-page .score-phase {
+  color: #63818d;
+}
+
+/* =========================================================
+   MANUAL SCORE
+   ========================================================= */
+
+.warmup-page .manual-score-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+
+  margin-top: 12px;
+  padding-top: 11px;
+
+  border-top: 1px solid rgba(0, 77, 102, 0.10);
+}
+
+.manual-score-label {
+  grid-column: 1 / -1;
+
+  color: #527888;
+
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.13em;
+}
+
+.warmup-page .manual-score-button {
+  min-height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+
+  border: 1px solid rgba(0, 77, 102, 0.14);
+  border-radius: 9px;
+
+  font-size: 14px;
+  font-weight: 950;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.warmup-page .manual-score-button span {
+  font-size: 10px;
+}
+
+.warmup-page .manual-score-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.warmup-page .manual-score-button.minus {
+  color: #8c3030;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.warmup-page .manual-score-button.plus {
+  color: #005c6e;
+  background: rgba(0, 180, 216, 0.12);
+}
+
+.warmup-page .manual-score-button:disabled {
+  opacity: 0.30;
+}
+
+/* =========================================================
+   TEAM SELECTOR
+   ========================================================= */
+
+.warmup-page .team-select {
+  color: #004d66;
+
+  background: rgba(255, 255, 255, 0.84);
+
+  border-color: rgba(0, 77, 102, 0.12);
+}
+
+.warmup-page .team-select:hover:not(:disabled) {
+  color: #003f52;
+
+  background: #ffffff;
+
+  border-color: rgba(0, 180, 216, 0.48);
+
+  box-shadow:
+    0 10px 24px rgba(0, 180, 216, 0.10);
+}
+
+.warmup-page .team-select > span {
+  color: #005d73;
+  background: #e8f5e9;
+}
+
+.warmup-page .team-select small {
+  color: #5c7e8b;
+}
+
+.warmup-page .team-select.selected {
+  background: rgba(0, 180, 216, 0.10);
+
+  border-color: #00b4d8;
+
+  box-shadow:
+    0 0 0 2px rgba(0, 180, 216, 0.10),
+    0 12px 28px rgba(0, 180, 216, 0.12);
+}
+
+.warmup-page .team-select.selected > span {
+  color: #004d66;
+  background: rgba(0, 180, 216, 0.18);
+}
+
+.warmup-page .team-select.played {
+  color: #5c747c;
+
+  background: rgba(232, 245, 233, 0.80);
+
+  border-color: rgba(52, 105, 72, 0.12);
+}
+
+/* =========================================================
+   QUESTION SET SELECTION
+   ========================================================= */
+
+.warmup-set-selection {
+  margin-top: 20px;
+  padding: clamp(20px, 3vw, 30px);
+
+  border: 1px solid;
+  border-radius: 18px;
+}
+
+.warmup-selection-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.warmup-selection-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.warmup-selection-heading span {
+  color: #64818d;
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.warmup-selection-heading strong {
+  color: #004d66;
+
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.warmup-selection-heading .ghost-button {
+  color: #004d66;
+
+  background: #e8f5e9;
+
+  border-color: rgba(0, 77, 102, 0.14);
+}
+
+.warmup-selection-help {
+  margin: 10px 0 16px;
+
+  color: #527888;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.warmup-set-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.warmup-set-card {
+  min-height: 135px;
+
+  display: grid;
+  align-content: center;
+  gap: 7px;
+
+  padding: 18px;
+
+  text-align: left;
+
+  color: #004d66;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #e8f5e9
+    );
+
+  border: 1px solid rgba(0, 180, 216, 0.22);
+  border-radius: 15px;
+
+  box-shadow:
+    0 8px 22px rgba(0, 77, 102, 0.06);
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.warmup-set-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+
+  border-color: #00b4d8;
+
+  box-shadow:
+    0 14px 30px rgba(0, 180, 216, 0.14);
+}
+
+.warmup-set-card span {
+  color: #004d66;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.warmup-set-card strong {
+  color: #00758d;
+
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.warmup-set-card small {
+  color: #527888;
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+}
+
+.warmup-set-card:disabled {
+  opacity: 0.50;
+}
+
+/* =========================================================
+   LIVE QUESTION
+   ========================================================= */
+
+.warmup-page .live-meta {
+  color: #527888;
+}
+
+.warmup-page .live-meta b {
+  color: #805900;
+
+  background: rgba(251, 191, 36, 0.14);
+}
+
+.warmup-page .question-text {
+  color: #003f52;
+}
+
+.warmup-page .status-cell {
+  color: #62818d;
+
+  background: rgba(232, 245, 233, 0.60);
+
+  border-color: rgba(0, 77, 102, 0.10);
+}
+
+.warmup-page .status-cell.active {
+  color: #005b70;
+
+  background: rgba(0, 180, 216, 0.12);
+
+  border-color: rgba(0, 180, 216, 0.65);
+}
+
+.warmup-page .status-cell.status-correct {
+  color: #075f45;
+  background: rgba(34, 197, 94, 0.10);
+  border-color: rgba(16, 120, 84, 0.28);
+}
+
+.warmup-page .status-cell.status-wrong {
+  color: #8c3030;
+  background: rgba(244, 63, 94, 0.08);
+  border-color: rgba(180, 55, 55, 0.25);
+}
+
+.warmup-page .status-cell.status-skipped {
+  color: #775500;
+  background: rgba(251, 191, 36, 0.10);
+  border-color: rgba(176, 128, 0, 0.25);
+}
+
+/* =========================================================
+   READY / RESULT
+   ========================================================= */
+
+.warmup-page .ready-icon {
+  color: #006b80;
+
+  background: rgba(0, 180, 216, 0.10);
+
+  border-color: rgba(0, 180, 216, 0.24);
+}
+
+.warmup-page .ready-panel h2,
+.warmup-page .result-panel h2 {
+  color: #004d66;
+}
+
+.warmup-page .ready-panel p,
+.warmup-page .result-panel p {
+  color: #527888;
+}
+
+.warmup-page .shortcut-hint {
+  color: #63818d;
+}
+
+.warmup-page kbd {
+  color: #005d73;
+  background: #e8f5e9;
+  border-color: rgba(0, 77, 102, 0.14);
+}
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+
+.warmup-admin-page {
+  color: #004d66;
+}
+
+.warmup-admin-page .admin-header h1 {
+  color: #004d66;
+}
+
+.warmup-admin-page .admin-header p,
+.warmup-admin-page .admin-help {
+  color: #527888;
+}
+
+.warmup-admin-page .admin-card {
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(244, 252, 248, 0.94)
+    );
+
+  border-color: rgba(0, 77, 102, 0.12);
+
+  box-shadow:
+    0 18px 50px rgba(0, 77, 102, 0.08);
+}
+
+.warmup-admin-page .set-tab {
+  color: #356778;
+
+  background: #f4fbf5;
+
+  border-color: rgba(0, 77, 102, 0.10);
+}
+
+.warmup-admin-page .set-tab:hover {
+  color: #004d66;
+  background: #ffffff;
+}
+
+.warmup-admin-page .set-tab.active {
+  color: #004d66;
+
+  background: rgba(0, 180, 216, 0.10);
+
+  border-color: #00b4d8;
+}
+
+.warmup-admin-page .set-tab small {
+  color: #63838f;
+}
+
+.warmup-admin-page input,
+.warmup-admin-page textarea {
+  color: #004d66;
+
+  background: #f8fcf9;
+
+  border-color: rgba(0, 77, 102, 0.13);
+}
+
+.warmup-admin-page input:focus,
+.warmup-admin-page textarea:focus {
+  color: #003f52;
+
+  background: #ffffff;
+
+  border-color: rgba(0, 180, 216, 0.60);
+
+  box-shadow:
+    0 0 0 3px rgba(0, 180, 216, 0.08);
+}
+
+.warmup-admin-page .primary-button {
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #009fbe,
+      #00b4d8
+    );
+
+  border-color: rgba(0, 77, 102, 0.16);
+
+  box-shadow:
+    0 8px 24px rgba(0, 180, 216, 0.20);
+}
+
+.warmup-admin-page .primary-button:hover:not(:disabled) {
+  box-shadow:
+    0 11px 28px rgba(0, 180, 216, 0.28);
+}
+
+.warmup-admin-page .danger-button {
+  color: #8c3030;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(180, 55, 55, 0.22);
+}
+
+.warmup-admin-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* =========================================================
+   ADMIN FLOW
+   ========================================================= */
+
+.warmup-admin-note-card {
+  overflow: hidden;
+}
+
+.warmup-admin-flow {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.warmup-admin-flow > div {
+  display: grid;
+  gap: 7px;
+
+  padding: 14px;
+
+  background: #f4fbf5;
+
+  border: 1px solid rgba(0, 180, 216, 0.14);
+  border-radius: 12px;
+}
+
+.warmup-admin-flow b {
+  color: #00b4d8;
+
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+
+.warmup-admin-flow span {
+  color: #004d66;
+
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.35;
 }
 
 /* =========================================================
    RESPONSIVE
    ========================================================= */
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
   .warmup-set-grid,
   .warmup-admin-flow {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
+}
 
+@media (max-width: 700px) {
   .warmup-selection-heading {
     align-items: flex-start;
     flex-direction: column;
@@ -569,6 +773,13 @@ body:has(.warmup-admin-page) .ghost-button {
   }
 
   .warmup-set-card {
-    min-height: 100px;
+    min-height: 105px;
+  }
+
+  .warmup-page::before,
+  .warmup-page::after {
+    width: 180px;
+    height: 180px;
+    opacity: 0.20;
   }
 }
