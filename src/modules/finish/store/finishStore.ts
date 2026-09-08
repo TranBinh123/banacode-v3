@@ -57,14 +57,14 @@ type FinishStore = {
   starActive: boolean;
   starDecisionPending: boolean;
   selectedStealTeamId: TeamId | null;
-  selectionOrder: TeamId[];
+  selectionOrder: TeamId[]; // Lưu thứ tự các đội đã chọn gói
   timerSeconds: number;
   isTimerRunning: boolean;
 
   // Actions
   selectPackage: (teamId: TeamId, packageId: string) => boolean;
-  startQuestion: () => void; // Chuyển từ intro sang playing
-  decideStar: (useStar: boolean) => void; // Quyết định sao -> chuyển sang intro
+  startQuestion: () => void;
+  decideStar: (useStar: boolean) => void;
   startTimer: () => void;
   tickTimer: () => void;
   markCorrect: () => void;
@@ -102,7 +102,7 @@ const createInitialState = (): Omit<
   currentTeamId: null,
   currentPackageId: null,
   currentQuestionIndex: 0,
-  questionPhase: "star_decision", // Mặc định là star_decision khi vào vòng mới
+  questionPhase: "star_decision",
   starActive: false,
   starDecisionPending: false,
   selectedStealTeamId: null,
@@ -120,13 +120,21 @@ export const useFinishStore = create<FinishStore>()(
         const state = get();
         if (state.status !== "selection") return false;
         if (!TEAM_IDS.includes(teamId)) return false;
+
+        // Kiểm tra đội đã chọn gói chưa
         if (state.packages.some((pkg) => pkg.selectedBy === teamId)) return false;
 
         const pkg = state.packages.find((p) => p.id === packageId);
         if (!pkg || pkg.selectedBy !== null) return false;
 
+        // Xáo trộn câu hỏi trong gói
         const shuffledQuestions = shuffle(pkg.questions);
         const starUsed = pkg.starUsed;
+
+        // Cập nhật selectionOrder nếu đội chưa có trong danh sách
+        const newSelectionOrder = state.selectionOrder.includes(teamId)
+          ? state.selectionOrder
+          : [...state.selectionOrder, teamId];
 
         set({
           packages: state.packages.map((p) =>
@@ -142,7 +150,7 @@ export const useFinishStore = create<FinishStore>()(
           starActive: false,
           starDecisionPending: !starUsed,
           selectedStealTeamId: null,
-          selectionOrder: [...state.selectionOrder, teamId],
+          selectionOrder: newSelectionOrder,
           timerSeconds: 30,
           isTimerRunning: false,
         });
@@ -163,7 +171,7 @@ export const useFinishStore = create<FinishStore>()(
             ),
             starActive: true,
             starDecisionPending: false,
-            questionPhase: "intro", // Chuyển sang intro sau khi quyết định sao
+            questionPhase: "intro",
             timerSeconds: 30,
             isTimerRunning: false,
           });
@@ -219,7 +227,10 @@ export const useFinishStore = create<FinishStore>()(
       markWrong: () => {
         const state = get();
         if (state.questionPhase !== "playing") return;
+        // Kiểm tra còn đội khác để cướp không
         const remainingTeams = TEAM_IDS.filter(id => id !== state.currentTeamId);
+        // Nhưng cần kiểm tra các đội còn lại đã chọn gói chưa? Luật cho phép tất cả đội còn lại cướp.
+        // Nếu còn ít nhất 1 đội khác, mở cướp.
         if (remainingTeams.length > 0) {
           set({
             questionPhase: "steal",
@@ -258,6 +269,7 @@ export const useFinishStore = create<FinishStore>()(
         if (!pkg) return;
         const nextIndex = state.currentQuestionIndex + 1;
         if (nextIndex >= pkg.questions.length) {
+          // Hết câu hỏi trong gói -> chuyển sang đội tiếp theo
           get().nextTeam();
           return;
         }
@@ -275,29 +287,33 @@ export const useFinishStore = create<FinishStore>()(
 
       nextTeam: () => {
         const state = get();
-        if (state.questionPhase !== "resolved") return;
-        const currentIndex = state.selectionOrder.indexOf(state.currentTeamId as TeamId);
-        const nextTeamId = state.selectionOrder[currentIndex + 1] || null;
 
-        if (nextTeamId) {
-          const nextPkg = state.packages.find((p) => p.selectedBy === nextTeamId);
-          if (nextPkg) {
-            const starUsed = nextPkg.starUsed;
-            set({
-              currentTeamId: nextTeamId,
-              currentPackageId: nextPkg.id,
-              currentQuestionIndex: 0,
-              questionPhase: starUsed ? "intro" : "star_decision",
-              starActive: false,
-              starDecisionPending: !starUsed,
-              selectedStealTeamId: null,
-              timerSeconds: 30,
-              isTimerRunning: false,
-            });
-            return;
-          }
+        // Tìm các đội đã được gán gói
+        const assignedTeams = state.packages
+          .map(p => p.selectedBy)
+          .filter(id => id !== null) as TeamId[];
+
+        // Tìm đội tiếp theo chưa được gán
+        const remainingTeams = TEAM_IDS.filter(id => !assignedTeams.includes(id));
+
+        if (remainingTeams.length > 0) {
+          // Vẫn còn đội chưa thi -> quay lại màn hình selection
+          set({
+            status: "selection",
+            currentTeamId: null,
+            currentPackageId: null,
+            currentQuestionIndex: 0,
+            questionPhase: "star_decision",
+            starActive: false,
+            starDecisionPending: false,
+            selectedStealTeamId: null,
+            timerSeconds: 30,
+            isTimerRunning: false,
+          });
+          return;
         }
 
+        // Tất cả đội đã thi xong
         set({
           status: "finished",
           currentTeamId: null,
