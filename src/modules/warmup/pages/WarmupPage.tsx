@@ -347,7 +347,7 @@ export function WarmupPage({ teams }: Props) {
       : Array(10).fill("unanswered");
 
   return (
-    <main className="game-page">
+    <main className="game-page warmup-page">
       <header className="game-header">
         <div>
           <div
