@@ -3030,3 +3030,77 @@ body:has(.finish-page) .ghost-button {
 .finish-game-meta strong {
   font-size: 24px !important;
 }
+/* =========================================================
+   Finish – Nút chính sinh động hơn
+   ========================================================= */
+
+.finish-primary-button {
+  background: linear-gradient(135deg, #FFD700, #FF8C00, #FF6A00) !important;
+  border: none !important;
+  color: #4E2E00 !important;
+  font-weight: 900 !important;
+  font-size: 16px !important;
+  padding: 14px 28px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.40), 0 0 0 1px rgba(255, 215, 0, 0.20) inset !important;
+  transition: all 0.25s ease !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Hiệu ứng ánh sáng lướt trên nút */
+.finish-primary-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, transparent 60%);
+  transform: rotate(25deg) translateX(-100%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+
+.finish-primary-button:hover::before {
+  transform: rotate(25deg) translateX(100%);
+}
+
+/* Hover */
+.finish-primary-button:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 35px rgba(255, 215, 0, 0.55), 0 0 0 2px rgba(255, 215, 0, 0.30) inset !important;
+  background: linear-gradient(135deg, #FFE033, #FF9D00, #FF7B00) !important;
+}
+
+/* Active (nhấn) */
+.finish-primary-button:active:not(:disabled) {
+  transform: translateY(0px) scale(0.98);
+  box-shadow: 0 3px 12px rgba(255, 215, 0, 0.30) !important;
+}
+
+/* Disabled */
+.finish-primary-button:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.5);
+  transform: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* Thêm animation pulse nhẹ khi ở trạng thái sẵn sàng (không bị disabled) */
+.finish-primary-button:not(:disabled) {
+  animation: finish-button-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes finish-button-glow {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.40), 0 0 0 1px rgba(255, 215, 0, 0.20) inset;
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.60), 0 0 0 2px rgba(255, 215, 0, 0.30) inset;
+  }
+}
