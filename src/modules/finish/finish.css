@@ -1508,3 +1508,327 @@
     flex-direction: column;
   }
 }
+/* =========================================================
+   FINISH — PACKAGE / TEAM ASSIGNMENT
+   ========================================================= */
+
+.finish-assignment-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 28px;
+}
+
+.finish-assignment-column {
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.finish-assignment-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.finish-assignment-title > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.finish-assignment-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.finish-assignment-title strong {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.finish-assignment-title small {
+  opacity: 0.55;
+  font-size: 12px;
+}
+
+/* TEAM GRID */
+
+.finish-assignment-team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.finish-assignment-team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 68px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.finish-assignment-team:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.finish-assignment-team.selected {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.12);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.2);
+}
+
+.finish-assignment-team span {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.finish-assignment-team strong {
+  min-width: 36px;
+  text-align: right;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+/* PACKAGE GRID */
+
+.finish-assignment-package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.finish-assignment-package {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 110px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.045);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.finish-assignment-package:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.finish-assignment-package.selected {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(250, 204, 21, 0.2),
+    0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.finish-assignment-package > span {
+  margin-bottom: 8px;
+  opacity: 0.45;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.finish-assignment-package strong {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.finish-assignment-package small {
+  margin-top: 5px;
+  opacity: 0.55;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* CONFIRM BAR */
+
+.finish-assignment-confirm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  margin-top: 20px;
+  padding: 20px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.finish-assignment-confirm > div:not(.finish-assignment-arrow) {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.finish-assignment-confirm span {
+  opacity: 0.45;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.finish-assignment-confirm strong {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finish-assignment-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 300;
+  opacity: 0.5;
+}
+
+/* ASSIGNED LIST */
+
+.finish-assigned-list {
+  margin-top: 24px;
+  padding: 20px 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.finish-assigned-list-title {
+  margin-bottom: 14px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  opacity: 0.5;
+}
+
+.finish-assigned-empty {
+  display: block;
+  padding: 10px 0;
+  opacity: 0.45;
+  font-size: 13px;
+}
+
+.finish-assigned-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.finish-assigned-row > span {
+  opacity: 0.4;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.finish-assigned-row strong {
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finish-assigned-row b {
+  text-align: center;
+  opacity: 0.4;
+}
+
+.finish-assigned-row em {
+  overflow: hidden;
+  color: inherit;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* MOBILE */
+
+@media (max-width: 900px) {
+  .finish-assignment-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-assignment-confirm {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .finish-assignment-arrow {
+    transform: rotate(90deg);
+  }
+
+  .finish-assignment-confirm .finish-primary-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .finish-assignment-column {
+    padding: 18px;
+  }
+
+  .finish-assignment-team-grid,
+  .finish-assignment-package-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-assigned-list {
+    padding: 16px;
+  }
+
+  .finish-assigned-row {
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .finish-assigned-row b,
+  .finish-assigned-row em {
+    grid-column: 2;
+  }
+}
