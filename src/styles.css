@@ -1719,18 +1719,17 @@ body:has(.acceleration-game) .ghost-button {
   }
 }
 /* =========================================================
-   VÒNG 4 • VỀ ĐÍCH
+   VÒNG 4 • VỀ ĐÍCH – Layout & Theme
    Gold / Amber / Sunset Theme
    ========================================================= */
 
-/* Nền hoa Hướng Dương mờ làm background */
+/* ---------- NỀN & HOA ---------- */
 .finish-page {
   position: relative;
   isolation: isolate;
   color: #4E2E00;
 }
 
-/* Hoa Hướng Dương khổ lớn mờ ở hai bên */
 .finish-page::before,
 .finish-page::after {
   position: fixed;
@@ -1739,48 +1738,31 @@ body:has(.acceleration-game) .ghost-button {
   transform: translateY(-50%);
   font-size: 300px;
   line-height: 1;
-  opacity: 0.15;
+  opacity: 0.12;
   pointer-events: none;
   content: "🌻";
   color: #FFD700;
 }
 
 .finish-page::before {
-  left: -40px;
+  left: -60px;
   transform: translateY(-50%) rotate(-15deg) scale(1.2);
 }
 
 .finish-page::after {
-  right: -40px;
+  right: -60px;
   transform: translateY(-50%) rotate(15deg) scale(1.2);
 }
 
-/* Thêm một vài bông nhỏ hơn rải rác */
-.finish-page .sunflower-extra {
-  position: fixed;
-  z-index: -1;
-  opacity: 0.12;
-  pointer-events: none;
-  font-size: 120px;
-  color: #FF8C00;
-}
-
-/* =========================================================
-   BACKGROUND
-   ========================================================= */
-
 body:has(.finish-page) {
   background:
-    radial-gradient(circle at 70% 30%, rgba(255, 215, 0, 0.08), transparent 40%),
-    radial-gradient(circle at 30% 70%, rgba(255, 127, 0, 0.06), transparent 35%),
+    radial-gradient(circle at 70% 30%, rgba(255, 215, 0, 0.10), transparent 40%),
+    radial-gradient(circle at 30% 70%, rgba(255, 127, 0, 0.08), transparent 35%),
     linear-gradient(180deg, #FFF5CC 0%, #FFF8E7 40%, #FFFAF0 100%);
   background-attachment: fixed;
 }
 
-/* =========================================================
-   NAV (override)
-   ========================================================= */
-
+/* ---------- NAV ---------- */
 body:has(.finish-page) .top-nav {
   color: #4E2E00;
   background: rgba(255, 245, 204, 0.92);
@@ -1817,278 +1799,488 @@ body:has(.finish-page) .ghost-button {
   border-color: rgba(78, 46, 0, 0.14);
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
+/* ---------- LAYOUT CHÍNH ---------- */
+.finish-selection-page {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+}
 
-.finish-page .finish-round-label {
+.finish-hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.finish-hero .finish-round-label {
   color: #B87A2E;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  font-size: 12px;
+  margin-bottom: 6px;
 }
 
-.finish-page h1 {
+.finish-hero h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  margin: 0;
   color: #4E2E00;
+  letter-spacing: -0.03em;
 }
 
-.finish-page .finish-hero-line {
-  background: linear-gradient(90deg, #FFD700, #FF7F00, #FFD700);
+.finish-hero-line {
+  width: 80px;
+  height: 4px;
+  margin: 12px auto 16px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #FFD700, #FF7F00);
 }
 
-/* =========================================================
-   PANELS / CARDS
-   ========================================================= */
+.finish-hero p {
+  color: #B87A2E;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
 
-.finish-page .scoreboard,
-.finish-page .finish-assignment-section,
-.finish-page .finish-mapping-card,
-.finish-page .finish-assigned-summary,
-.finish-page .finish-game-header,
-.finish-page .finish-question-display,
-.finish-page .finish-live-control-panel,
-.finish-page .finish-public-star-decision,
-.finish-page .finish-judgement-panel,
-.finish-page .finish-steal-panel,
-.finish-page .finish-next-panel,
-.finish-page .finish-finale,
-.finish-page .finish-empty {
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 245, 204, 0.92));
-  border-color: rgba(78, 46, 0, 0.12);
-  box-shadow: 0 18px 50px rgba(78, 46, 0, 0.08);
+/* ---------- LƯỚI 3 CỘT ---------- */
+.finish-assignment-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 28px;
+}
+
+.finish-assignment-section {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(78, 46, 0, 0.10);
+  border-radius: 18px;
+  padding: 20px 18px 24px;
+  box-shadow: 0 12px 36px rgba(78, 46, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- HEADER CỦA MỖI CỘT ---------- */
+.finish-assignment-section-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.finish-assignment-index {
+  font-size: 28px;
+  font-weight: 950;
+  color: #FFD700;
+  line-height: 1;
+  min-width: 40px;
+}
+
+.finish-assignment-section-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.finish-assignment-section-header span {
+  font-size: 13px;
+  font-weight: 900;
   color: #4E2E00;
+  letter-spacing: 0.04em;
 }
 
-/* =========================================================
-   SCOREBOARD (trong finish)
-   ========================================================= */
-
-.finish-page .finish-scoreboard {
-  background: transparent;
-  border-color: rgba(78, 46, 0, 0.08);
+.finish-assignment-section-header small {
+  font-size: 11px;
+  color: #B87A2E;
+  font-weight: 600;
 }
 
-.finish-page .finish-score-team {
-  color: #4E2E00;
+/* ---------- DANH SÁCH ĐỘI ---------- */
+.finish-assignment-team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.finish-team-select-card {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid rgba(78, 46, 0, 0.10);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.60);
-  border-color: rgba(78, 46, 0, 0.06);
+  color: #4E2E00;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.finish-page .finish-score-team.active {
-  background: rgba(255, 215, 0, 0.15);
+.finish-team-select-card:hover {
+  background: rgba(255, 215, 0, 0.06);
   border-color: #FFD700;
-  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.20);
 }
 
-.finish-page .finish-score-team strong {
-  color: #4E2E00;
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.finish-page .finish-primary-button {
-  background: linear-gradient(135deg, #FFD700, #FF8C00);
-  border-color: rgba(255, 215, 0, 0.50);
-  color: #4E2E00;
-  box-shadow: 0 8px 24px rgba(255, 215, 0, 0.30);
-}
-
-.finish-page .finish-primary-button:hover:not(:disabled) {
-  box-shadow: 0 11px 28px rgba(255, 215, 0, 0.45);
-  transform: translateY(-1px);
-}
-
-.finish-page .finish-primary-button:disabled {
-  opacity: 0.5;
-}
-
-.finish-page .finish-star-yes {
-  background: linear-gradient(135deg, #FFD700, #FF8C00);
-  border-color: #FFD700;
-  color: #4E2E00;
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.30);
-}
-
-.finish-page .finish-star-yes:hover:not(:disabled) {
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.45);
-}
-
-.finish-page .finish-star-no {
-  background: rgba(78, 46, 0, 0.08);
-  border-color: rgba(78, 46, 0, 0.20);
-  color: #4E2E00;
-}
-
-.finish-page .finish-correct-button {
-  background: rgba(255, 215, 0, 0.15);
-  border-color: rgba(255, 215, 0, 0.50);
-  color: #4E2E00;
-}
-
-.finish-page .finish-correct-button:hover:not(:disabled) {
-  background: rgba(255, 215, 0, 0.25);
-}
-
-.finish-page .finish-wrong-button {
-  background: rgba(200, 50, 50, 0.08);
-  border-color: rgba(200, 50, 50, 0.25);
-  color: #6A1B1B;
-}
-
-.finish-page .finish-wrong-button:hover:not(:disabled) {
-  background: rgba(200, 50, 50, 0.16);
-}
-
-/* =========================================================
-   SELECTION CARDS
-   ========================================================= */
-
-.finish-page .finish-team-select-card,
-.finish-page .finish-package-select-card {
-  background: rgba(255, 255, 255, 0.60);
-  border-color: rgba(78, 46, 0, 0.12);
-  color: #4E2E00;
-}
-
-.finish-page .finish-team-select-card.selected,
-.finish-page .finish-package-select-card.selected {
+.finish-team-select-card.selected {
   border-color: #FFD700;
   background: rgba(255, 215, 0, 0.10);
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.15);
 }
 
-.finish-page .finish-team-select-score strong {
+.finish-team-select-check {
+  font-size: 16px;
+  color: #FFD700;
+}
+
+.finish-team-select-name {
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.finish-team-select-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.finish-team-select-score small {
+  font-size: 8px;
+  color: #B87A2E;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.finish-team-select-score strong {
+  font-size: 18px;
+  font-weight: 950;
   color: #4E2E00;
 }
 
-/* =========================================================
-   MAPPING CARD
-   ========================================================= */
+/* ---------- CỘT GHÉP ---------- */
+.finish-mapping-section {
+  align-items: stretch;
+}
 
-.finish-page .finish-mapping-value.active {
+.finish-mapping-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255, 248, 235, 0.50);
+  border-radius: 14px;
+  border: 1px dashed rgba(78, 46, 0, 0.12);
+}
+
+.finish-mapping-label {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #B87A2E;
+  text-transform: uppercase;
+}
+
+.finish-mapping-value {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.70);
+  border: 1px solid rgba(78, 46, 0, 0.06);
+  font-weight: 700;
+  font-size: 14px;
+  color: #B87A2E;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.finish-mapping-value.active {
   color: #4E2E00;
   border-color: #FFD700;
   background: rgba(255, 215, 0, 0.06);
 }
 
-.finish-page .finish-mapping-label {
+.finish-mapping-value span {
   color: #B87A2E;
+  font-weight: 400;
 }
 
-.finish-page .finish-mapping-arrow {
+.finish-mapping-arrow {
+  text-align: center;
+  font-size: 20px;
   color: #FF8C00;
 }
 
-/* =========================================================
-   STAR DECISION
-   ========================================================= */
-
-.finish-page .finish-star-glow {
-  color: #FFD700;
-  text-shadow: 0 0 40px rgba(255, 215, 0, 0.40);
+.finish-assignment-submit {
+  margin-top: 8px;
+  width: 100%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+  font-weight: 900;
 }
 
-.finish-page .finish-star-caption {
+.finish-assignment-hint {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 12px;
   color: #B87A2E;
+  font-weight: 600;
+  background: rgba(255, 215, 0, 0.06);
+  padding: 8px 12px;
+  border-radius: 8px;
 }
 
-.finish-page .finish-star-question {
-  color: #4E2E00;
-  background: rgba(255, 215, 0, 0.08);
-  border-color: rgba(255, 215, 0, 0.20);
+/* ---------- DANH SÁCH GÓI ---------- */
+.finish-assignment-package-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
 }
 
-/* =========================================================
-   STEAL TEAM
-   ========================================================= */
-
-.finish-page .finish-steal-team {
+.finish-package-select-card {
+  display: grid;
+  grid-template-columns: 40px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid rgba(78, 46, 0, 0.10);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.60);
-  border-color: rgba(78, 46, 0, 0.12);
   color: #4E2E00;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
-.finish-page .finish-steal-team:hover {
+.finish-package-select-card:hover {
+  background: rgba(255, 215, 0, 0.06);
+  border-color: #FFD700;
+}
+
+.finish-package-select-card.selected {
+  border-color: #FFD700;
   background: rgba(255, 215, 0, 0.10);
-  border-color: #FFD700;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.15);
 }
 
-/* =========================================================
-   FINALE
-   ========================================================= */
-
-.finish-page .finish-finale-badge {
-  color: #B87A2E;
-}
-
-.finish-page .finish-finale-star {
+.finish-package-select-number {
+  font-size: 18px;
+  font-weight: 950;
   color: #FFD700;
-  text-shadow: 0 0 60px rgba(255, 215, 0, 0.30);
 }
 
-.finish-page .finish-final-score-row {
-  background: rgba(255, 255, 255, 0.60);
-  border-color: rgba(78, 46, 0, 0.06);
+.finish-package-select-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.finish-page .finish-final-rank {
-  color: #FF8C00;
+.finish-package-select-info strong {
+  font-size: 13px;
+  font-weight: 800;
 }
 
-.finish-page .finish-finale-message {
-  color: #4E2E00;
-}
-
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
-.finish-page .finish-footer-brand {
+.finish-package-select-info span {
+  font-size: 10px;
   color: #B87A2E;
+  font-weight: 600;
 }
 
-.finish-page .finish-footer-brand strong {
-  color: #4E2E00;
-}
-
-/* =========================================================
-   VIDEO / EMPTY
-   ========================================================= */
-
-.finish-page .finish-public-video-empty {
+.finish-package-select-arrow {
+  font-size: 18px;
   color: #B87A2E;
+  text-align: right;
+}
+
+.finish-package-select-card.selected .finish-package-select-arrow {
+  color: #FFD700;
+}
+
+/* ---------- TIẾN ĐỘ GÁN ---------- */
+.finish-assigned-summary {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(78, 46, 0, 0.08);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 16px rgba(78, 46, 0, 0.04);
+}
+
+.finish-assigned-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #B87A2E;
+  letter-spacing: 0.06em;
+}
+
+.finish-assigned-summary-header strong {
+  color: #4E2E00;
+  font-size: 14px;
+}
+
+.finish-assigned-summary-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.finish-assigned-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px 6px 8px;
   background: rgba(255, 215, 0, 0.06);
-  border-color: rgba(78, 46, 0, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  font-size: 12px;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+.finish-assigned-summary-item span {
+  font-weight: 900;
+  color: #FFD700;
+  min-width: 20px;
+}
 
-@media (max-width: 900px) {
-  .finish-page::before,
-  .finish-page::after {
-    font-size: 180px;
-    opacity: 0.10;
+.finish-assigned-summary-item strong {
+  font-weight: 700;
+  color: #4E2E00;
+}
+
+.finish-assigned-summary-item b {
+  color: #B87A2E;
+}
+
+.finish-assigned-summary-item em {
+  color: #4E2E00;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.finish-assigned-summary-item small {
+  font-size: 8px;
+  color: #B87A2E;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: rgba(255, 215, 0, 0.10);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* ---------- FOOTER (BẢNG ĐIỂM) ---------- */
+.finish-public-footer {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.finish-scoreboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.finish-score-team {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.80);
+  border-radius: 12px;
+  border: 1px solid rgba(78, 46, 0, 0.06);
+  font-size: 13px;
+  font-weight: 700;
+  color: #4E2E00;
+}
+
+.finish-score-team.active {
+  background: rgba(255, 215, 0, 0.12);
+  border-color: #FFD700;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.10);
+}
+
+.finish-score-team strong {
+  font-size: 20px;
+  font-weight: 950;
+  color: #4E2E00;
+}
+
+.finish-footer-brand {
+  text-align: center;
+  font-size: 11px;
+  color: #B87A2E;
+  letter-spacing: 0.12em;
+}
+
+.finish-footer-brand strong {
+  display: block;
+  font-size: 13px;
+  color: #4E2E00;
+  font-weight: 950;
+}
+
+/* ---------- EMPTY STATE ---------- */
+.finish-assignment-empty {
+  text-align: center;
+  color: #B87A2E;
+  font-weight: 700;
+  padding: 24px 0;
+  font-size: 13px;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .finish-assignment-layout {
+    grid-template-columns: 1fr 1fr;
   }
-  .finish-page::before {
-    left: -20px;
-  }
-  .finish-page::after {
-    right: -20px;
+  .finish-package-section {
+    grid-column: span 2;
   }
 }
 
-@media (max-width: 560px) {
-  .finish-page::before,
-  .finish-page::after {
-    font-size: 120px;
-    opacity: 0.08;
+@media (max-width: 720px) {
+  .finish-assignment-layout {
+    grid-template-columns: 1fr;
   }
-  .finish-page::before {
-    left: -10px;
+  .finish-package-section {
+    grid-column: span 1;
   }
-  .finish-page::after {
-    right: -10px;
+  .finish-scoreboard {
+    grid-template-columns: 1fr 1fr;
+  }
+  .finish-hero h1 {
+    font-size: 32px;
+  }
+  .finish-assignment-section {
+    padding: 16px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .finish-scoreboard {
+    grid-template-columns: 1fr;
+  }
+  .finish-team-select-card {
+    grid-template-columns: 24px 1fr;
+  }
+  .finish-team-select-score {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 4px;
+    border-top: 1px solid rgba(78, 46, 0, 0.06);
+  }
+  .finish-package-select-card {
+    grid-template-columns: 32px 1fr 24px;
   }
 }
