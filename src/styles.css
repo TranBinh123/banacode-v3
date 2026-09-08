@@ -3001,3 +3001,32 @@ body:has(.finish-page) .ghost-button {
 .finish-mapping-card {
   padding: 20px 16px;
 }
+/* =========================================================
+   Finish – Ẩn header điều khiển & tăng giãn cách header
+   ========================================================= */
+
+/* Ẩn hoàn toàn phần MC/Kỹ thuật và đáp án tham khảo */
+.finish-live-control-header {
+  display: none !important;
+}
+
+/* Tăng padding và gap cho header chính */
+.finish-game-header {
+  padding: 24px 32px !important;
+  gap: 28px !important;
+}
+
+/* Tăng khoảng cách giữa các meta item */
+.finish-game-meta {
+  gap: 32px !important;
+}
+
+/* Tăng khoảng cách dòng trong mỗi meta item */
+.finish-game-meta > div {
+  gap: 6px !important;
+}
+
+/* Tăng kích thước font cho các số trong meta để cân đối */
+.finish-game-meta strong {
+  font-size: 24px !important;
+}
