@@ -4,54 +4,27 @@ export type FinishQuestion = {
   id: string;
   text: string;
   answer: string;
-
-  /**
-   * Nếu true, Public Screen sẽ hiển thị trình phát YouTube.
-   */
-  isVideo: boolean;
-
-  /**
-   * URL YouTube do BTC nhập.
-   * Ví dụ:
-   * https://www.youtube.com/watch?v=xxxxx
-   */
-  youtubeUrl: string;
+  difficulty: 'easy' | 'medium' | 'hard'; // dễ:10, vừa:20, khó:30
+  points: number; // 10, 20, 30
+  isVideo: boolean; // true cho câu khó
+  youtubeUrl: string; // nếu isVideo
 };
 
 export type FinishPackage = {
   id: string;
-
-  /**
-   * Tên hiển thị của gói.
-   * Mặc định: GÓI 1, GÓI 2...
-   */
   label: string;
-
-  /**
-   * Đội đã chọn gói này.
-   * null = chưa có đội chọn.
-   */
   selectedBy: TeamId | null;
-
-  /**
-   * Mỗi gói chỉ được sử dụng Ngôi sao hy vọng 1 lần.
-   */
   starUsed: boolean;
-
-  /**
-   * Mỗi gói có đúng 5 câu.
-   */
   questions: FinishQuestion[];
 };
 
-export type FinishStatus =
-  | "selection"
-  | "playing"
-  | "finished";
+export type FinishStatus = 'selection' | 'playing' | 'finished';
 
-export type FinishResolution =
-  | "idle"
-  | "awaiting-main-result"
-  | "selecting-steal-team"
-  | "awaiting-steal-result"
-  | "resolved";
+// Các pha trong một câu hỏi
+export type QuestionPhase =
+  | 'intro'           // giới thiệu độ khó
+  | 'star_decision'   // chọn dùng sao hay không
+  | 'playing'         // hiển thị câu hỏi, timer đang chạy
+  | 'result'          // kết quả của đội chính (đúng/sai)
+  | 'steal'           // cơ hội cướp cho đội khác
+  | 'resolved';       // đã kết thúc câu hỏi
