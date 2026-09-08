@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useFinishStore } from "../store/finishStore";
 import { useGameStore } from "../../../core/store/gameStore";
 import type { TeamId } from "../../../core/types/game";
-import "./finish.css"; // <-- thêm dòng này
+
 const youtubeEmbedUrl = (url: string) => {
   if (!url) return "";
 
