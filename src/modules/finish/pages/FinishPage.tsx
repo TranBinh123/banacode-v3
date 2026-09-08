@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useFinishStore } from "../store/finishStore";
 import { useGameStore } from "../../../core/store/gameStore";
-import { addScore } from "../../../core/scoring/scoring";
 import type { TeamId } from "../../../core/types/game";
 
 const youtubeEmbedUrl = (url: string) => {
