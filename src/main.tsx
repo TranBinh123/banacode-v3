@@ -1,9 +1,10 @@
-import "./modules/finish/finish.css";
-import "./modules/warmup/warmup.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+
 import "./styles.css";
+import "./modules/warmup/warmup.css";
+import "./modules/finish/finish.css";
 
 ReactDOM.createRoot(
   document.getElementById("root")!,
