@@ -1,4 +1,3 @@
-```tsx
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { addScore } from "../../../core/scoring/scoring";
 import { useGameStore } from "../../../core/store/gameStore";
@@ -852,4 +851,3 @@ export function ObstaclePage() {
     </main>
   );
 }
-```
