@@ -1664,7 +1664,7 @@ body:has(.acceleration-game) .ghost-button {
    ========================================================= */
 
 .acceleration-game .image-placeholder {
-  background: radial-gradient(circle at center, rgba(199, 125, 255, 0.15), transparent 55%);
+  background: radial-gradient(circle at center, #F3E8FF 20%, transparent 60%);
 }
 
 .acceleration-game .image-placeholder strong {
