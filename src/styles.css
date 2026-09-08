@@ -1680,7 +1680,7 @@ body:has(.acceleration-game) .ghost-button {
    ========================================================= */
 
 .acceleration-game .answer-reveal {
-  background: rgba(58, 12, 163, 0.70); /* giảm từ 0.85 xuống 0.70 để mờ hơn */
+  background: rgba(58, 12, 163, 0.30); /* giảm từ 0.85 xuống 0.70 để mờ hơn */
   border-color: rgba(123, 44, 191, 0.60);
   box-shadow: 0 10px 35px rgba(0,0,0,0.30), 0 0 28px rgba(123, 44, 191, 0.15);
 }
