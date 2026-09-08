@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Team, TeamId } from "../../../core/types/game";
 import { addScore } from "../../../core/scoring/scoring";
 import { Scoreboard } from "../../../components/Scoreboard";
@@ -12,78 +6,34 @@ import { useWarmupStore } from "../store/warmupStore";
 import { TeamSelector } from "../components/TeamSelector";
 import { WarmupControls } from "../components/WarmupControls";
 import { QuestionStatusBar } from "../components/QuestionStatusBar";
-import type {
-  QuestionStatus,
-  QuestionSet,
-  WarmupQuestion,
-} from "../types/warmup";
+import type { QuestionStatus, WarmupQuestion } from "../types/warmup";
 
 const TOTAL_SECONDS = 120;
 
-type Props = {
-  teams: Team[];
-};
+type Props = { teams: Team[] };
 
 export function WarmupPage({ teams }: Props) {
-  const questionSets = useWarmupStore(
-    (state) => state.questionSets,
-  );
-
-  const [selectedTeamId, setSelectedTeamId] =
-    useState<TeamId | null>(null);
-
-  const [selectedSetId, setSelectedSetId] =
-    useState<string | null>(null);
-
-  const [usedTeamIds, setUsedTeamIds] =
-    useState<TeamId[]>([]);
-
-  const [usedSetIds, setUsedSetIds] =
-    useState<string[]>([]);
-
+  const { questionSets, teamQuestionSetMap } = useWarmupStore();
+  const [selectedTeamId, setSelectedTeamId] = useState<TeamId | null>(null);
   const [active, setActive] = useState(false);
   const [paused, setPaused] = useState(false);
-
-  const [secondsLeft, setSecondsLeft] =
-    useState(TOTAL_SECONDS);
-
-  const [questions, setQuestions] =
-    useState<WarmupQuestion[]>([]);
-
-  const [statuses, setStatuses] =
-    useState<QuestionStatus[]>([]);
-
-  const [currentIndex, setCurrentIndex] =
-    useState(0);
-
+  const [secondsLeft, setSecondsLeft] = useState(TOTAL_SECONDS);
+  const [questions, setQuestions] = useState<WarmupQuestion[]>([]);
+  const [statuses, setStatuses] = useState<QuestionStatus[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [finished, setFinished] = useState(false);
 
-  const [showScoreboard, setShowScoreboard] =
-    useState(true);
+  // Mặc định ẩn bảng điểm
+  const [showScoreboard, setShowScoreboard] = useState(false);
 
   const transitionLock = useRef(false);
 
-  const currentQuestion =
-    questions[currentIndex];
-
-  const selectedTeam = teams.find(
-    (team) => team.id === selectedTeamId,
-  );
-
-  const selectedSet = questionSets.find(
-    (set) => set.id === selectedSetId,
-  );
-
-  const availableSets = questionSets.filter(
-    (set) => !usedSetIds.includes(set.id),
-  );
-
-  const allTeamsPlayed =
-    usedTeamIds.length >= teams.length;
+  const currentQuestion = questions[currentIndex];
+  const selectedTeam = teams.find((t) => t.id === selectedTeamId);
+  const assignedSetId = selectedTeamId ? teamQuestionSetMap[selectedTeamId] : null;
+  const assignedSet = questionSets.find((s) => s.id === assignedSetId);
 
   const resetTurn = useCallback(() => {
-    setSelectedTeamId(null);
-    setSelectedSetId(null);
     setActive(false);
     setPaused(false);
     setSecondsLeft(TOTAL_SECONDS);
@@ -94,103 +44,47 @@ export function WarmupPage({ teams }: Props) {
     transitionLock.current = false;
   }, []);
 
-  const chooseTeam = useCallback(
+  const startTeam = useCallback(
     (teamId: TeamId) => {
       if (active) return;
 
-      if (usedTeamIds.includes(teamId)) {
-        return;
-      }
+      const setId = teamQuestionSetMap[teamId];
+      const set = questionSets.find((item) => item.id === setId);
 
-      setSelectedTeamId(teamId);
-      setSelectedSetId(null);
-      setFinished(false);
-    },
-    [active, usedTeamIds],
-  );
-
-  const startTeam = useCallback(
-    (
-      teamId: TeamId,
-      questionSet: QuestionSet,
-    ) => {
-      if (active) return;
-
-      if (usedTeamIds.includes(teamId)) {
-        return;
-      }
-
-      if (usedSetIds.includes(questionSet.id)) {
-        return;
-      }
-
-      if (questionSet.questions.length !== 10) {
+      if (!set || set.questions.length !== 10) {
         window.alert(
-          "Bộ câu hỏi này chưa hợp lệ. Phải có đúng 10 câu.",
+          "Đội này chưa được phân công bộ câu hỏi hợp lệ (phải đủ 10 câu).",
         );
         return;
       }
 
-      const orderedQuestions = [
-        ...questionSet.questions,
-      ].sort(
-        (a, b) => a.order - b.order,
-      );
-
       setSelectedTeamId(teamId);
-      setSelectedSetId(questionSet.id);
+      setQuestions([...set.questions].sort((a, b) => a.order - b.order));
 
-      setUsedTeamIds((current) => [
-        ...current,
-        teamId,
-      ]);
+      const initialStatuses = Array(10).fill(
+        "unanswered",
+      ) as QuestionStatus[];
 
-      setUsedSetIds((current) => [
-        ...current,
-        questionSet.id,
-      ]);
-
-      setQuestions(orderedQuestions);
-
-      const initialStatuses =
-        Array(orderedQuestions.length).fill(
-          "unanswered",
-        ) as QuestionStatus[];
-
-      if (initialStatuses.length > 0) {
-        initialStatuses[0] = "current";
-      }
+      initialStatuses[0] = "current";
 
       setStatuses(initialStatuses);
       setCurrentIndex(0);
       setSecondsLeft(TOTAL_SECONDS);
       setPaused(false);
       setFinished(false);
-      transitionLock.current = false;
       setActive(true);
     },
-    [
-      active,
-      usedSetIds,
-      usedTeamIds,
-    ],
+    [active, questionSets, teamQuestionSetMap],
   );
 
   const finishTurn = useCallback(() => {
     setActive(false);
     setPaused(false);
     setFinished(true);
-    transitionLock.current = false;
   }, []);
 
   useEffect(() => {
-    if (
-      !active ||
-      paused ||
-      finished
-    ) {
-      return;
-    }
+    if (!active || paused || finished) return;
 
     if (secondsLeft <= 0) {
       finishTurn();
@@ -198,28 +92,14 @@ export function WarmupPage({ teams }: Props) {
     }
 
     const timer = window.setInterval(() => {
-      setSecondsLeft((value) =>
-        Math.max(0, value - 1),
-      );
+      setSecondsLeft((value) => Math.max(0, value - 1));
     }, 1000);
 
-    return () =>
-      window.clearInterval(timer);
-  }, [
-    active,
-    paused,
-    finished,
-    secondsLeft,
-    finishTurn,
-  ]);
+    return () => window.clearInterval(timer);
+  }, [active, paused, finished, secondsLeft, finishTurn]);
 
   const resolve = useCallback(
-    (
-      result:
-        | "correct"
-        | "wrong"
-        | "skipped",
-    ) => {
+    (result: "correct" | "wrong" | "skipped") => {
       if (
         !active ||
         paused ||
@@ -233,67 +113,42 @@ export function WarmupPage({ teams }: Props) {
       transitionLock.current = true;
 
       if (result === "correct") {
-        addScore(
-          selectedTeamId,
-          10,
-          "warmup",
-        );
+        addScore(selectedTeamId, 10, "warmup");
       }
 
       window.setTimeout(() => {
         setStatuses((latest) => {
-          const resolved = latest.map(
-            (status, index) =>
-              index === currentIndex
-                ? result
-                : status,
+          const resolved = latest.map((status, index) =>
+            index === currentIndex ? result : status,
           );
 
-          const nextUnanswered =
-            resolved.findIndex(
-              (status) =>
-                status === "unanswered",
-            );
+          const nextUnanswered = resolved.findIndex(
+            (status) => status === "unanswered",
+          );
 
           if (nextUnanswered >= 0) {
-            setCurrentIndex(
-              nextUnanswered,
-            );
+            setCurrentIndex(nextUnanswered);
+            transitionLock.current = false;
 
-            transitionLock.current =
-              false;
-
-            return resolved.map(
-              (status, index) =>
-                index ===
-                nextUnanswered
-                  ? "current"
-                  : status,
+            return resolved.map((status, index) =>
+              index === nextUnanswered ? "current" : status,
             );
           }
 
-          const nextSkipped =
-            resolved.findIndex(
-              (status) =>
-                status === "skipped",
-            );
+          const nextSkipped = resolved.findIndex(
+            (status) => status === "skipped",
+          );
 
           if (nextSkipped >= 0) {
-            setCurrentIndex(
-              nextSkipped,
-            );
+            setCurrentIndex(nextSkipped);
+            transitionLock.current = false;
 
-            transitionLock.current =
-              false;
-
-            return resolved.map(
-              (status, index) =>
-                index === nextSkipped
-                  ? "current"
-                  : status,
+            return resolved.map((status, index) =>
+              index === nextSkipped ? "current" : status,
             );
           }
 
+          transitionLock.current = false;
           finishTurn();
 
           return resolved;
@@ -311,115 +166,72 @@ export function WarmupPage({ teams }: Props) {
   );
 
   useEffect(() => {
-    const onKeyDown = (
-      event: KeyboardEvent,
-    ) => {
-      const target =
-        event.target as HTMLElement | null;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
 
-      const tag =
-        target?.tagName?.toLowerCase();
-
-      if (
-        tag === "input" ||
-        tag === "textarea" ||
-        tag === "select"
-      ) {
+      if (tag === "input" || tag === "textarea" || tag === "select") {
         return;
       }
 
-      const key =
-        event.key.toLowerCase();
+      const key = event.key.toLowerCase();
 
       if (!active) {
-        if (
-          ["1", "2", "3", "4"].includes(
-            key,
-          )
-        ) {
-          chooseTeam(
-            `team-${key}` as TeamId,
-          );
+        if (["1", "2", "3", "4"].includes(key)) {
+          startTeam(`team-${key}` as TeamId);
         }
 
         return;
       }
 
-      if (key === "d") {
-        resolve("correct");
-      }
-
-      if (key === "s") {
-        resolve("wrong");
-      }
-
-      if (key === "c") {
-        resolve("skipped");
-      }
-
-      if (key === "p") {
-        setPaused(
-          (value) => !value,
-        );
-      }
+      if (key === "d") resolve("correct");
+      if (key === "s") resolve("wrong");
+      if (key === "c") resolve("skipped");
+      if (key === "p") setPaused((value) => !value);
     };
 
-    window.addEventListener(
-      "keydown",
-      onKeyDown,
-    );
+    window.addEventListener("keydown", onKeyDown);
 
-    return () =>
-      window.removeEventListener(
-        "keydown",
-        onKeyDown,
-      );
-  }, [
-    active,
-    chooseTeam,
-    resolve,
-  ]);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active, startTeam, resolve]);
 
   const timerText = useMemo(
     () =>
-      `${String(
-        Math.floor(
-          secondsLeft / 60,
-        ),
-      ).padStart(2, "0")}:${String(
+      `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(
         secondsLeft % 60,
       ).padStart(2, "0")}`,
     [secondsLeft],
   );
 
-  const displayedStatuses =
-    statuses.length
-      ? statuses
-      : Array(10).fill(
-          "unanswered",
-        );
+  const displayedStatuses = statuses.length
+    ? statuses
+    : Array(10).fill("unanswered");
 
   return (
-    <main className="game-page warmup-page">
+    <main className="game-page">
       <header className="game-header">
         <div>
-          <div className="eyebrow">
+          <div
+            className="eyebrow"
+            style={{
+              marginBottom: "14px",
+            }}
+          >
             GAME SHOW • VÒNG 1
           </div>
 
-          <h1>KHỞI ĐỘNG</h1>
-
-          <p className="warmup-subtitle">
-            Mở đầu hành trình • 120 giây
-          </p>
+          <h1
+            style={{
+              marginTop: 0,
+            }}
+          >
+            KHỞI ĐỘNG
+          </h1>
         </div>
 
         <div
           className={`timer ${
-            secondsLeft <= 15 &&
-            active
-              ? "danger"
-              : ""
+            secondsLeft <= 15 && active ? "danger" : ""
           }`}
         >
           {timerText}
@@ -429,269 +241,84 @@ export function WarmupPage({ teams }: Props) {
       <div className="scoreboard-toggle-row">
         <button
           className="ghost-button scoreboard-toggle"
-          onClick={() =>
-            setShowScoreboard(
-              (value) => !value,
-            )
-          }
+          onClick={() => setShowScoreboard((value) => !value)}
         >
-          {showScoreboard
-            ? "ẨN BẢNG ĐIỂM"
-            : "BẢNG ĐIỂM"}
+          {showScoreboard ? "ẨN BẢNG ĐIỂM" : "BẢNG ĐIỂM"}
         </button>
       </div>
 
       {showScoreboard && (
         <div className="scoreboard-collapsible">
-          <Scoreboard
-            teams={teams}
-            allowManualAdjust
-            phase="warmup"
-          />
+          <Scoreboard teams={teams} />
         </div>
       )}
 
-      {!active &&
-        !finished &&
-        !allTeamsPlayed && (
-          <>
-            <TeamSelector
-              teams={teams}
-              selectedTeamId={
-                selectedTeamId
-              }
-              locked={false}
-              disabledTeamIds={
-                usedTeamIds
-              }
-              onSelect={chooseTeam}
-            />
+      <TeamSelector
+        teams={teams}
+        selectedTeamId={selectedTeamId}
+        locked={active}
+        onSelect={startTeam}
+      />
 
-            {selectedTeam && (
-              <section className="warmup-set-selection">
-                <div className="section-label">
-                  CHỌN BỘ CÂU HỎI
-                </div>
+      {assignedSet && !active && !finished && selectedTeam && (
+        <div className="assignment-note">
+          {selectedTeam.name} • <strong>{assignedSet.name}</strong> •{" "}
+          {assignedSet.questions.length}/10 câu
+        </div>
+      )}
 
-                <div className="warmup-selection-heading">
-                  <div>
-                    <span>
-                      ĐỘI ĐANG CHỌN
-                    </span>
+      {active && currentQuestion && selectedTeam && (
+        <section className="question-panel">
+          <div className="live-meta">
+            <span>{selectedTeam.name}</span>
+            <span>
+              CÂU {String(currentIndex + 1).padStart(2, "0")}/10
+            </span>
+            {paused && <b>TẠM DỪNG</b>}
+          </div>
 
-                    <strong>
-                      {selectedTeam.name}
-                    </strong>
-                  </div>
+          <div className="question-text">{currentQuestion.question}</div>
 
-                  <button
-                    className="ghost-button"
-                    onClick={() => {
-                      setSelectedTeamId(
-                        null,
-                      );
-                      setSelectedSetId(
-                        null,
-                      );
-                    }}
-                  >
-                    ← ĐỔI ĐỘI
-                  </button>
-                </div>
+          <QuestionStatusBar
+            statuses={displayedStatuses}
+            currentIndex={currentIndex}
+          />
 
-                <p className="warmup-selection-help">
-                  Đội được tự chọn một
-                  bộ câu hỏi chưa được
-                  sử dụng.
-                </p>
+          <WarmupControls
+            disabled={paused || !active || secondsLeft <= 0}
+            paused={paused}
+            onCorrect={() => resolve("correct")}
+            onWrong={() => resolve("wrong")}
+            onSkip={() => resolve("skipped")}
+            onPause={() => setPaused((v) => !v)}
+          />
+        </section>
+      )}
 
-                <div className="warmup-set-grid">
-                  {availableSets.map(
-                    (set) => {
-                      const valid =
-                        set.questions.length ===
-                        10;
+      {!active && !finished && (
+        <div className="ready-panel">
+          <div className="ready-icon">▶</div>
+          <h2>Chọn đội để bắt đầu</h2>
+          <p>Timer 02:00 sẽ tự chạy ngay khi đội được chọn.</p>
+          <div className="shortcut-hint">
+            Phím nhanh: <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd>{" "}
+            <kbd>4</kbd>
+          </div>
+        </div>
+      )}
 
-                      return (
-                        <button
-                          key={set.id}
-                          className="warmup-set-card"
-                          disabled={!valid}
-                          onClick={() =>
-                            startTeam(
-                              selectedTeam.id,
-                              set,
-                            )
-                          }
-                        >
-                          <span>
-                            {set.name}
-                          </span>
-
-                          <strong>
-                            10 CÂU
-                          </strong>
-
-                          <small>
-                            {valid
-                              ? "CHỌN BỘ NÀY →"
-                              : "CHƯA ĐỦ 10 CÂU"}
-                          </small>
-                        </button>
-                      );
-                    },
-                  )}
-                </div>
-              </section>
-            )}
-          </>
-        )}
-
-      {!active &&
-        !finished &&
-        !selectedTeam &&
-        !allTeamsPlayed && (
-          <section className="ready-panel">
-            <div className="ready-icon">
-              ▶
-            </div>
-
-            <h2>
-              Chọn đội để bắt đầu
-            </h2>
-
-            <p>
-              Chọn một đội, sau đó đội
-              sẽ tự chọn bộ câu hỏi.
-              Đồng hồ 02:00 bắt đầu
-              ngay khi bộ câu hỏi được
-              chọn.
-            </p>
-
-            <div className="shortcut-hint">
-              Phím nhanh chọn đội:
-              {" "}
-              <kbd>1</kbd>
-              {" "}
-              <kbd>2</kbd>
-              {" "}
-              <kbd>3</kbd>
-              {" "}
-              <kbd>4</kbd>
-            </div>
-          </section>
-        )}
-
-      {active &&
-        currentQuestion &&
-        selectedTeam && (
-          <section className="question-panel">
-            <div className="live-meta">
-              <span>
-                {selectedTeam.name}
-              </span>
-
-              <span>
-                {selectedSet?.name}
-              </span>
-
-              <span>
-                CÂU{" "}
-                {String(
-                  currentIndex + 1,
-                ).padStart(2, "0")}
-                /10
-              </span>
-
-              {paused && (
-                <b>TẠM DỪNG</b>
-              )}
-            </div>
-
-            <div className="question-text">
-              {currentQuestion.question ||
-                "CÂU HỎI ĐANG ĐƯỢC CHUẨN BỊ"}
-            </div>
-
-            <QuestionStatusBar
-              statuses={
-                displayedStatuses
-              }
-              currentIndex={
-                currentIndex
-              }
-            />
-
-            <WarmupControls
-              disabled={
-                paused ||
-                !active ||
-                secondsLeft <= 0
-              }
-              paused={paused}
-              onCorrect={() =>
-                resolve("correct")
-              }
-              onWrong={() =>
-                resolve("wrong")
-              }
-              onSkip={() =>
-                resolve("skipped")
-              }
-              onPause={() =>
-                setPaused(
-                  (value) => !value,
-                )
-              }
-            />
-          </section>
-        )}
-
-      {finished &&
-        selectedTeam && (
-          <section className="result-panel">
-            <div className="eyebrow">
-              HOÀN THÀNH LƯỢT CHƠI
-            </div>
-
-            <h2>
-              {selectedTeam.name}
-            </h2>
-
-            <p>
-              {selectedSet?.name} đã
-              hoàn thành. Điểm Khởi động
-              đã được cập nhật vào bảng
-              điểm chung.
-            </p>
-
-            <button
-              className="primary-button"
-              onClick={resetTurn}
-            >
-              CHỌN ĐỘI TIẾP THEO
-            </button>
-          </section>
-        )}
-
-      {!active &&
-        !finished &&
-        allTeamsPlayed && (
-          <section className="result-panel">
-            <div className="eyebrow">
-              VÒNG 1 HOÀN TẤT
-            </div>
-
-            <h2>
-              ĐÃ THI ĐỦ 4 ĐỘI
-            </h2>
-
-            <p>
-              Tất cả các đội đã hoàn
-              thành lượt Khởi động.
-            </p>
-          </section>
-        )}
+      {finished && selectedTeam && (
+        <section className="result-panel">
+          <div className="eyebrow">HOÀN THÀNH LƯỢT CHƠI</div>
+          <h2>{selectedTeam.name}</h2>
+          <p>
+            Điểm Khởi động đã được cập nhật vào bảng điểm chung.
+          </p>
+          <button className="primary-button" onClick={resetTurn}>
+            CHỌN ĐỘI TIẾP THEO
+          </button>
+        </section>
+      )}
     </main>
   );
 }
