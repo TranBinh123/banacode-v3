@@ -808,7 +808,7 @@ export function FinishPage() {
                 QUYẾT ĐỊNH
               </div>
 
-              <div className="finish-control-panel">
+              <div className="finish-star-actions">
                 <button
                   className="finish-star-yes"
                   onClick={() =>
