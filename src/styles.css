@@ -983,3 +983,332 @@ textarea { min-height: 74px; resize: vertical; line-height: 1.5; }
     width: 100%;
   }
 }
+/* =========================================================
+   VÒNG 2 • VƯỢT CHƯỚNG NGẠI VẬT
+   Terracotta / Coral Theme
+   ========================================================= */
+
+.obstacle-game {
+  position: relative;
+  isolation: isolate;
+  color: #9C2E00;
+}
+
+/* Hoa Hướng Dương trang trí ở góc trái dưới và phải trên */
+.obstacle-game::before,
+.obstacle-game::after {
+  position: fixed;
+  z-index: -1;
+  font-size: 140px;
+  line-height: 1;
+  opacity: 0.25;
+  pointer-events: none;
+  content: "🌻";
+}
+
+.obstacle-game::before {
+  bottom: 3%;
+  left: 3%;
+  color: #FF8C42;
+}
+
+.obstacle-game::after {
+  top: 3%;
+  right: 3%;
+  color: #FF6B6B;
+  transform: scaleX(-1) rotate(20deg);
+}
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+body:has(.obstacle-game) {
+  background:
+    radial-gradient(600px 300px at 10% 5%, rgba(255, 140, 66, 0.15), transparent 55%),
+    radial-gradient(400px 200px at 90% 95%, rgba(255, 107, 107, 0.10), transparent 50%),
+    radial-gradient(300px 150px at 40% 20%, rgba(255, 215, 0, 0.08), transparent 40%),
+    linear-gradient(180deg, #FFF3E0 0%, #FFECD2 40%, #FFF8F0 100%);
+  background-attachment: fixed;
+}
+
+/* =========================================================
+   NAV (override từ theme tối)
+   ========================================================= */
+
+body:has(.obstacle-game) .top-nav {
+  color: #9C2E00;
+  background: rgba(255, 243, 224, 0.90);
+  border-bottom-color: rgba(156, 46, 0, 0.10);
+  box-shadow: 0 8px 30px rgba(156, 46, 0, 0.06);
+}
+
+body:has(.obstacle-game) .top-nav strong {
+  color: #9C2E00;
+}
+
+body:has(.obstacle-game) .nav-subtitle {
+  color: #B05A2A;
+}
+
+body:has(.obstacle-game) .nav-module {
+  color: #B05A2A;
+}
+
+body:has(.obstacle-game) .nav-module:hover {
+  color: #9C2E00;
+  background: rgba(255, 140, 66, 0.08);
+}
+
+body:has(.obstacle-game) .nav-module.active {
+  color: #9C2E00;
+  background: rgba(255, 140, 66, 0.14);
+  border-color: rgba(255, 140, 66, 0.34);
+}
+
+body:has(.obstacle-game) .ghost-button {
+  color: #9C2E00;
+  background: rgba(255, 255, 255, 0.80);
+  border-color: rgba(156, 46, 0, 0.14);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.obstacle-game .game-header h1 {
+  color: #9C2E00;
+}
+
+.obstacle-game .eyebrow,
+.obstacle-game .section-label {
+  color: #B05A2A;
+}
+
+/* =========================================================
+   TIMER
+   ========================================================= */
+
+.obstacle-game .timer {
+  color: #9C2E00;
+}
+
+.obstacle-game .timer.danger {
+  color: #CC3333;
+}
+
+/* =========================================================
+   PANELS / CARDS
+   ========================================================= */
+
+.obstacle-game .scoreboard,
+.obstacle-game .question-panel,
+.obstacle-game .ready-panel,
+.obstacle-game .result-panel,
+.obstacle-game .obstacle-stage,
+.obstacle-game .grading-panel,
+.obstacle-game .question-stage-card,
+.obstacle-game .vertical-stage-card,
+.obstacle-game .vertical-win-card {
+  background:
+    linear-gradient(145deg, rgba(255, 248, 240, 0.96), rgba(255, 237, 220, 0.92));
+  border-color: rgba(156, 46, 0, 0.12);
+  box-shadow: 0 18px 50px rgba(156, 46, 0, 0.10);
+}
+
+/* =========================================================
+   SCOREBOARD
+   ========================================================= */
+
+.obstacle-game .score-card {
+  color: #9C2E00;
+  background: linear-gradient(145deg, #ffffff, #FFF3E0);
+  border-color: rgba(156, 46, 0, 0.10);
+  box-shadow: 0 10px 28px rgba(156, 46, 0, 0.08);
+}
+
+.obstacle-game .score-team {
+  color: #B05A2A;
+}
+
+.obstacle-game .score-value {
+  color: #9C2E00;
+}
+
+.obstacle-game .score-phase {
+  color: #A9714A;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.obstacle-game .primary-button {
+  background: linear-gradient(135deg, #FF8C42, #FF6B6B);
+  border-color: rgba(255, 140, 66, 0.40);
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(255, 140, 66, 0.25);
+}
+
+.obstacle-game .primary-button:hover:not(:disabled) {
+  box-shadow: 0 11px 28px rgba(255, 140, 66, 0.35);
+}
+
+.obstacle-game .danger-button {
+  color: #9C2E00;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(180, 55, 55, 0.22);
+}
+
+.obstacle-game .vertical-button {
+  border-color: rgba(255, 140, 66, 0.40);
+  background: rgba(255, 140, 66, 0.12);
+  color: #9C2E00;
+}
+
+.obstacle-game .vertical-button:hover:not(:disabled) {
+  background: rgba(255, 140, 66, 0.20);
+}
+
+.obstacle-game .audience-button {
+  border-color: rgba(255, 107, 107, 0.35);
+  background: rgba(255, 107, 107, 0.10);
+  color: #9C2E00;
+}
+
+.obstacle-game .audience-button:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.18);
+}
+
+/* =========================================================
+   PUZZLE BOARD
+   ========================================================= */
+
+.obstacle-game .puzzle-board {
+  background:
+    radial-gradient(circle at 70% 30%, rgba(255, 140, 66, 0.06), transparent 50%),
+    linear-gradient(180deg, rgba(255, 248, 240, 0.80), rgba(255, 237, 220, 0.60));
+  border-color: rgba(156, 46, 0, 0.10);
+}
+
+/* Hàng ngang */
+.obstacle-game .puzzle-row > b {
+  background: rgba(255, 140, 66, 0.15);
+  color: #9C2E00;
+}
+
+.obstacle-game .puzzle-row .cell {
+  border-color: rgba(156, 46, 0, 0.20);
+  background: rgba(255, 255, 255, 0.40);
+  color: transparent;
+}
+
+.obstacle-game .puzzle-row.solved .cell {
+  color: #9C2E00;
+  background: linear-gradient(180deg, rgba(255, 140, 66, 0.35), rgba(255, 107, 107, 0.20));
+  border-color: rgba(255, 140, 66, 0.60);
+}
+
+.obstacle-game .puzzle-row.active {
+  outline-color: #FF6B6B;
+}
+
+/* Hàng dọc */
+.obstacle-game .vertical-answer span.revealed {
+  color: #9C2E00;
+  background: linear-gradient(180deg, #FFE0B2, #FFCC80);
+  border-color: #FF8C42;
+  box-shadow: 0 0 16px rgba(255, 140, 66, 0.30);
+}
+
+/* =========================================================
+   GRADING PANEL
+   ========================================================= */
+
+.obstacle-game .grading-head h2 {
+  color: #9C2E00;
+}
+
+.obstacle-game .grading-answer {
+  color: #A9714A;
+}
+
+.obstacle-game .grading-answer strong {
+  color: #9C2E00;
+}
+
+.obstacle-game .team-grade {
+  background: rgba(255, 255, 255, 0.60);
+  border-color: rgba(156, 46, 0, 0.12);
+  color: #9C2E00;
+}
+
+.obstacle-game .team-grade b {
+  color: #A9714A;
+}
+
+.obstacle-game .team-grade.correct {
+  border-color: rgba(255, 140, 66, 0.60);
+  background: rgba(255, 140, 66, 0.12);
+}
+
+.obstacle-game .team-grade.selected {
+  outline-color: #FF8C42;
+  background: rgba(255, 140, 66, 0.08);
+}
+
+/* =========================================================
+   MODALS
+   ========================================================= */
+
+.obstacle-game .question-stage-card h2,
+.obstacle-game .vertical-stage-card h2,
+.obstacle-game .vertical-win-card h2 {
+  color: #9C2E00;
+}
+
+.obstacle-game .big-timer {
+  color: #9C2E00;
+}
+
+/* =========================================================
+   ANSWER BUTTONS (override từ global)
+   ========================================================= */
+
+.obstacle-game .answer-button.correct {
+  background: rgba(255, 140, 66, 0.15);
+  border-color: rgba(255, 140, 66, 0.50);
+  color: #9C2E00;
+}
+
+.obstacle-game .answer-button.correct:hover:not(:disabled) {
+  background: rgba(255, 140, 66, 0.25);
+}
+
+.obstacle-game .answer-button.wrong {
+  background: rgba(255, 107, 107, 0.12);
+  border-color: rgba(255, 107, 107, 0.40);
+  color: #9C2E00;
+}
+
+.obstacle-game .answer-button.wrong:hover:not(:disabled) {
+  background: rgba(255, 107, 107, 0.22);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .obstacle-game::before,
+  .obstacle-game::after {
+    font-size: 80px;
+  }
+}
+
+@media (max-width: 560px) {
+  .obstacle-game::before,
+  .obstacle-game::after {
+    font-size: 60px;
+  }
+}
