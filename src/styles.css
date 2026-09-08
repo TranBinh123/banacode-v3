@@ -3810,3 +3810,88 @@ body:has(.finish-page) .ghost-button {
     font-size: 48px;
   }
 }
+/* =========================================================
+   Finish – Style nút Đúng / Sai
+   ========================================================= */
+
+/* Nút chung cho cả hai khu vực */
+.finish-correct-button,
+.finish-wrong-button {
+  min-width: 120px;
+  min-height: 48px;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 900;
+  font-size: 16px;
+  border: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.04em;
+}
+
+/* Nút ĐÚNG */
+.finish-correct-button {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.35);
+}
+
+.finish-correct-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.50);
+  background: linear-gradient(135deg, #66BB6A, #388E3C);
+}
+
+/* Nút SAI */
+.finish-wrong-button {
+  background: linear-gradient(135deg, #EF5350, #B71C1C);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(239, 83, 80, 0.35);
+}
+
+.finish-wrong-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 83, 80, 0.50);
+  background: linear-gradient(135deg, #F44336, #C62828);
+}
+
+.finish-correct-button:disabled,
+.finish-wrong-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Căn chỉnh nhóm nút trong judgement panel */
+.finish-judgement-panel > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Căn chỉnh nhóm nút trong steal panel */
+.finish-steal-panel > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Tăng kích thước nút trên màn hình nhỏ */
+@media (max-width: 480px) {
+  .finish-correct-button,
+  .finish-wrong-button {
+    min-width: 100px;
+    min-height: 44px;
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
