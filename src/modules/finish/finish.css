@@ -807,3 +807,704 @@
     font-size: 20px;
   }
 }
+/* =========================================================
+   FINISH ADMIN PANEL
+   ========================================================= */
+
+.finish-admin {
+  min-height: calc(100vh - 76px);
+  padding: 32px;
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      rgba(255, 214, 92, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 15%,
+      rgba(105, 91, 255, 0.12),
+      transparent 28%
+    ),
+    linear-gradient(
+      135deg,
+      #f8faff 0%,
+      #ffffff 50%,
+      #fff8ed 100%
+    );
+  color: #182338;
+}
+
+.finish-admin > * {
+  width: min(1450px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.finish-admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.finish-kicker {
+  color: #ff7100;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.finish-admin-header h1 {
+  margin: 6px 0 8px;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  background: linear-gradient(
+    90deg,
+    #ff8700,
+    #ff3f7d,
+    #7055ff
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.finish-admin-header p {
+  max-width: 700px;
+  margin: 0;
+  color: #7a8598;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.finish-admin-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.finish-admin-meta span,
+.finish-admin-meta strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.finish-admin-meta span {
+  background: #eef1f7;
+  color: #69758a;
+  letter-spacing: 0.08em;
+}
+
+.finish-admin-meta strong {
+  background: #fff0dc;
+  color: #e56600;
+}
+
+/* =========================================================
+   ADMIN SELECTION
+   ========================================================= */
+
+.finish-selection-team {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 18px 22px;
+  border: 1px solid rgba(255, 157, 0, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 35px rgba(37, 48, 73, 0.08);
+}
+
+.finish-selection-team span {
+  color: #8993a5;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.finish-selection-team strong {
+  color: #ff6900;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.finish-selection-team small {
+  color: #7c8799;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.finish-package-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.finish-package-card {
+  position: relative;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 24px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 171, 0, 0.2);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at 85% 15%,
+      rgba(255, 210, 65, 0.3),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #fff3d2
+    );
+  color: #202b40;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 16px 38px rgba(40, 48, 70, 0.08);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.finish-package-card::before {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  top: -50px;
+  right: -30px;
+  border-radius: 50%;
+  border: 20px solid rgba(255, 160, 0, 0.08);
+}
+
+.finish-package-card:not(:disabled):hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 130, 0, 0.5);
+  box-shadow: 0 23px 48px rgba(40, 48, 70, 0.14);
+}
+
+.finish-package-card:disabled {
+  cursor: not-allowed;
+}
+
+.finish-package-card > span {
+  position: relative;
+  z-index: 1;
+  font-size: 30px;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.finish-package-card small {
+  position: relative;
+  z-index: 1;
+  margin-top: 7px;
+  color: #ff7100;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.finish-package-card.taken {
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
+
+/* =========================================================
+   ADMIN MAIN
+   ========================================================= */
+
+.finish-admin-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.finish-question-card {
+  position: relative;
+  padding: 30px;
+  overflow: hidden;
+  border: 1px solid rgba(58, 69, 94, 0.1);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 20px 55px rgba(37, 47, 70, 0.09);
+}
+
+.finish-question-card::before {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  top: -120px;
+  right: -60px;
+  border-radius: 50%;
+  background: rgba(255, 190, 0, 0.1);
+}
+
+.finish-question-number {
+  position: relative;
+  z-index: 1;
+  color: #ff7100;
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+}
+
+.finish-question-card h2 {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 24px;
+  max-width: 1100px;
+  color: #202a3e;
+  font-size: clamp(25px, 3vw, 42px);
+  line-height: 1.2;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+}
+
+.finish-active-star {
+  margin: 12px 0 18px;
+}
+
+.finish-answer-box {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 18px;
+  border-radius: 16px;
+  background: #f4f6fa;
+}
+
+.finish-answer-box span {
+  color: #8a94a6;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+}
+
+.finish-answer-box strong {
+  color: #39445a;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+/* =========================================================
+   ADMIN VIDEO
+   ========================================================= */
+
+.finish-video-wrapper {
+  position: relative;
+  z-index: 2;
+  width: min(850px, 100%);
+  aspect-ratio: 16 / 9;
+  margin: 24px auto;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #101522;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+}
+
+.finish-video-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.finish-video-placeholder {
+  margin: 24px 0;
+  padding: 45px 20px;
+  border-radius: 18px;
+  background: #f0f2f6;
+  color: #7c8799;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+/* =========================================================
+   ADMIN JUDGEMENT
+   ========================================================= */
+
+.finish-judgement-panel {
+  padding: 22px;
+  border: 1px solid rgba(70, 82, 110, 0.1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 38px rgba(38, 47, 69, 0.08);
+}
+
+.finish-judgement-title {
+  color: #263148;
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+}
+
+.finish-judgement-panel p {
+  margin: 7px 0 18px;
+  color: #7c8799;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.finish-judgement-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.finish-correct-button,
+.finish-wrong-button {
+  min-height: 58px;
+  border: 0;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 950;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.finish-correct-button {
+  background: #dcf7e4;
+  color: #18733a;
+}
+
+.finish-wrong-button {
+  background: #ffe1e1;
+  color: #b52f35;
+}
+
+.finish-correct-button:hover,
+.finish-wrong-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(30, 40, 60, 0.1);
+}
+
+/* =========================================================
+   STAR DECISION ADMIN
+   ========================================================= */
+
+.finish-star-decision {
+  min-height: 510px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 45px 25px;
+  text-align: center;
+  border: 2px solid rgba(255, 186, 0, 0.25);
+  border-radius: 30px;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255, 215, 72, 0.32),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      #fffef4,
+      #fff3c9
+    );
+  box-shadow: 0 22px 60px rgba(105, 75, 15, 0.1);
+}
+
+.finish-star-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(
+    145deg,
+    #ffe15b,
+    #ff9500
+  );
+  color: white;
+  font-size: 42px;
+  box-shadow:
+    0 0 0 10px rgba(255, 193, 0, 0.1),
+    0 0 45px rgba(255, 174, 0, 0.3);
+}
+
+.finish-star-label {
+  margin-top: 20px;
+  color: #a66a00;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.18em;
+}
+
+.finish-star-decision h2 {
+  margin: 12px 0 5px;
+  color: #242d40;
+  font-size: clamp(25px, 3vw, 40px);
+  line-height: 1.15;
+  font-weight: 950;
+}
+
+.finish-star-decision p {
+  max-width: 600px;
+  margin: 0;
+  color: #747e91;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.finish-star-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: min(620px, 100%);
+  margin-top: 25px;
+}
+
+.finish-star-yes,
+.finish-star-no {
+  min-height: 58px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.finish-star-yes {
+  border: 0;
+  background: linear-gradient(
+    135deg,
+    #ffd83d,
+    #ff8c00
+  );
+  color: #5e3b00;
+  box-shadow: 0 12px 30px rgba(255, 160, 0, 0.22);
+}
+
+.finish-star-no {
+  border: 1px solid rgba(75, 86, 110, 0.16);
+  background: rgba(255, 255, 255, 0.8);
+  color: #59657a;
+}
+
+/* =========================================================
+   STEAL ADMIN
+   ========================================================= */
+
+.finish-steal-panel {
+  padding: 25px;
+  border: 2px solid rgba(255, 173, 0, 0.2);
+  border-radius: 22px;
+  background: #fff9e8;
+  box-shadow: 0 15px 40px rgba(90, 67, 20, 0.08);
+}
+
+.finish-steal-panel > p {
+  margin: 8px 0 18px;
+  color: #777f90;
+  font-size: 12px;
+}
+
+.finish-steal-team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.finish-steal-team {
+  min-height: 55px;
+  padding: 10px 15px;
+  border: 1px solid rgba(255, 145, 0, 0.2);
+  border-radius: 14px;
+  background: #ffffff;
+  color: #39445a;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(50, 58, 80, 0.06);
+}
+
+.finish-steal-team:hover {
+  border-color: rgba(255, 120, 0, 0.5);
+  background: #fff3d7;
+}
+
+/* =========================================================
+   ADMIN NEXT
+   ========================================================= */
+
+.finish-next-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(65, 78, 105, 0.1);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 32px rgba(40, 48, 70, 0.07);
+}
+
+.finish-result-message {
+  color: #687388;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.finish-primary-button {
+  min-height: 50px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    #ff8500,
+    #ff4d72
+  );
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(255, 100, 40, 0.2);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.finish-primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(255, 100, 40, 0.28);
+}
+
+/* =========================================================
+   ADMIN FOOTER
+   ========================================================= */
+
+.finish-admin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 18px;
+  padding: 13px 16px;
+  color: #8992a3;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.finish-admin-footer strong {
+  color: #ff7100;
+  font-weight: 950;
+}
+
+/* =========================================================
+   ADMIN CARD / EMPTY
+   ========================================================= */
+
+.finish-admin-card {
+  width: min(700px, 100%);
+  margin: 80px auto;
+  padding: 45px;
+  text-align: center;
+  border: 1px solid rgba(55, 67, 95, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 20px 55px rgba(38, 47, 69, 0.1);
+}
+
+.finish-admin-card h2 {
+  margin: 0 0 20px;
+  color: #263148;
+}
+
+.finish-admin-card p {
+  margin: 0 0 25px;
+  color: #7b8597;
+}
+
+/* =========================================================
+   ADMIN RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+  .finish-admin {
+    padding: 22px;
+  }
+
+  .finish-package-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finish-selection-team {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+}
+
+@media (max-width: 720px) {
+  .finish-admin {
+    padding: 14px;
+  }
+
+  .finish-admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .finish-package-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-question-card {
+    padding: 22px 17px;
+  }
+
+  .finish-answer-box {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .finish-judgement-actions,
+  .finish-star-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-steal-team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .finish-next-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .finish-primary-button {
+    width: 100%;
+  }
+
+  .finish-admin-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
