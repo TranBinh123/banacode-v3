@@ -10,11 +10,13 @@ type TeamWithRank = {
   medal: string;
 };
 
-const STORAGE_KEY = "olympia-ranking-extra-points";
+const STORAGE_KEY = "olympia-ranking-scores";
 
 export function RankingAdmin() {
   const teams = useGameStore((state) => state.teams);
-  const [extraPoints, setExtraPoints] = useState<Record<string, number>>(() => {
+
+  // Lưu điểm cho từng vòng của từng đội
+  const [scores, setScores] = useState<Record<string, { round1: number; round2: number }>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
@@ -26,16 +28,17 @@ export function RankingAdmin() {
     return {};
   });
 
-  const [showRanking, setShowRanking] = useState(false);
-  const [rankingTeams, setRankingTeams] = useState<TeamWithRank[]>([]);
-  const [inputValues, setInputValues] = useState<Record<string, string>>(() => {
+  const [inputValues, setInputValues] = useState<Record<string, { round1: string; round2: string }>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        const initial: Record<string, string> = {};
+        const initial: Record<string, { round1: string; round2: string }> = {};
         Object.keys(parsed).forEach((key) => {
-          initial[key] = parsed[key].toString();
+          initial[key] = {
+            round1: parsed[key].round1?.toString() || "0",
+            round2: parsed[key].round2?.toString() || "0",
+          };
         });
         return initial;
       } catch {
@@ -45,37 +48,70 @@ export function RankingAdmin() {
     return {};
   });
 
-  const setExtraPointsDirect = (teamId: string, value: number) => {
+  const [showRanking, setShowRanking] = useState(false);
+  const [rankingTeams, setRankingTeams] = useState<TeamWithRank[]>([]);
+
+  // Cập nhật điểm cho một vòng của một đội
+  const updateScore = (teamId: string, round: 'round1' | 'round2', value: number) => {
+    const current = scores[teamId] || { round1: 0, round2: 0 };
     const newValue = Math.max(0, value);
-    const newExtra = { ...extraPoints, [teamId]: newValue };
-    setExtraPoints(newExtra);
-    setInputValues((prev) => ({ ...prev, [teamId]: newValue.toString() }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
+    const newScores = {
+      ...scores,
+      [teamId]: {
+        ...current,
+        [round]: newValue,
+      },
+    };
+    setScores(newScores);
+    setInputValues((prev) => ({
+      ...prev,
+      [teamId]: {
+        ...(prev[teamId] || { round1: "0", round2: "0" }),
+        [round]: newValue.toString(),
+      },
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
-  const resetExtraPoints = (teamId: string) => {
-    const newExtra = { ...extraPoints };
-    delete newExtra[teamId];
-    setExtraPoints(newExtra);
+  // Reset điểm của một đội
+  const resetScores = (teamId: string) => {
+    const newScores = { ...scores };
+    delete newScores[teamId];
+    setScores(newScores);
     setInputValues((prev) => {
       const newInput = { ...prev };
       delete newInput[teamId];
       return newInput;
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
-  const getTotalScoreWithExtra = (teamId: string): number => {
+  // Lấy tổng điểm của một đội (Vòng 1 + Vòng 2 + Vòng 3)
+  const getTotalScore = (teamId: string): number => {
     const team = teams.find((t) => t.id === teamId);
     if (!team) return 0;
-    return team.totalScore + (extraPoints[teamId] || 0);
+    const round1 = scores[teamId]?.round1 || 0;
+    const round2 = scores[teamId]?.round2 || 0;
+    const round3 = team.totalScore; // Điểm thi hôm nay (Vòng 3 - Chạm đỉnh)
+    return round1 + round2 + round3;
   };
 
+  // Lấy điểm từng vòng
+  const getRoundScores = (teamId: string) => {
+    const team = teams.find((t) => t.id === teamId);
+    return {
+      round1: scores[teamId]?.round1 || 0,
+      round2: scores[teamId]?.round2 || 0,
+      round3: team?.totalScore || 0,
+    };
+  };
+
+  // Xếp hạng
   const calculateRanking = () => {
     const ranked = teams
       .map((team) => ({
         ...team,
-        totalScore: getTotalScoreWithExtra(team.id),
+        totalScore: getTotalScore(team.id),
       }))
       .sort((a, b) => b.totalScore - a.totalScore);
 
@@ -112,22 +148,26 @@ export function RankingAdmin() {
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
         <div className="ranking-flower-left">🌷</div>
-        <div className="ranking-flower-right">🚡</div>
-        <div className="ranking-flower-center">🌻</div>
+        <div className="ranking-flower-right">🌻</div>
+        <div className="ranking-flower-center">🚡</div>
       </div>
 
       <header className="admin-header ranking-header">
         <div>
           <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
+          <p>
+            Nhập điểm Vòng 1 và Vòng 2 (thủ công từ các ngày thi trước).
+            Điểm Vòng 3 (Chạm đỉnh) được tự động lấy từ điểm thi hôm nay.
+          </p>
         </div>
       </header>
 
       <div className="ranking-grid">
         {teams.map((team) => {
-          const extra = extraPoints[team.id] || 0;
-          const total = getTotalScoreWithExtra(team.id);
-          const inputValue = inputValues[team.id] || extra.toString();
+          const { round1, round2, round3 } = getRoundScores(team.id);
+          const total = getTotalScore(team.id);
+          const inputVals = inputValues[team.id] || { round1: "0", round2: "0" };
 
           return (
             <div key={team.id} className="ranking-team-card" style={{ borderTopColor: team.color }}>
@@ -136,15 +176,63 @@ export function RankingAdmin() {
                 <span className="ranking-team-name">{team.name}</span>
               </div>
 
+              {/* 4 cột điểm số */}
               <div className="ranking-score-display">
                 <div className="ranking-score-item">
-                  <span>Điểm hôm nay</span>
-                  <strong>{team.totalScore}</strong>
+                  <span>Vòng 1<br/>Khám phá</span>
+                  <input
+                    type="number"
+                    className="ranking-score-input"
+                    value={inputVals.round1}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setInputValues((prev) => ({
+                        ...prev,
+                        [team.id]: { ...(prev[team.id] || { round1: "0", round2: "0" }), round1: val },
+                      }));
+                    }}
+                    onBlur={() => {
+                      const val = parseFloat(inputVals.round1);
+                      if (!isNaN(val) && val >= 0) {
+                        updateScore(team.id, 'round1', val);
+                      }
+                    }}
+                    placeholder="0"
+                    step="0.5"
+                    min="0"
+                  />
                 </div>
+
                 <div className="ranking-score-item">
-                  <span>Điểm cộng thêm</span>
-                  <strong className="extra-points">{extra}</strong>
+                  <span>Vòng 2<br/>Lên cáp</span>
+                  <input
+                    type="number"
+                    className="ranking-score-input"
+                    value={inputVals.round2}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setInputValues((prev) => ({
+                        ...prev,
+                        [team.id]: { ...(prev[team.id] || { round1: "0", round2: "0" }), round2: val },
+                      }));
+                    }}
+                    onBlur={() => {
+                      const val = parseFloat(inputVals.round2);
+                      if (!isNaN(val) && val >= 0) {
+                        updateScore(team.id, 'round2', val);
+                      }
+                    }}
+                    placeholder="0"
+                    step="0.5"
+                    min="0"
+                  />
                 </div>
+
+                <div className="ranking-score-item highlight">
+                  <span>Vòng 3<br/>Chạm đỉnh</span>
+                  <strong className="round3-score">{round3}</strong>
+                </div>
+
                 <div className="ranking-score-item total">
                   <span>Tổng điểm</span>
                   <strong>{total}</strong>
@@ -152,38 +240,13 @@ export function RankingAdmin() {
               </div>
 
               <div className="ranking-controls">
-                <div className="ranking-input-group">
-                  <input
-                    type="number"
-                    className="ranking-input"
-                    value={inputValue}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setInputValues((prev) => ({ ...prev, [team.id]: val }));
-                    }}
-                    placeholder="Nhập điểm"
-                    step="0.5"
-                    min="0"
-                  />
-                  <button
-                    className="ranking-btn set"
-                    onClick={() => {
-                      const val = parseFloat(inputValue);
-                      if (!isNaN(val) && val >= 0) {
-                        setExtraPointsDirect(team.id, val);
-                      }
-                    }}
-                  >
-                    Cập nhật
-                  </button>
-                  <button
-                    className="ranking-btn reset"
-                    onClick={() => resetExtraPoints(team.id)}
-                    disabled={extra === 0}
-                  >
-                    Reset
-                  </button>
-                </div>
+                <button
+                  className="ranking-btn reset"
+                  onClick={() => resetScores(team.id)}
+                  disabled={!scores[team.id] || (scores[team.id]?.round1 === 0 && scores[team.id]?.round2 === 0)}
+                >
+                  Reset điểm
+                </button>
               </div>
             </div>
           );
