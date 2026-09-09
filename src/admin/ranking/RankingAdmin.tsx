@@ -27,25 +27,10 @@ export function RankingAdmin() {
     return {};
   });
 
-  const [inputValues, setInputValues] = useState<Record<string, { round1: string; round2: string }>>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const initial: Record<string, { round1: string; round2: string }> = {};
-        Object.keys(parsed).forEach((key) => {
-          initial[key] = {
-            round1: parsed[key].round1?.toString() || "0",
-            round2: parsed[key].round2?.toString() || "0",
-          };
-        });
-        return initial;
-      } catch {
-        return {};
-      }
-    }
-    return {};
-  });
+  // State để theo dõi ô nào đang được chỉnh sửa
+  const [editingTeam, setEditingTeam] = useState<string | null>(null);
+  const [editingRound, setEditingRound] = useState<'round1' | 'round2' | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
 
   const [showRanking, setShowRanking] = useState(false);
   const [rankingTeams, setRankingTeams] = useState<TeamWithRank[]>([]);
@@ -61,13 +46,6 @@ export function RankingAdmin() {
       },
     };
     setScores(newScores);
-    setInputValues((prev) => ({
-      ...prev,
-      [teamId]: {
-        ...(prev[teamId] || { round1: "0", round2: "0" }),
-        [round]: newValue.toString(),
-      },
-    }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
@@ -75,11 +53,6 @@ export function RankingAdmin() {
     const newScores = { ...scores };
     delete newScores[teamId];
     setScores(newScores);
-    setInputValues((prev) => {
-      const newInput = { ...prev };
-      delete newInput[teamId];
-      return newInput;
-    });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
@@ -138,6 +111,42 @@ export function RankingAdmin() {
     }
   };
 
+  // Xử lý click để chỉnh sửa điểm
+  const handleScoreClick = (teamId: string, round: 'round1' | 'round2', currentValue: number) => {
+    setEditingTeam(teamId);
+    setEditingRound(round);
+    setEditValue(currentValue.toString());
+  };
+
+  // Xử lý lưu sau khi chỉnh sửa
+  const handleEditSave = () => {
+    if (editingTeam && editingRound) {
+      const val = parseFloat(editValue);
+      if (!isNaN(val) && val >= 0) {
+        updateScore(editingTeam, editingRound, val);
+      }
+    }
+    setEditingTeam(null);
+    setEditingRound(null);
+    setEditValue("");
+  };
+
+  // Xử lý hủy chỉnh sửa
+  const handleEditCancel = () => {
+    setEditingTeam(null);
+    setEditingRound(null);
+    setEditValue("");
+  };
+
+  // Xử lý phím Enter để lưu
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleEditSave();
+    } else if (e.key === 'Escape') {
+      handleEditCancel();
+    }
+  };
+
   return (
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
@@ -151,7 +160,7 @@ export function RankingAdmin() {
           <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
           <p>
-            Tổng điểm sẽ được tính bằng tổng số điểm các Đội đã giành được sau 3 vòng thi: Khám Phá - Lên Cáp & Chạm Đỉnh
+            Điểm chung cuộc bằng tổng điểm các đội đã giành được sau 03 vòng: KHÁM PHÁ - LÊN CÁP - CHẠM ĐỈNH
           </p>
         </div>
       </header>
@@ -160,7 +169,7 @@ export function RankingAdmin() {
         {teams.map((team) => {
           const roundScores = getRoundScores(team.id);
           const total = getTotalScore(team.id);
-          const inputVals = inputValues[team.id] || { round1: "0", round2: "0" };
+          const isEditing = editingTeam === team.id;
 
           return (
             <div key={team.id} className="ranking-team-card" style={{ borderTopColor: team.color }}>
@@ -170,61 +179,65 @@ export function RankingAdmin() {
               </div>
 
               <div className="ranking-score-display">
+                {/* Vòng 1 - Khám phá */}
                 <div className="ranking-score-item">
                   <span>Khám phá</span>
-                  <input
-                    type="number"
-                    className="ranking-score-input"
-                    value={inputVals.round1}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setInputValues((prev) => ({
-                        ...prev,
-                        [team.id]: { ...(prev[team.id] || { round1: "0", round2: "0" }), round1: val },
-                      }));
-                    }}
-                    onBlur={() => {
-                      const val = parseFloat(inputVals.round1);
-                      if (!isNaN(val) && val >= 0) {
-                        updateScore(team.id, 'round1', val);
-                      }
-                    }}
-                    placeholder="0"
-                    step="0.1"
-                    min="0"
-                  />
+                  {isEditing && editingRound === 'round1' ? (
+                    <input
+                      type="number"
+                      className="ranking-edit-input"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={handleEditSave}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                      step="0.1"
+                      min="0"
+                    />
+                  ) : (
+                    <strong 
+                      className="clickable-score"
+                      onClick={() => handleScoreClick(team.id, 'round1', roundScores.round1)}
+                      title="Click để chỉnh sửa"
+                    >
+                      {roundScores.round1}
+                    </strong>
+                  )}
                 </div>
 
+                {/* Vòng 2 - Lên cáp */}
                 <div className="ranking-score-item">
                   <span>Lên cáp</span>
-                  <input
-                    type="number"
-                    className="ranking-score-input"
-                    value={inputVals.round2}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setInputValues((prev) => ({
-                        ...prev,
-                        [team.id]: { ...(prev[team.id] || { round1: "0", round2: "0" }), round2: val },
-                      }));
-                    }}
-                    onBlur={() => {
-                      const val = parseFloat(inputVals.round2);
-                      if (!isNaN(val) && val >= 0) {
-                        updateScore(team.id, 'round2', val);
-                      }
-                    }}
-                    placeholder="0"
-                    step="0.1"
-                    min="0"
-                  />
+                  {isEditing && editingRound === 'round2' ? (
+                    <input
+                      type="number"
+                      className="ranking-edit-input"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={handleEditSave}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                      step="0.1"
+                      min="0"
+                    />
+                  ) : (
+                    <strong 
+                      className="clickable-score"
+                      onClick={() => handleScoreClick(team.id, 'round2', roundScores.round2)}
+                      title="Click để chỉnh sửa"
+                    >
+                      {roundScores.round2}
+                    </strong>
+                  )}
                 </div>
 
+                {/* Vòng 3 - Chạm đỉnh (chỉ hiển thị, không chỉnh sửa) */}
                 <div className="ranking-score-item highlight">
                   <span>Chạm đỉnh</span>
                   <strong className="round3-score">{roundScores.round3}</strong>
                 </div>
 
+                {/* Tổng điểm */}
                 <div className="ranking-score-item total">
                   <span>Tổng điểm</span>
                   <strong>{total}</strong>
