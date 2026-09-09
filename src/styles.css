@@ -4562,7 +4562,7 @@ body:has(.finish-page) .ghost-button {
   color: #3A1F00;
 }
 
-/* Score Display - căn đều 3 cột */
+/* Score Display */
 .ranking-score-display {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -4621,7 +4621,6 @@ body:has(.finish-page) .ghost-button {
   align-items: center;
 }
 
-/* Fix input bị đen */
 .ranking-input {
   flex: 1;
   min-height: 36px;
@@ -4698,18 +4697,20 @@ body:has(.finish-page) .ghost-button {
   margin: 20px 0 30px;
 }
 
+/* Nút Xếp hạng – màu xanh lam */
 .ranking-calculate {
   min-width: 200px;
   min-height: 50px;
   font-size: 16px;
-  background: linear-gradient(135deg, #F8D800, #FF8E53) !important;
-  color: #3A1F00 !important;
-  border-color: rgba(248, 216, 0, 0.30) !important;
-  box-shadow: 0 4px 20px rgba(248, 216, 0, 0.30) !important;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8) !important;
+  color: #ffffff !important;
+  border-color: rgba(37, 99, 235, 0.30) !important;
+  box-shadow: 0 4px 20px rgba(37, 99, 235, 0.30) !important;
 }
 
 .ranking-calculate:hover:not(:disabled) {
-  box-shadow: 0 6px 28px rgba(248, 216, 0, 0.45) !important;
+  box-shadow: 0 6px 28px rgba(37, 99, 235, 0.50) !important;
+  transform: translateY(-2px);
 }
 
 /* Ranking Result */
@@ -4734,6 +4735,7 @@ body:has(.finish-page) .ghost-button {
   margin: 4px 0 0;
 }
 
+/* ===== Ranking Podium – Căn giữa ===== */
 .ranking-podium {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4745,6 +4747,8 @@ body:has(.finish-page) .ghost-button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   padding: 20px 16px;
   border: 2px solid;
   border-radius: 16px;
@@ -4772,12 +4776,14 @@ body:has(.finish-page) .ghost-button {
   font-size: 18px;
   font-weight: 900;
   margin: 6px 0 4px;
+  text-align: center;
 }
 
 .ranking-item-score {
   font-size: 28px;
   font-weight: 950;
   color: #3A1F00;
+  text-align: center;
 }
 
 /* Summary */
@@ -4797,6 +4803,7 @@ body:has(.finish-page) .ghost-button {
   background: rgba(253, 235, 113, 0.08);
   border-radius: 10px;
   border: 1px solid rgba(248, 216, 0, 0.08);
+  text-align: center;
 }
 
 .ranking-summary-item span {
