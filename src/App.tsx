@@ -59,10 +59,6 @@ export default function App() {
       objectFit: 'contain'
     }}
   />
-  {/* Nếu muốn giữ text bên cạnh */}
-  <span className="nav-subtitle" style={{ fontSize: '14px' }}>
-    🌻HÀNH TRÌNH 19 NĂM
-  </span>
 </div>
 
         <div className="nav-module-tabs">
