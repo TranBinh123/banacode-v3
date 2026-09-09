@@ -48,9 +48,9 @@ export default function App() {
     <div className="app-shell">
       <nav className="top-nav">
         <div>
-          <strong>ĐƯỜNG LÊN ĐỈNH OLYMPIA</strong>
+          <strong>THE BANA CODE</strong>
           <span className="nav-subtitle">
-            THE BANACODE • HÀNH TRÌNH 19 NĂM
+            🌻HÀNH TRÌNH 19 NĂM
           </span>
         </div>
 
@@ -59,28 +59,28 @@ export default function App() {
             className={module === "warmup" ? "nav-module active" : "nav-module"}
             onClick={() => handleModuleChange("warmup")}
           >
-            VÒNG 1
+            KHỞI ĐỘNG
           </button>
 
           <button
             className={module === "obstacle" ? "nav-module active" : "nav-module"}
             onClick={() => handleModuleChange("obstacle")}
           >
-            VÒNG 2
+            VƯỢT CHƯỚNG NGẠI VẬT
           </button>
 
           <button
             className={module === "acceleration" ? "nav-module active" : "nav-module"}
             onClick={() => handleModuleChange("acceleration")}
           >
-            VÒNG 3
+            TĂNG TỐC
           </button>
 
           <button
             className={module === "finish" ? "nav-module active" : "nav-module"}
             onClick={() => handleModuleChange("finish")}
           >
-            VÒNG 4
+            VỀ ĐÍCH
           </button>
 
           <button
