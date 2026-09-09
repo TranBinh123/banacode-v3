@@ -56,10 +56,10 @@ export default function App() {
     src={logo}
     alt="THE BANA CODE" 
     style={{
-      height: '100%',          /* CHIẾM 100% CHIỀU CAO NAV */
+      height: '100%',       
       width: 'auto',
       maxHeight: '100%',
-      objectFit: 'contain'
+      objectFit: 'scale-down'
     }}
   />
 </div>
