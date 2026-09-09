@@ -1,3 +1,4 @@
+import { Scoreboard } from "../../../components/Scoreboard";
 import { useState, useEffect } from "react";
 import { useFinishStore } from "../store/finishStore";
 import { useGameStore } from "../../../core/store/gameStore";
@@ -262,23 +263,33 @@ export function FinishPage() {
             </section>
           )}
 
-          <footer className="finish-public-footer">
-            <div className="finish-scoreboard">
-              {teams
-                .slice()
-                .sort((a, b) => b.totalScore - a.totalScore)
-                .map((team) => (
-                  <div key={team.id} className="finish-score-team">
-                    <span>{team.name}</span>
-                    <strong>{team.totalScore}</strong>
-                  </div>
-                ))}
-            </div>
-            <div className="finish-footer-brand">
-              <span>THE BANACODE</span>
-              <strong>HÀNH TRÌNH 19 NĂM</strong>
-            </div>
-          </footer>
+        <footer className="finish-public-footer">
+  {/* Scoreboard hiển thị bảng điểm đầy đủ */}
+  <div className="finish-scoreboard-wrapper">
+    <Scoreboard teams={teams} />
+  </div>
+
+  {/* Bảng điểm tóm tắt */}
+  <div className="finish-scoreboard">
+    {teams
+      .slice()
+      .sort((a, b) => b.totalScore - a.totalScore)
+      .map((team) => (
+        <div
+          key={team.id}
+          className={`finish-score-team ${team.id === finish.currentTeamId ? "active" : ""}`}
+        >
+          <span>{team.name}</span>
+          <strong>{team.totalScore}</strong>
+        </div>
+      ))}
+  </div>
+
+  <div className="finish-footer-brand">
+    <span>THE BANACODE</span>
+    <strong>HÀNH TRÌNH 19 NĂM</strong>
+  </div>
+</footer>
         </div>
       </section>
     );
