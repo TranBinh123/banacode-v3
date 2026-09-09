@@ -9,7 +9,7 @@ import { FinishPage } from "./modules/finish/pages/FinishPage";
 import { FinishAdmin } from "./admin/finish/FinishAdmin";
 import { RankingAdmin } from "./admin/ranking/RankingAdmin";
 import { useGameStore } from "./core/store/gameStore";
-import logo from "./TheBanacode_Logo-Photoroom.png"; // Hoặc đường dẫn chính xác
+const logo = require("./TheBanacode_Logo-Photoroom.png");
 type Module =
   | "warmup"
   | "obstacle"
