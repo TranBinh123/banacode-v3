@@ -15,7 +15,6 @@ const STORAGE_KEY = "olympia-ranking-scores";
 export function RankingAdmin() {
   const teams = useGameStore((state) => state.teams);
 
-  // Lưu điểm cho từng vòng của từng đội
   const [scores, setScores] = useState<Record<string, { round1: number; round2: number }>>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -51,7 +50,6 @@ export function RankingAdmin() {
   const [showRanking, setShowRanking] = useState(false);
   const [rankingTeams, setRankingTeams] = useState<TeamWithRank[]>([]);
 
-  // Cập nhật điểm cho một vòng của một đội
   const updateScore = (teamId: string, round: 'round1' | 'round2', value: number) => {
     const current = scores[teamId] || { round1: 0, round2: 0 };
     const newValue = Math.max(0, value);
@@ -73,7 +71,6 @@ export function RankingAdmin() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
-  // Reset điểm của một đội
   const resetScores = (teamId: string) => {
     const newScores = { ...scores };
     delete newScores[teamId];
@@ -86,17 +83,15 @@ export function RankingAdmin() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newScores));
   };
 
-  // Lấy tổng điểm của một đội (Vòng 1 + Vòng 2 + Vòng 3)
   const getTotalScore = (teamId: string): number => {
     const team = teams.find((t) => t.id === teamId);
     if (!team) return 0;
     const round1 = scores[teamId]?.round1 || 0;
     const round2 = scores[teamId]?.round2 || 0;
-    const round3 = team.totalScore; // Điểm thi hôm nay (Vòng 3 - Chạm đỉnh)
+    const round3 = team.totalScore;
     return round1 + round2 + round3;
   };
 
-  // Lấy điểm từng vòng
   const getRoundScores = (teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
     return {
@@ -106,7 +101,6 @@ export function RankingAdmin() {
     };
   };
 
-  // Xếp hạng
   const calculateRanking = () => {
     const ranked = teams
       .map((team) => ({
@@ -165,7 +159,7 @@ export function RankingAdmin() {
 
       <div className="ranking-grid">
         {teams.map((team) => {
-          const { round1, round2, round3 } = getRoundScores(team.id);
+          const roundScores = getRoundScores(team.id);
           const total = getTotalScore(team.id);
           const inputVals = inputValues[team.id] || { round1: "0", round2: "0" };
 
@@ -176,7 +170,6 @@ export function RankingAdmin() {
                 <span className="ranking-team-name">{team.name}</span>
               </div>
 
-              {/* 4 cột điểm số */}
               <div className="ranking-score-display">
                 <div className="ranking-score-item">
                   <span>Vòng 1<br/>Khám phá</span>
@@ -230,7 +223,7 @@ export function RankingAdmin() {
 
                 <div className="ranking-score-item highlight">
                   <span>Vòng 3<br/>Chạm đỉnh</span>
-                  <strong className="round3-score">{round3}</strong>
+                  <strong className="round3-score">{roundScores.round3}</strong>
                 </div>
 
                 <div className="ranking-score-item total">
