@@ -174,7 +174,6 @@ export function RankingAdmin() {
           return (
             <div key={team.id} className="ranking-team-card" style={{ borderTopColor: team.color }}>
               <div className="ranking-team-header">
-                <span className="ranking-team-color" style={{ background: team.color }} />
                 <span className="ranking-team-name">{team.name}</span>
               </div>
 
