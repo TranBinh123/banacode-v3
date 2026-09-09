@@ -4897,3 +4897,54 @@ body:has(.finish-page) .ghost-button {
     flex: 1;
   }
 }
+/* =========================================================
+   NAV – Logo
+   ========================================================= */
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 24px;
+  min-height: 72px;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.nav-logo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-nav {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    min-height: 60px;
+  }
+  .nav-logo {
+    height: 40px;
+  }
+  .nav-module-tabs {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-logo {
+    height: 32px;
+  }
+  .top-nav {
+    padding: 6px 12px;
+  }
+}
