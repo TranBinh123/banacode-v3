@@ -9,7 +9,7 @@ import { FinishPage } from "./modules/finish/pages/FinishPage";
 import { FinishAdmin } from "./admin/finish/FinishAdmin";
 import { RankingAdmin } from "./admin/ranking/RankingAdmin";
 import { useGameStore } from "./core/store/gameStore";
-
+import logo from "./TheBanacode_Logo-Photoroom.png"; // Hoặc đường dẫn chính xác
 type Module =
   | "warmup"
   | "obstacle"
@@ -49,7 +49,7 @@ export default function App() {
       <nav className="top-nav">
 <div className="nav-brand">
   <img 
-    src="src/TheBanacode_Logo-Photoroom.png"  // Đường dẫn đến file logo
+    src={logo}  // ← Dùng biến đã import
     alt="THE BANA CODE" 
     className="nav-logo"
   />
