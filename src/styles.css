@@ -4446,15 +4446,87 @@ body:has(.finish-page) .ghost-button {
   }
 }
 /* =========================================================
-   Ranking Admin
+   Ranking Admin – Hoàng hôn vàng trên mây
    ========================================================= */
 
 .ranking-admin {
+  position: relative;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 24px;
+  padding: 20px 24px 60px;
+  min-height: 100vh;
+  isolation: isolate;
+  overflow: hidden;
 }
 
+/* ===== Nền gradient ===== */
+.ranking-admin::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(180deg, #FDEB71 0%, #F8D800 30%, #FF8E53 70%, #FF6B6B 100%);
+  background-attachment: fixed;
+}
+
+/* ===== Hoa Tulip vàng kim tạo vòng nguyệt quế ===== */
+.ranking-background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ranking-flower-left,
+.ranking-flower-right,
+.ranking-flower-center {
+  position: absolute;
+  font-size: 120px;
+  opacity: 0.15;
+  color: #FFD700;
+  user-select: none;
+}
+
+.ranking-flower-left {
+  left: 5%;
+  top: 50%;
+  transform: translateY(-50%) rotate(-15deg);
+}
+
+.ranking-flower-right {
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%) rotate(15deg) scaleX(-1);
+}
+
+.ranking-flower-center {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(1.8);
+  opacity: 0.08;
+}
+
+/* ===== Header ===== */
+.ranking-header h1 {
+  color: #4A2800 !important;
+  text-shadow: 0 2px 8px rgba(253, 235, 113, 0.3);
+}
+
+.ranking-header .eyebrow {
+  color: #7A3B00 !important;
+}
+
+.ranking-header p {
+  color: #5A2D00 !important;
+  font-weight: 600;
+}
+
+.ranking-header p strong {
+  color: #8B4500;
+}
+
+/* ===== Grid Cards ===== */
 .ranking-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4463,19 +4535,22 @@ body:has(.finish-page) .ghost-button {
 }
 
 .ranking-team-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.20);
   border-top: 4px solid;
   border-radius: 16px;
   padding: 18px 16px 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  transition: transform 0.15s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(253, 235, 113, 0.10);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ranking-team-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(253, 235, 113, 0.15);
 }
 
+/* ===== Team Header ===== */
 .ranking-team-header {
   display: flex;
   align-items: center;
@@ -4493,41 +4568,79 @@ body:has(.finish-page) .ghost-button {
 .ranking-team-name {
   font-size: 15px;
   font-weight: 900;
-  color: #1A0A3A;
+  color: #3A1F00;
 }
 
+/* ===== Score Display ===== */
 .ranking-score-display {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 6px;
   margin-bottom: 12px;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(253, 235, 113, 0.12);
   border-radius: 10px;
+  border: 1px solid rgba(253, 235, 113, 0.15);
 }
 
-.ranking-score-display > div {
+.ranking-score-item {
   text-align: center;
 }
 
-.ranking-score-display span {
+.ranking-score-item span {
   display: block;
   font-size: 8px;
   font-weight: 800;
-  color: #8A7A6A;
+  color: #7A4A1A;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.ranking-score-display strong {
+.ranking-score-item strong {
   font-size: 22px;
   font-weight: 950;
-  color: #4E2E00;
+  color: #3A1F00;
 }
 
+.ranking-score-item .extra-points {
+  color: #D4760A;
+}
+
+.ranking-score-item.total strong {
+  color: #8B4500;
+  font-size: 26px;
+}
+
+/* ===== Controls ===== */
 .ranking-controls {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ranking-input-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ranking-input {
+  flex: 1;
+  min-height: 36px;
+  padding: 4px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.80);
+  color: #3A1F00;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ranking-input:focus {
+  border-color: #F8D800;
+  box-shadow: 0 0 0 3px rgba(248, 216, 0, 0.15);
 }
 
 .ranking-extra-controls {
@@ -4535,54 +4648,67 @@ body:has(.finish-page) .ghost-button {
   gap: 6px;
 }
 
-.ranking-extra-btn {
+.ranking-btn {
   min-width: 44px;
   height: 36px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
   font-weight: 900;
   font-size: 13px;
   transition: all 0.12s ease;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.60);
+  background: rgba(255, 255, 255, 0.70);
 }
 
-.ranking-extra-btn:hover:not(:disabled) {
+.ranking-btn:hover:not(:disabled) {
   transform: translateY(-1px);
 }
 
-.ranking-extra-btn:disabled {
+.ranking-btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 
-.ranking-extra-btn.minus {
+.ranking-btn.set {
+  min-width: 70px;
+  background: #F8D800;
+  color: #3A1F00;
+  border-color: #F8D800;
+  font-size: 11px;
+}
+
+.ranking-btn.set:hover:not(:disabled) {
+  background: #E8C800;
+}
+
+.ranking-btn.minus {
   color: #C62828;
   border-color: rgba(239, 83, 80, 0.20);
 }
 
-.ranking-extra-btn.minus:hover:not(:disabled) {
+.ranking-btn.minus:hover:not(:disabled) {
   background: rgba(239, 83, 80, 0.08);
 }
 
-.ranking-extra-btn.plus {
+.ranking-btn.plus {
   color: #2E7D32;
   border-color: rgba(76, 175, 80, 0.20);
 }
 
-.ranking-extra-btn.plus:hover:not(:disabled) {
+.ranking-btn.plus:hover:not(:disabled) {
   background: rgba(76, 175, 80, 0.08);
 }
 
-.ranking-extra-btn.reset {
-  color: #8A7A6A;
+.ranking-btn.reset {
+  color: #7A4A1A;
   font-size: 10px;
 }
 
-.ranking-extra-btn.reset:hover:not(:disabled) {
+.ranking-btn.reset:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.05);
 }
 
+/* ===== Actions ===== */
 .ranking-actions {
   display: flex;
   gap: 12px;
@@ -4594,15 +4720,24 @@ body:has(.finish-page) .ghost-button {
   min-width: 200px;
   min-height: 50px;
   font-size: 16px;
+  background: linear-gradient(135deg, #F8D800, #FF8E53) !important;
+  color: #3A1F00 !important;
+  border-color: rgba(248, 216, 0, 0.30) !important;
+  box-shadow: 0 4px 20px rgba(248, 216, 0, 0.30) !important;
+}
+
+.ranking-calculate:hover:not(:disabled) {
+  box-shadow: 0 6px 28px rgba(248, 216, 0, 0.45) !important;
 }
 
 /* ===== Ranking Result ===== */
 .ranking-result {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(12px);
   border-radius: 20px;
   padding: 28px 24px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(248, 216, 0, 0.20);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08), 0 0 60px rgba(253, 235, 113, 0.08);
   animation: rankingFadeIn 0.4s ease;
 }
 
@@ -4613,7 +4748,7 @@ body:has(.finish-page) .ghost-button {
 
 .ranking-result-header h2 {
   font-size: 32px;
-  color: #4E2E00;
+  color: #3A1F00;
   margin: 4px 0 0;
 }
 
@@ -4648,7 +4783,7 @@ body:has(.finish-page) .ghost-button {
 .ranking-item-rank {
   font-size: 14px;
   font-weight: 800;
-  color: #8A7A6A;
+  color: #7A4A1A;
 }
 
 .ranking-item-name {
@@ -4660,15 +4795,16 @@ body:has(.finish-page) .ghost-button {
 .ranking-item-score {
   font-size: 28px;
   font-weight: 950;
-  color: #4E2E00;
+  color: #3A1F00;
 }
 
+/* ===== Summary ===== */
 .ranking-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-top: 1px solid rgba(248, 216, 0, 0.15);
 }
 
 .ranking-summary-item {
@@ -4676,19 +4812,33 @@ body:has(.finish-page) .ghost-button {
   flex-direction: column;
   align-items: center;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(253, 235, 113, 0.08);
   border-radius: 10px;
+  border: 1px solid rgba(248, 216, 0, 0.08);
 }
 
 .ranking-summary-item span {
   font-size: 11px;
-  color: #8A7A6A;
+  color: #7A4A1A;
 }
 
 .ranking-summary-item strong {
   font-size: 16px;
   font-weight: 900;
-  color: #4E2E00;
+  color: #3A1F00;
+}
+
+.ranking-summary-item.gold strong {
+  color: #D4760A;
+}
+.ranking-summary-item.silver strong {
+  color: #8A8A8A;
+}
+.ranking-summary-item.bronze strong {
+  color: #CD7F32;
+}
+.ranking-summary-item.fourth strong {
+  color: #5A7A8A;
 }
 
 /* ===== Animations ===== */
@@ -4743,5 +4893,12 @@ body:has(.finish-page) .ghost-button {
   .ranking-actions {
     flex-direction: column;
     align-items: center;
+  }
+  .ranking-flower-left,
+  .ranking-flower-right {
+    font-size: 60px;
+  }
+  .ranking-flower-center {
+    font-size: 80px;
   }
 }
