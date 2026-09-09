@@ -52,7 +52,17 @@ export default function App() {
     src={logo}
     alt="THE BANA CODE" 
     className="nav-logo"
+    style={{
+      height: '35px',
+      width: 'auto',
+      maxHeight: '35px',
+      objectFit: 'contain'
+    }}
   />
+  {/* Nếu muốn giữ text bên cạnh */}
+  <span className="nav-subtitle" style={{ fontSize: '14px' }}>
+    🌻HÀNH TRÌNH 19 NĂM
+  </span>
 </div>
 
         <div className="nav-module-tabs">
