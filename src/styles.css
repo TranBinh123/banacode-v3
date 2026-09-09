@@ -5547,3 +5547,111 @@ body:has(.finish-page) .ghost-button {
     min-height: auto;
   }
 }
+/* =========================================================
+   Ranking Admin – Input vừa đủ, tên đội căn giữa
+   ========================================================= */
+
+/* Team Header - căn giữa */
+.ranking-team-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.ranking-team-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ranking-team-name {
+  font-size: 22px;
+  font-weight: 900;
+  color: #3A1F00;
+  text-align: center;
+}
+
+/* Input - vừa đủ để hiển thị chữ */
+.ranking-score-input {
+  width: 100%;
+  max-width: 140px;
+  min-height: 50px;
+  padding: 6px 10px;
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  background: #ffffff !important;
+  color: #1A0A3A !important;
+  outline: none;
+  transition: border-color 0.15s ease;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.ranking-score-input:focus {
+  border-color: #F8D800;
+  box-shadow: 0 0 0 4px rgba(248, 216, 0, 0.15);
+}
+
+/* Điểm số hiển thị */
+.ranking-score-item strong {
+  font-size: 24px;
+  font-weight: 950;
+  color: #3A1F00;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+
+.ranking-score-item .round3-score {
+  color: #D4760A;
+  font-size: 24px;
+}
+
+.ranking-score-item.total strong {
+  color: #8B4500;
+  font-size: 32px;
+}
+
+/* Responsive - trên màn hình nhỏ */
+@media (max-width: 1024px) {
+  .ranking-score-input {
+    max-width: 110px;
+    font-size: 18px;
+    min-height: 44px;
+  }
+  .ranking-score-item strong {
+    font-size: 20px;
+    min-height: 44px;
+  }
+  .ranking-score-item.total strong {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ranking-score-input {
+    max-width: 100%;
+    font-size: 18px;
+    min-height: 44px;
+  }
+  .ranking-score-item strong {
+    font-size: 18px;
+    min-height: 44px;
+  }
+  .ranking-score-item.total strong {
+    font-size: 24px;
+  }
+  .ranking-team-name {
+    font-size: 18px;
+  }
+}
