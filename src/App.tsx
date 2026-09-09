@@ -47,12 +47,13 @@ export default function App() {
   return (
     <div className="app-shell">
       <nav className="top-nav">
-        <div>
-          <strong>THE BANA CODE</strong>
-          <span className="nav-subtitle">
-            🌻HÀNH TRÌNH 19 NĂM
-          </span>
-        </div>
+<div className="nav-brand">
+  <img 
+    src="src/TheBanacode_Logo-Photoroom.png"  // Đường dẫn đến file logo
+    alt="THE BANA CODE" 
+    className="nav-logo"
+  />
+</div>
 
         <div className="nav-module-tabs">
           <button
