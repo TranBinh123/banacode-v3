@@ -10,7 +10,6 @@ type TeamWithRank = {
   medal: string;
 };
 
-// Lưu trữ điểm cộng dồn thủ công từ các ngày trước
 const STORAGE_KEY = "olympia-ranking-extra-points";
 
 export function RankingAdmin() {
@@ -29,30 +28,58 @@ export function RankingAdmin() {
 
   const [showRanking, setShowRanking] = useState(false);
   const [rankingTeams, setRankingTeams] = useState<TeamWithRank[]>([]);
+  const [inputValues, setInputValues] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const initial: Record<string, string> = {};
+        Object.keys(parsed).forEach((key) => {
+          initial[key] = parsed[key].toString();
+        });
+        return initial;
+      } catch {
+        return {};
+      }
+    }
+    return {};
+  });
 
-  // Cập nhật điểm cộng thêm cho một đội
   const updateExtraPoints = (teamId: string, points: number) => {
-    const newExtra = { ...extraPoints, [teamId]: Math.max(0, (extraPoints[teamId] || 0) + points) };
+    const current = extraPoints[teamId] || 0;
+    const newValue = Math.max(0, current + points);
+    const newExtra = { ...extraPoints, [teamId]: newValue };
     setExtraPoints(newExtra);
+    setInputValues((prev) => ({ ...prev, [teamId]: newValue.toString() }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
   };
 
-  // Reset điểm cộng thêm của một đội
+  const setExtraPointsDirect = (teamId: string, value: number) => {
+    const newValue = Math.max(0, value);
+    const newExtra = { ...extraPoints, [teamId]: newValue };
+    setExtraPoints(newExtra);
+    setInputValues((prev) => ({ ...prev, [teamId]: newValue.toString() }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
+  };
+
   const resetExtraPoints = (teamId: string) => {
     const newExtra = { ...extraPoints };
     delete newExtra[teamId];
     setExtraPoints(newExtra);
+    setInputValues((prev) => {
+      const newInput = { ...prev };
+      delete newInput[teamId];
+      return newInput;
+    });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
   };
 
-  // Tính tổng điểm (điểm hiện tại + điểm cộng thêm)
   const getTotalScoreWithExtra = (teamId: string): number => {
     const team = teams.find((t) => t.id === teamId);
     if (!team) return 0;
     return team.totalScore + (extraPoints[teamId] || 0);
   };
 
-  // Xếp hạng
   const calculateRanking = () => {
     const ranked = teams
       .map((team) => ({
@@ -72,13 +99,11 @@ export function RankingAdmin() {
     setShowRanking(true);
   };
 
-  // Reset ranking
   const resetRanking = () => {
     setShowRanking(false);
     setRankingTeams([]);
   };
 
-  // Medal colors
   const getMedalColor = (rank: number) => {
     switch (rank) {
       case 1:
@@ -94,13 +119,20 @@ export function RankingAdmin() {
 
   return (
     <main className="admin-page ranking-admin">
-      <header className="admin-header">
+      <div className="ranking-background">
+        {/* Hoa Tulip vàng kim tạo vòng nguyệt quế */}
+        <div className="ranking-flower-left">🌷</div>
+        <div className="ranking-flower-right">🌷</div>
+        <div className="ranking-flower-center">🌷</div>
+      </div>
+
+      <header className="admin-header ranking-header">
         <div>
-          <div className="eyebrow">ADMIN • TỔNG HỢP ĐIỂM</div>
+          <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
           <p>
             Cộng dồn điểm thủ công từ các ngày thi trước (Ngày 1, Ngày 2,...) để tính tổng điểm xếp hạng.
-            Sau khi cộng đủ, bấm "Xếp hạng" để hiển thị kết quả.
+            Sau khi cộng đủ, bấm <strong>"Xếp hạng"</strong> để hiển thị kết quả.
           </p>
         </div>
       </header>
@@ -109,6 +141,7 @@ export function RankingAdmin() {
         {teams.map((team) => {
           const extra = extraPoints[team.id] || 0;
           const total = getTotalScoreWithExtra(team.id);
+          const inputValue = inputValues[team.id] || extra.toString();
 
           return (
             <div key={team.id} className="ranking-team-card" style={{ borderTopColor: team.color }}>
@@ -118,37 +151,62 @@ export function RankingAdmin() {
               </div>
 
               <div className="ranking-score-display">
-                <div className="ranking-current-score">
+                <div className="ranking-score-item">
                   <span>Điểm hôm nay</span>
                   <strong>{team.totalScore}</strong>
                 </div>
-                <div className="ranking-extra-score">
+                <div className="ranking-score-item">
                   <span>Điểm cộng thêm</span>
-                  <strong>{extra}</strong>
+                  <strong className="extra-points">{extra}</strong>
                 </div>
-                <div className="ranking-total-score">
+                <div className="ranking-score-item total">
                   <span>Tổng điểm</span>
                   <strong>{total}</strong>
                 </div>
               </div>
 
               <div className="ranking-controls">
+                <div className="ranking-input-group">
+                  <input
+                    type="number"
+                    className="ranking-input"
+                    value={inputValue}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setInputValues((prev) => ({ ...prev, [team.id]: val }));
+                    }}
+                    placeholder="Nhập điểm"
+                    step="0.5"
+                    min="0"
+                  />
+                  <button
+                    className="ranking-btn set"
+                    onClick={() => {
+                      const val = parseFloat(inputValue);
+                      if (!isNaN(val) && val >= 0) {
+                        setExtraPointsDirect(team.id, val);
+                      }
+                    }}
+                  >
+                    Cập nhật
+                  </button>
+                </div>
                 <div className="ranking-extra-controls">
                   <button
-                    className="ranking-extra-btn minus"
-                    onClick={() => updateExtraPoints(team.id, -10)}
-                    disabled={extra < 10}
+                    className="ranking-btn minus"
+                    onClick={() => updateExtraPoints(team.id, -1)}
+                    disabled={extra < 1}
                   >
-                    −10
+                    −1
                   </button>
                   <button
-                    className="ranking-extra-btn plus"
-                    onClick={() => updateExtraPoints(team.id, 10)}
+                    className="ranking-btn plus"
+                    onClick={() => updateExtraPoints(team.id, 1)}
                   >
-                    +10
+                    +1
                   </button>
                   <button
-                    className="ranking-extra-btn reset"
+                    className="ranking-btn reset"
                     onClick={() => resetExtraPoints(team.id)}
                     disabled={extra === 0}
                   >
@@ -174,7 +232,7 @@ export function RankingAdmin() {
         <div className="ranking-result">
           <div className="ranking-result-header">
             <div className="eyebrow">KẾT QUẢ CHUNG CUỘC</div>
-            <h2>BẢNG XẾP HẠNG</h2>
+            <h2>🏆 BẢNG XẾP HẠNG</h2>
           </div>
 
           <div className="ranking-podium">
@@ -198,23 +256,23 @@ export function RankingAdmin() {
           </div>
 
           <div className="ranking-summary">
-            <div className="ranking-summary-item">
-              <span>🥇 Nhất:</span>
+            <div className="ranking-summary-item gold">
+              <span>🥇 Nhất</span>
               <strong>{rankingTeams[0]?.name}</strong>
               <span>{rankingTeams[0]?.totalScore} điểm</span>
             </div>
-            <div className="ranking-summary-item">
-              <span>🥈 Nhì:</span>
+            <div className="ranking-summary-item silver">
+              <span>🥈 Nhì</span>
               <strong>{rankingTeams[1]?.name}</strong>
               <span>{rankingTeams[1]?.totalScore} điểm</span>
             </div>
-            <div className="ranking-summary-item">
-              <span>🥉 Ba:</span>
+            <div className="ranking-summary-item bronze">
+              <span>🥉 Ba</span>
               <strong>{rankingTeams[2]?.name}</strong>
               <span>{rankingTeams[2]?.totalScore} điểm</span>
             </div>
-            <div className="ranking-summary-item">
-              <span>🎖️ Khuyến khích:</span>
+            <div className="ranking-summary-item fourth">
+              <span>🎖️ Khuyến khích</span>
               <strong>{rankingTeams[3]?.name}</strong>
               <span>{rankingTeams[3]?.totalScore} điểm</span>
             </div>
