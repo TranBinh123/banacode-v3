@@ -47,15 +47,18 @@ export default function App() {
   return (
     <div className="app-shell">
       <nav className="top-nav">
-<div className="nav-brand">
+<div className="nav-brand" style={{
+  display: 'flex',
+  alignItems: 'center',
+  height: '100%'              /* Chiếm full chiều cao nav */
+}}>
   <img 
     src={logo}
     alt="THE BANA CODE" 
-    className="nav-logo"
     style={{
-      height: '35px',
+      height: '100%',          /* CHIẾM 100% CHIỀU CAO NAV */
       width: 'auto',
-      maxHeight: '35px',
+      maxHeight: '100%',
       objectFit: 'contain'
     }}
   />
