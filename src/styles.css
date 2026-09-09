@@ -4459,7 +4459,7 @@ body:has(.finish-page) .ghost-button {
   overflow: hidden;
 }
 
-/* ===== Nền gradient ===== */
+/* Nền gradient */
 .ranking-admin::before {
   content: "";
   position: fixed;
@@ -4469,7 +4469,7 @@ body:has(.finish-page) .ghost-button {
   background-attachment: fixed;
 }
 
-/* ===== Hoa Tulip vàng kim tạo vòng nguyệt quế ===== */
+/* Hoa Tulip vàng kim */
 .ranking-background {
   position: fixed;
   inset: 0;
@@ -4507,7 +4507,7 @@ body:has(.finish-page) .ghost-button {
   opacity: 0.08;
 }
 
-/* ===== Header ===== */
+/* Header */
 .ranking-header h1 {
   color: #4A2800 !important;
   text-shadow: 0 2px 8px rgba(253, 235, 113, 0.3);
@@ -4517,16 +4517,7 @@ body:has(.finish-page) .ghost-button {
   color: #7A3B00 !important;
 }
 
-.ranking-header p {
-  color: #5A2D00 !important;
-  font-weight: 600;
-}
-
-.ranking-header p strong {
-  color: #8B4500;
-}
-
-/* ===== Grid Cards ===== */
+/* Grid Cards */
 .ranking-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4550,7 +4541,7 @@ body:has(.finish-page) .ghost-button {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(253, 235, 113, 0.15);
 }
 
-/* ===== Team Header ===== */
+/* Team Header */
 .ranking-team-header {
   display: flex;
   align-items: center;
@@ -4571,7 +4562,7 @@ body:has(.finish-page) .ghost-button {
   color: #3A1F00;
 }
 
-/* ===== Score Display ===== */
+/* Score Display - căn đều 3 cột */
 .ranking-score-display {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -4581,10 +4572,15 @@ body:has(.finish-page) .ghost-button {
   background: rgba(253, 235, 113, 0.12);
   border-radius: 10px;
   border: 1px solid rgba(253, 235, 113, 0.15);
+  align-items: stretch;
 }
 
 .ranking-score-item {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0;
 }
 
 .ranking-score-item span {
@@ -4594,6 +4590,7 @@ body:has(.finish-page) .ghost-button {
   color: #7A4A1A;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin-bottom: 2px;
 }
 
 .ranking-score-item strong {
@@ -4611,7 +4608,7 @@ body:has(.finish-page) .ghost-button {
   font-size: 26px;
 }
 
-/* ===== Controls ===== */
+/* Controls */
 .ranking-controls {
   display: flex;
   flex-direction: column;
@@ -4624,6 +4621,7 @@ body:has(.finish-page) .ghost-button {
   align-items: center;
 }
 
+/* Fix input bị đen */
 .ranking-input {
   flex: 1;
   min-height: 36px;
@@ -4632,8 +4630,8 @@ body:has(.finish-page) .ghost-button {
   border-radius: 8px;
   font-size: 13px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.80);
-  color: #3A1F00;
+  background: #ffffff !important;
+  color: #1A0A3A !important;
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -4641,11 +4639,12 @@ body:has(.finish-page) .ghost-button {
 .ranking-input:focus {
   border-color: #F8D800;
   box-shadow: 0 0 0 3px rgba(248, 216, 0, 0.15);
+  background: #ffffff !important;
+  color: #1A0A3A !important;
 }
 
-.ranking-extra-controls {
-  display: flex;
-  gap: 6px;
+.ranking-input::placeholder {
+  color: #999;
 }
 
 .ranking-btn {
@@ -4681,25 +4680,8 @@ body:has(.finish-page) .ghost-button {
   background: #E8C800;
 }
 
-.ranking-btn.minus {
-  color: #C62828;
-  border-color: rgba(239, 83, 80, 0.20);
-}
-
-.ranking-btn.minus:hover:not(:disabled) {
-  background: rgba(239, 83, 80, 0.08);
-}
-
-.ranking-btn.plus {
-  color: #2E7D32;
-  border-color: rgba(76, 175, 80, 0.20);
-}
-
-.ranking-btn.plus:hover:not(:disabled) {
-  background: rgba(76, 175, 80, 0.08);
-}
-
 .ranking-btn.reset {
+  min-width: 60px;
   color: #7A4A1A;
   font-size: 10px;
 }
@@ -4708,7 +4690,7 @@ body:has(.finish-page) .ghost-button {
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* ===== Actions ===== */
+/* Actions */
 .ranking-actions {
   display: flex;
   gap: 12px;
@@ -4730,7 +4712,7 @@ body:has(.finish-page) .ghost-button {
   box-shadow: 0 6px 28px rgba(248, 216, 0, 0.45) !important;
 }
 
-/* ===== Ranking Result ===== */
+/* Ranking Result */
 .ranking-result {
   background: rgba(255, 255, 255, 0.90);
   backdrop-filter: blur(12px);
@@ -4798,7 +4780,7 @@ body:has(.finish-page) .ghost-button {
   color: #3A1F00;
 }
 
-/* ===== Summary ===== */
+/* Summary */
 .ranking-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -4841,7 +4823,7 @@ body:has(.finish-page) .ghost-button {
   color: #5A7A8A;
 }
 
-/* ===== Animations ===== */
+/* Animations */
 @keyframes rankingFadeIn {
   from {
     opacity: 0;
@@ -4864,7 +4846,7 @@ body:has(.finish-page) .ghost-button {
   }
 }
 
-/* ===== Responsive ===== */
+/* Responsive */
 @media (max-width: 1024px) {
   .ranking-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -4900,5 +4882,11 @@ body:has(.finish-page) .ghost-button {
   }
   .ranking-flower-center {
     font-size: 80px;
+  }
+  .ranking-input-group {
+    flex-wrap: wrap;
+  }
+  .ranking-btn.set {
+    flex: 1;
   }
 }
