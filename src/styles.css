@@ -4948,3 +4948,142 @@ body:has(.finish-page) .ghost-button {
     padding: 6px 12px;
   }
 }
+/* =========================================================
+   Ranking Admin – Cập nhật 4 cột điểm
+   ========================================================= */
+
+/* Score Display - 4 cột */
+.ranking-score-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: rgba(253, 235, 113, 0.12);
+  border-radius: 10px;
+  border: 1px solid rgba(253, 235, 113, 0.15);
+  align-items: stretch;
+}
+
+.ranking-score-item {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 2px;
+}
+
+.ranking-score-item span {
+  display: block;
+  font-size: 8px;
+  font-weight: 800;
+  color: #7A4A1A;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.ranking-score-item span br {
+  display: none;
+}
+
+/* Input trong cột điểm */
+.ranking-score-input {
+  width: 100%;
+  max-width: 80px;
+  min-height: 32px;
+  padding: 2px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  background: #ffffff !important;
+  color: #1A0A3A !important;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ranking-score-input:focus {
+  border-color: #F8D800;
+  box-shadow: 0 0 0 3px rgba(248, 216, 0, 0.15);
+}
+
+.ranking-score-item strong {
+  font-size: 20px;
+  font-weight: 950;
+  color: #3A1F00;
+}
+
+.ranking-score-item .round3-score {
+  color: #D4760A;
+  font-size: 20px;
+}
+
+.ranking-score-item.total strong {
+  color: #8B4500;
+  font-size: 24px;
+}
+
+.ranking-score-item.highlight {
+  background: rgba(253, 235, 113, 0.15);
+  border-radius: 6px;
+}
+
+/* Controls - chỉ còn nút Reset */
+.ranking-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.ranking-btn.reset {
+  min-width: 100px;
+  padding: 6px 16px;
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  transition: all 0.12s ease;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.70);
+  color: #7A4A1A;
+}
+
+.ranking-btn.reset:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.ranking-btn.reset:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ranking-score-display {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ranking-score-item span br {
+    display: inline;
+  }
+}
+
+@media (max-width: 600px) {
+  .ranking-score-display {
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .ranking-score-input {
+    max-width: 60px;
+    font-size: 14px;
+  }
+  .ranking-score-item strong {
+    font-size: 16px;
+  }
+  .ranking-score-item.total strong {
+    font-size: 18px;
+  }
+}
