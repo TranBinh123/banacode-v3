@@ -5655,3 +5655,66 @@ body:has(.finish-page) .ghost-button {
     font-size: 18px;
   }
 }
+/* =========================================================
+   Ranking Admin – Style cho edit input
+   ========================================================= */
+
+.ranking-edit-input {
+  width: 100%;
+  max-width: 120px;
+  min-height: 46px;
+  padding: 4px 8px;
+  border: 3px solid #F8D800;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+  background: #ffffff !important;
+  color: #1A0A3A !important;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(248, 216, 0, 0.15);
+  margin-top: auto;
+  animation: editInputPulse 0.3s ease;
+}
+
+.ranking-edit-input::-webkit-inner-spin-button,
+.ranking-edit-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ranking-edit-input {
+  -moz-appearance: textfield;
+}
+
+@keyframes editInputPulse {
+  from {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Clickable score - hiệu ứng hover */
+.clickable-score {
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+  padding: 4px 12px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  min-width: 60px;
+}
+
+.clickable-score:hover {
+  background: rgba(248, 216, 0, 0.20);
+  transform: scale(1.05);
+}
+
+.clickable-score:active {
+  transform: scale(0.95);
+}
