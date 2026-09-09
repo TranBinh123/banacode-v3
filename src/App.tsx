@@ -7,7 +7,7 @@ import { AccelerationPage } from "./modules/acceleration/pages/AccelerationPage"
 import { AccelerationAdmin } from "./admin/acceleration/AccelerationAdmin";
 import { FinishPage } from "./modules/finish/pages/FinishPage";
 import { FinishAdmin } from "./admin/finish/FinishAdmin";
-import { RankingAdmin } from "./admin/ranking/RankingAdmin"; // <-- THÊM IMPORT
+import { RankingAdmin } from "./admin/ranking/RankingAdmin";
 import { useGameStore } from "./core/store/gameStore";
 
 type Module =
@@ -15,35 +15,23 @@ type Module =
   | "obstacle"
   | "acceleration"
   | "finish"
-  | "ranking"; // <-- THÊM "ranking"
+  | "ranking";
 
 export default function App() {
-  const [module, setModule] =
-    useState<Module>("warmup");
-
+  const [module, setModule] = useState<Module>("warmup");
   const [admin, setAdmin] = useState(false);
 
-  const teams = useGameStore(
-    (state) => state.teams,
-  );
+  const teams = useGameStore((state) => state.teams);
 
-  const isObstacle =
-    module === "obstacle";
+  const isObstacle = module === "obstacle";
+  const isAcceleration = module === "acceleration";
+  const isFinish = module === "finish";
+  const isRanking = module === "ranking";
 
-  const isAcceleration =
-    module === "acceleration";
-
-  const isFinish =
-    module === "finish";
-
-  const isRanking =
-    module === "ranking"; // <-- THÊM
-
-  const handleModuleChange = (
-    nextModule: Module,
-  ) => {
+  const handleModuleChange = (nextModule: Module) => {
     setModule(nextModule);
-    setAdmin(true); // Luôn chuyển sang admin khi chọn module mới
+    // QUAN TRỌNG: Khi chuyển module, luôn về màn hình chơi (admin = false)
+    setAdmin(false);
   };
 
   const adminLabel = isFinish
@@ -60,10 +48,7 @@ export default function App() {
     <div className="app-shell">
       <nav className="top-nav">
         <div>
-          <strong>
-            ĐƯỜNG LÊN ĐỈNH OLYMPIA
-          </strong>
-
+          <strong>ĐƯỜNG LÊN ĐỈNH OLYMPIA</strong>
           <span className="nav-subtitle">
             THE BANACODE • HÀNH TRÌNH 19 NĂM
           </span>
@@ -71,78 +56,43 @@ export default function App() {
 
         <div className="nav-module-tabs">
           <button
-            className={
-              module === "warmup"
-                ? "nav-module active"
-                : "nav-module"
-            }
-            onClick={() =>
-              handleModuleChange("warmup")
-            }
+            className={module === "warmup" ? "nav-module active" : "nav-module"}
+            onClick={() => handleModuleChange("warmup")}
           >
             VÒNG 1
           </button>
 
           <button
-            className={
-              module === "obstacle"
-                ? "nav-module active"
-                : "nav-module"
-            }
-            onClick={() =>
-              handleModuleChange("obstacle")
-            }
+            className={module === "obstacle" ? "nav-module active" : "nav-module"}
+            onClick={() => handleModuleChange("obstacle")}
           >
             VÒNG 2
           </button>
 
           <button
-            className={
-              module === "acceleration"
-                ? "nav-module active"
-                : "nav-module"
-            }
-            onClick={() =>
-              handleModuleChange(
-                "acceleration",
-              )
-            }
+            className={module === "acceleration" ? "nav-module active" : "nav-module"}
+            onClick={() => handleModuleChange("acceleration")}
           >
             VÒNG 3
           </button>
 
           <button
-            className={
-              module === "finish"
-                ? "nav-module active"
-                : "nav-module"
-            }
-            onClick={() =>
-              handleModuleChange("finish")
-            }
+            className={module === "finish" ? "nav-module active" : "nav-module"}
+            onClick={() => handleModuleChange("finish")}
           >
             VÒNG 4
           </button>
 
-          {/* <-- THÊM NÚT XẾP HẠNG */}
           <button
-            className={
-              module === "ranking"
-                ? "nav-module active"
-                : "nav-module"
-            }
-            onClick={() =>
-              handleModuleChange("ranking")
-            }
+            className={module === "ranking" ? "nav-module active" : "nav-module"}
+            onClick={() => handleModuleChange("ranking")}
           >
             🏆 XẾP HẠNG
           </button>
 
           <button
             className="ghost-button"
-            onClick={() =>
-              setAdmin((value) => !value)
-            }
+            onClick={() => setAdmin((value) => !value)}
           >
             {admin
               ? "← Màn hình chơi"
@@ -152,7 +102,7 @@ export default function App() {
       </nav>
 
       {admin ? (
-        isRanking ? ( // <-- THÊM ĐIỀU KIỆN RANKING
+        isRanking ? (
           <RankingAdmin />
         ) : isFinish ? (
           <FinishAdmin />
@@ -163,6 +113,9 @@ export default function App() {
         ) : (
           <WarmupAdmin />
         )
+      ) : isRanking ? (
+        // Ranking không có màn hình chơi, chỉ có admin
+        <RankingAdmin />
       ) : isFinish ? (
         <FinishPage />
       ) : isAcceleration ? (
