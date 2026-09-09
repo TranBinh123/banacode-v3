@@ -112,8 +112,8 @@ export function RankingAdmin() {
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
         <div className="ranking-flower-left">🌷</div>
-        <div className="ranking-flower-right">🌷</div>
-        <div className="ranking-flower-center">🌷</div>
+        <div className="ranking-flower-right">🚡</div>
+        <div className="ranking-flower-center">🌻</div>
       </div>
 
       <header className="admin-header ranking-header">
@@ -224,29 +224,6 @@ export function RankingAdmin() {
                 <div className="ranking-item-score">{team.totalScore}</div>
               </div>
             ))}
-          </div>
-
-          <div className="ranking-summary">
-            <div className="ranking-summary-item gold">
-              <span>🥇 Nhất</span>
-              <strong>{rankingTeams[0]?.name}</strong>
-              <span>{rankingTeams[0]?.totalScore} điểm</span>
-            </div>
-            <div className="ranking-summary-item silver">
-              <span>🥈 Nhì</span>
-              <strong>{rankingTeams[1]?.name}</strong>
-              <span>{rankingTeams[1]?.totalScore} điểm</span>
-            </div>
-            <div className="ranking-summary-item bronze">
-              <span>🥉 Ba</span>
-              <strong>{rankingTeams[2]?.name}</strong>
-              <span>{rankingTeams[2]?.totalScore} điểm</span>
-            </div>
-            <div className="ranking-summary-item fourth">
-              <span>🎖️ Khuyến khích</span>
-              <strong>{rankingTeams[3]?.name}</strong>
-              <span>{rankingTeams[3]?.totalScore} điểm</span>
-            </div>
           </div>
         </div>
       )}
