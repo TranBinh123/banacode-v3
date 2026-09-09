@@ -45,15 +45,6 @@ export function RankingAdmin() {
     return {};
   });
 
-  const updateExtraPoints = (teamId: string, points: number) => {
-    const current = extraPoints[teamId] || 0;
-    const newValue = Math.max(0, current + points);
-    const newExtra = { ...extraPoints, [teamId]: newValue };
-    setExtraPoints(newExtra);
-    setInputValues((prev) => ({ ...prev, [teamId]: newValue.toString() }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newExtra));
-  };
-
   const setExtraPointsDirect = (teamId: string, value: number) => {
     const newValue = Math.max(0, value);
     const newExtra = { ...extraPoints, [teamId]: newValue };
@@ -120,7 +111,6 @@ export function RankingAdmin() {
   return (
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
-        {/* Hoa Tulip vàng kim tạo vòng nguyệt quế */}
         <div className="ranking-flower-left">🌷</div>
         <div className="ranking-flower-right">🌷</div>
         <div className="ranking-flower-center">🌷</div>
@@ -130,10 +120,6 @@ export function RankingAdmin() {
         <div>
           <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
-          <p>
-            Cộng dồn điểm thủ công từ các ngày thi trước (Ngày 1, Ngày 2,...) để tính tổng điểm xếp hạng.
-            Sau khi cộng đủ, bấm <strong>"Xếp hạng"</strong> để hiển thị kết quả.
-          </p>
         </div>
       </header>
 
@@ -189,21 +175,6 @@ export function RankingAdmin() {
                     }}
                   >
                     Cập nhật
-                  </button>
-                </div>
-                <div className="ranking-extra-controls">
-                  <button
-                    className="ranking-btn minus"
-                    onClick={() => updateExtraPoints(team.id, -1)}
-                    disabled={extra < 1}
-                  >
-                    −1
-                  </button>
-                  <button
-                    className="ranking-btn plus"
-                    onClick={() => updateExtraPoints(team.id, 1)}
-                  >
-                    +1
                   </button>
                   <button
                     className="ranking-btn reset"
