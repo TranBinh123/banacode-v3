@@ -151,8 +151,7 @@ export function RankingAdmin() {
           <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
           <p>
-            Nhập điểm Vòng 1 và Vòng 2 (thủ công từ các ngày thi trước).
-            Điểm Vòng 3 (Chạm đỉnh) được tự động lấy từ điểm thi hôm nay.
+            TỔNG ĐIỂM 03 VÒNG THI
           </p>
         </div>
       </header>
@@ -172,7 +171,7 @@ export function RankingAdmin() {
 
               <div className="ranking-score-display">
                 <div className="ranking-score-item">
-                  <span>Vòng 1<br/>Khám phá</span>
+                  <span>KHÁM PHÁ</span>
                   <input
                     type="number"
                     className="ranking-score-input"
@@ -197,7 +196,7 @@ export function RankingAdmin() {
                 </div>
 
                 <div className="ranking-score-item">
-                  <span>Vòng 2<br/>Lên cáp</span>
+                  <span>LÊN CÁP</span>
                   <input
                     type="number"
                     className="ranking-score-input"
@@ -222,7 +221,7 @@ export function RankingAdmin() {
                 </div>
 
                 <div className="ranking-score-item highlight">
-                  <span>Vòng 3<br/>Chạm đỉnh</span>
+                  <span>CHẠM ĐỈNH</span>
                   <strong className="round3-score">{roundScores.round3}</strong>
                 </div>
 
