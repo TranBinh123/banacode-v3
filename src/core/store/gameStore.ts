@@ -10,10 +10,10 @@ const phaseScores = (): Record<GamePhase, number> => ({
 });
 
 export const TEAM_NAMES: Record<TeamId, string> = {
-  "team-1": "BAN KỸ THUẬT",
-  "team-2": "BAN ẨM THỰC",
-  "team-3": "BAN VẬN HÀNH",
-  "team-4": "BAN DO GIÁM ĐỐC QUẢN LÝ",
+  "team-1": "🔧 BAN KỸ THUẬT",
+  "team-2": "🧑‍🍳 BAN ẨM THỰC",
+  "team-3": "⚙️ BAN VẬN HÀNH",
+  "team-4": "🤝 BAN DO GIÁM ĐỐC QUẢN LÝ",
 };
 
 const initialTeams: Team[] = [
