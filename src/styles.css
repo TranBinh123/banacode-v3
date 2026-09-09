@@ -4272,3 +4272,176 @@ body:has(.finish-page) .ghost-button {
   background: #FFD700;
   color: #4E2E00;
 }
+/* =========================================================
+   Scoreboard – Cải thiện giao diện
+   ========================================================= */
+
+.scoreboard {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.scoreboard .section-label {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: #B87A2E;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.score-card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.30) !important;
+  border-top: 4px solid;
+  border-radius: 16px !important;
+  padding: 18px 20px 16px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.score-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Tên đội */
+.score-team {
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  color: #1A0A3A !important;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Điểm số chính */
+.score-value {
+  font-size: clamp(38px, 5vw, 56px) !important;
+  font-weight: 950 !important;
+  color: #4E2E00 !important;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 4px 0 2px;
+}
+
+/* Điểm theo vòng */
+.score-phase {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: #8A7A6A !important;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Manual score controls */
+.manual-score-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.manual-score-label {
+  grid-column: 1 / -1;
+  font-size: 8px !important;
+  font-weight: 900;
+  letter-spacing: 0.10em;
+  color: #8A7A6A;
+  text-transform: uppercase;
+}
+
+.manual-score-button {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 950;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.60);
+}
+
+.manual-score-button span {
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.manual-score-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.manual-score-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.manual-score-button.minus {
+  color: #C62828;
+  background: rgba(239, 83, 80, 0.06);
+  border-color: rgba(239, 83, 80, 0.15);
+}
+
+.manual-score-button.minus:hover:not(:disabled) {
+  background: rgba(239, 83, 80, 0.12);
+  border-color: rgba(239, 83, 80, 0.30);
+}
+
+.manual-score-button.plus {
+  color: #2E7D32;
+  background: rgba(76, 175, 80, 0.06);
+  border-color: rgba(76, 175, 80, 0.15);
+}
+
+.manual-score-button.plus:hover:not(:disabled) {
+  background: rgba(76, 175, 80, 0.12);
+  border-color: rgba(76, 175, 80, 0.30);
+}
+
+.manual-score-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .score-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .score-grid {
+    grid-template-columns: 1fr;
+  }
+  .score-card {
+    padding: 14px 16px !important;
+  }
+  .score-team {
+    font-size: 14px !important;
+  }
+  .score-value {
+    font-size: 34px !important;
+  }
+}
