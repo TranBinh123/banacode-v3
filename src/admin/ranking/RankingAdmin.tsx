@@ -142,8 +142,8 @@ export function RankingAdmin() {
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
         <div className="ranking-flower-left">🌷</div>
-        <div className="ranking-flower-right">💐</div>
-        <div className="ranking-flower-center">🌻</div>
+        <div className="ranking-flower-right">🌷</div>
+        <div className="ranking-flower-center">🌷</div>
       </div>
 
       <header className="admin-header ranking-header">
@@ -151,7 +151,8 @@ export function RankingAdmin() {
           <div className="eyebrow">🏆 ADMIN • TỔNG HỢP ĐIỂM</div>
           <h1>XẾP HẠNG CHUNG CUỘC</h1>
           <p>
-            TỔNG ĐIỂM 03 VÒNG THI
+            Nhập điểm Vòng 1 và Vòng 2 (thủ công từ các ngày thi trước).
+            Điểm Vòng 3 (Chạm đỉnh) được tự động lấy từ điểm thi hôm nay.
           </p>
         </div>
       </header>
@@ -171,7 +172,7 @@ export function RankingAdmin() {
 
               <div className="ranking-score-display">
                 <div className="ranking-score-item">
-                  <span>KHÁM PHÁ</span>
+                  <span>Vòng 1<br/>Khám phá</span>
                   <input
                     type="number"
                     className="ranking-score-input"
@@ -190,13 +191,13 @@ export function RankingAdmin() {
                       }
                     }}
                     placeholder="0"
-                    step="0.5"
+                    step="0.1"
                     min="0"
                   />
                 </div>
 
                 <div className="ranking-score-item">
-                  <span>LÊN CÁP</span>
+                  <span>Vòng 2<br/>Lên cáp</span>
                   <input
                     type="number"
                     className="ranking-score-input"
@@ -215,13 +216,13 @@ export function RankingAdmin() {
                       }
                     }}
                     placeholder="0"
-                    step="0.5"
+                    step="0.1"
                     min="0"
                   />
                 </div>
 
                 <div className="ranking-score-item highlight">
-                  <span>CHẠM ĐỈNH</span>
+                  <span>Vòng 3<br/>Chạm đỉnh</span>
                   <strong className="round3-score">{roundScores.round3}</strong>
                 </div>
 
