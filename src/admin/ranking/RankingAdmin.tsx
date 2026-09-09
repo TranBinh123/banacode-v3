@@ -142,8 +142,8 @@ export function RankingAdmin() {
     <main className="admin-page ranking-admin">
       <div className="ranking-background">
         <div className="ranking-flower-left">🌷</div>
-        <div className="ranking-flower-right">🌻</div>
-        <div className="ranking-flower-center">🚡</div>
+        <div className="ranking-flower-right">💐</div>
+        <div className="ranking-flower-center">🌻</div>
       </div>
 
       <header className="admin-header ranking-header">
