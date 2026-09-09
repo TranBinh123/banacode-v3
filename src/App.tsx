@@ -7,13 +7,15 @@ import { AccelerationPage } from "./modules/acceleration/pages/AccelerationPage"
 import { AccelerationAdmin } from "./admin/acceleration/AccelerationAdmin";
 import { FinishPage } from "./modules/finish/pages/FinishPage";
 import { FinishAdmin } from "./admin/finish/FinishAdmin";
+import { RankingAdmin } from "./admin/ranking/RankingAdmin"; // <-- THÊM IMPORT
 import { useGameStore } from "./core/store/gameStore";
 
 type Module =
   | "warmup"
   | "obstacle"
   | "acceleration"
-  | "finish";
+  | "finish"
+  | "ranking"; // <-- THÊM "ranking"
 
 export default function App() {
   const [module, setModule] =
@@ -34,11 +36,14 @@ export default function App() {
   const isFinish =
     module === "finish";
 
+  const isRanking =
+    module === "ranking"; // <-- THÊM
+
   const handleModuleChange = (
     nextModule: Module,
   ) => {
     setModule(nextModule);
-    setAdmin(false);
+    setAdmin(true); // Luôn chuyển sang admin khi chọn module mới
   };
 
   const adminLabel = isFinish
@@ -47,7 +52,9 @@ export default function App() {
       ? "Tăng tốc"
       : isObstacle
         ? "Vượt chướng ngại vật"
-        : "Khởi động";
+        : isRanking
+          ? "Xếp hạng"
+          : "Khởi động";
 
   return (
     <div className="app-shell">
@@ -117,6 +124,20 @@ export default function App() {
             VÒNG 4
           </button>
 
+          {/* <-- THÊM NÚT XẾP HẠNG */}
+          <button
+            className={
+              module === "ranking"
+                ? "nav-module active"
+                : "nav-module"
+            }
+            onClick={() =>
+              handleModuleChange("ranking")
+            }
+          >
+            🏆 XẾP HẠNG
+          </button>
+
           <button
             className="ghost-button"
             onClick={() =>
@@ -131,7 +152,9 @@ export default function App() {
       </nav>
 
       {admin ? (
-        isFinish ? (
+        isRanking ? ( // <-- THÊM ĐIỀU KIỆN RANKING
+          <RankingAdmin />
+        ) : isFinish ? (
           <FinishAdmin />
         ) : isAcceleration ? (
           <AccelerationAdmin />
